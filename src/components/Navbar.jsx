@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, userRole } = useAuth();
   const location = useLocation();
 
   const isActive = (path) => {
@@ -37,6 +37,36 @@ const Navbar = () => {
                   Dashboard
                 </Link>
               </li>
+              {userRole === 'Admin' && (
+                <li>
+                  <Link 
+                    to="/admin" 
+                    className={isActive('/admin') ? 'active' : ''}
+                  >
+                    Admin
+                  </Link>
+                </li>
+              )}
+              {userRole === 'Staff' && (
+                <li>
+                  <Link 
+                    to="/staff" 
+                    className={isActive('/staff') ? 'active' : ''}
+                  >
+                    Staff
+                  </Link>
+                </li>
+              )}
+              {userRole === 'Customer' && (
+                <li>
+                  <Link 
+                    to="/customer" 
+                    className={isActive('/customer') ? 'active' : ''}
+                  >
+                    Customer
+                  </Link>
+                </li>
+              )}
               <li>
                 <span className="navbar-text">
                   Welcome, {user?.name || user?.email}

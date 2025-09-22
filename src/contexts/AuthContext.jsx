@@ -42,13 +42,23 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const userRole = user?.role || user?.roles?.[0] || null;
+
+  const hasRole = (roles) => {
+    if (!roles || roles.length === 0) return true;
+    if (!userRole) return false;
+    return roles.includes(userRole);
+  };
+
   const value = {
     user,
     login,
     register,
     logout,
     isAuthenticated: !!user,
-    loading
+    loading,
+    userRole,
+    hasRole
   };
 
   return (

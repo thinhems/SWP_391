@@ -10,7 +10,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { login } = useAuth();
+  const { login, userRole } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -29,7 +29,11 @@ const Login = () => {
     try {
       const result = await login(formData);
       if (result.success) {
-        navigate('/dashboard');
+        const role = result?.data?.user?.role || userRole;
+        if (role === 'Admin') navigate('/admin');
+        else if (role === 'Staff') navigate('/staff');
+        else if (role === 'Customer') navigate('/customer');
+        else navigate('/dashboard');
       } else {
         setError(result.error);
       }

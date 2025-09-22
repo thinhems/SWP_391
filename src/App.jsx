@@ -5,6 +5,12 @@ import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import Admin from './pages/Admin.jsx';
+import Staff from './pages/Staff.jsx';
+import Customer from './pages/Customer.jsx';
+import Unauthorized from './pages/Unauthorized.jsx';
+import RequireAuth from './components/RequireAuth.jsx';
+import RequireRole from './components/RequireRole.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import './App.css';
 
@@ -19,7 +25,43 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/unauthorized" element={<Unauthorized />} />
+              
+              <Route
+                path="/dashboard"
+                element={
+                  <RequireAuth>
+                    <Dashboard />
+                  </RequireAuth>
+                }
+              />
+
+              <Route
+                path="/admin"
+                element={
+                  <RequireRole roles={["Admin"]}>
+                    <Admin />
+                  </RequireRole>
+                }
+              />
+
+              <Route
+                path="/staff"
+                element={
+                  <RequireRole roles={["Staff"]}>
+                    <Staff />
+                  </RequireRole>
+                }
+              />
+
+              <Route
+                path="/customer"
+                element={
+                  <RequireRole roles={["Customer"]}>
+                    <Customer />
+                  </RequireRole>
+                }
+              />
             </Routes>
           </main>
         </div>
