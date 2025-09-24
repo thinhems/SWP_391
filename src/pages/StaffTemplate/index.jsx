@@ -5,7 +5,12 @@ import HeaderStaff from "../../components/HeaderStaff";
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function StaffTemplate() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  if (loading) {
+    return;
+  }
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }
@@ -13,8 +18,6 @@ export default function StaffTemplate() {
   if (user.role !== "staff") {
     return <Navigate to="/" replace />;
   }
-  
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
