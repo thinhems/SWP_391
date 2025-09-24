@@ -29,7 +29,12 @@ const Login = () => {
     try {
       const result = await login(formData);
       if (result.success) {
-        navigate('/dashboard');
+        const loggedUser = result.data.user;
+        if (loggedUser.role === 'staff') {
+          navigate('/staff'); // chuyển sang staff template
+        } else {
+          navigate('/dashboard'); // chuyển sang dashboard cho user khác
+        }
       } else {
         setError(result.error);
       }

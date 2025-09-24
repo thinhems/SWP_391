@@ -13,6 +13,24 @@ export const authService = {
       
       return { success: true, data: response.data };
     } catch (error) {
+      // fake login for staff, xóa khi có backend
+      const { email, password } = credentials;
+      if (email === 'staff@gmail.com' && password === '1') {
+        // Tạo user giả lập
+        const user = {
+          name: 'Staff User',
+          email: 'staff@gmail.com',
+          role: 'staff',
+          station: 'Nguyễn Huệ Quận 1'
+        };
+        const token = 'fake-jwt-token'; // token giả
+
+        // Lưu vào localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        return { success: true, data: { token, user } };
+      }
       return { 
         success: false, 
         error: error.response?.data?.message || 'Login failed' 
