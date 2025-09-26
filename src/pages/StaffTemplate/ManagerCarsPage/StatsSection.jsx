@@ -1,12 +1,15 @@
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleCheck, faCalendarCheck, faCarSide, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faCalendarCheck, faCarSide, faSpinner, faClock } from "@fortawesome/free-solid-svg-icons";
 
-export default function StatsSection({ cars, onRefresh, onAddCar }) {
-  const total = cars.available.length + cars.booked.length + cars.rented.length;
-
+export default function StatsSection({ cars, onRefresh }) {
+  // tính tổng số xe
+  const total = cars.available.length + cars.pending_approval.length + cars.booked.length + cars.rented.length + cars.pending_contract.length;
+  // mảng thống kê từng loại xe
   const stats = [
-    { label: 'Xe sẵn sàng', count: cars.available.length, color: 'green', icon: faCircleCheck },
-    { label: 'Đã đặt trước', count: cars.booked.length, color: 'orange', icon: faCalendarCheck },
+    { label: 'Xe có sẵn', count: cars.available.length, color: 'green', icon: faCircleCheck },
+    { label: 'Chờ xác nhận', count: cars.pending_approval.length + cars.pending_contract.length, color: 'yellow', icon: faClock },
+    { label: 'Xe đã đặt', count: cars.booked.length, color: 'orange', icon: faCalendarCheck },
     { label: 'Đang cho thuê', count: cars.rented.length, color: 'purple', icon: faSpinner },
     { label: 'Tổng số xe', count: total, color: 'blue', icon: faCarSide }
   ];
@@ -25,16 +28,10 @@ export default function StatsSection({ cars, onRefresh, onAddCar }) {
           >
             Làm mới
           </button>
-          <button
-            onClick={onAddCar}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-          >
-            Thêm xe mới
-          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {stats.map((s, idx) => (
           <div
             key={idx}

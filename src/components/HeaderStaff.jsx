@@ -30,7 +30,6 @@ export default function HeaderStaff({onToggleSidebar}) {
         <div className="flex items-center space-x-4">
           <div className="flex flex-col text-sm text-gray-600 text-right">
             <span>Trạm: <span className="font-medium text-green-600">{user.station}</span></span>
-            <span>Name: <span className="font-medium text-gray-800">{user.name}</span></span>
             <span>Email: <span className="font-medium text-gray-800">{user.email}</span></span>
           </div>
           <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">

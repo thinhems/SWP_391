@@ -1,10 +1,11 @@
 
-
 export default function TabsSection({ activeTab, setActiveTab, cars }) {
+  // mảng tab để render
   const tabs = [
     { id: 'available', label: 'Xe có sẵn', count: cars.available.length },
+    { id: 'pending_approval', label: 'Chờ xác nhận', count: cars.pending_approval.length + cars.pending_contract.length },
     { id: 'booked', label: 'Xe đã đặt', count: cars.booked.length },
-    { id: 'rented', label: 'Xe đang thuê', count: cars.rented.length }
+    { id: 'rented', label: 'Đang cho thuê', count: cars.rented.length }
   ];
 
   return (
@@ -22,7 +23,13 @@ export default function TabsSection({ activeTab, setActiveTab, cars }) {
               }`}
             >
               <span>{tab.label}</span>
-              <span className="mt-1 py-0.5 px-2 rounded-full text-xs bg-gray-100 text-gray-600">{tab.count}</span>
+              <span className={`ml-2 py-0.5 px-2 rounded-full text-xs ${
+                activeTab === tab.id
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-gray-100 text-gray-600'
+              }`}>
+                {tab.count}
+              </span>
             </button>
           ))}
         </nav>
@@ -30,4 +37,3 @@ export default function TabsSection({ activeTab, setActiveTab, cars }) {
     </div>
   );
 };
-
