@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockContractsData } from '../../../data/mockData';
+import { mockContractsData } from '../../../data/mockContractsData';
 import { listItemCar } from '../../../data/mockListItem';
 import ContractInfoStep from './ContractInfoStep';
 import CarInspectionStep from './CarInspectionStep';

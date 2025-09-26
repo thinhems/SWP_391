@@ -13,7 +13,7 @@ export const mockContractsData = [
     car: {
       id: 'VF006',
       model: 'VinFast VF 8',
-      licensePlate: '59A-777.88',
+      licensePlate: '51A-777.88',
       color: 'Xám',
       year: 2025,
       battery: 90
@@ -44,7 +44,7 @@ export const mockContractsData = [
     car: {
       id: 'VF007',
       model: 'VinFast VF 8',
-      licensePlate: '59A-999.00',
+      licensePlate: '51A-999.00',
       color: 'Đen',
       year: 2025,
       battery: 85

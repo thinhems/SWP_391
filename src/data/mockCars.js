@@ -5,7 +5,7 @@ export const mockCars = [
   {
     id: 'VF001',
     model: 'VinFast VF e34',
-    licensePlate: '59A-123.45',
+    licensePlate: '51A-123.45',
     battery: 85,
     location: 'Khu vực A - Vị trí 01',
     lastMaintenance: '2025-09-15',
@@ -16,7 +16,7 @@ export const mockCars = [
   {
     id: 'VF002',
     model: 'VinFast VF 8',
-    licensePlate: '59A-678.90',
+    licensePlate: '51A-678.90',
     battery: 92,
     location: 'Khu vực A - Vị trí 02',
     lastMaintenance: '2025-09-10',
@@ -27,7 +27,7 @@ export const mockCars = [
   {
     id: 'VF003',
     model: 'VinFast VF e34',
-    licensePlate: '59A-111.22',
+    licensePlate: '51A-111.22',
     battery: 78,
     location: 'Khu vực B - Vị trí 03',
     lastMaintenance: '2025-09-12',
@@ -40,7 +40,7 @@ export const mockCars = [
   {
     id: 'VF010',
     model: 'VinFast VF 8',
-    licensePlate: '59A-222.33',
+    licensePlate: '51A-222.33',
     battery: 91,
     location: 'Khu vực A - Vị trí 08',
     customer: 'Đặng Minh G',
@@ -59,7 +59,7 @@ export const mockCars = [
   {
     id: 'VF011',
     model: 'VinFast VF e34',
-    licensePlate: '59A-444.55',
+    licensePlate: '51A-444.55',
     battery: 87,
     location: 'Khu vực B - Vị trí 09',
     customer: 'Bùi Thị H',
@@ -80,7 +80,7 @@ export const mockCars = [
   {
     id: 'VF004',
     model: 'VinFast VF 8',
-    licensePlate: '59A-333.44',
+    licensePlate: '51A-333.44',
     battery: 88,
     location: 'Khu vực A - Vị trí 04',
     customer: 'Nguyễn Văn A',
@@ -99,7 +99,7 @@ export const mockCars = [
   {
     id: 'VF005',
     model: 'VinFast VF e34',
-    licensePlate: '59A-555.66',
+    licensePlate: '51A-555.66',
     battery: 95,
     location: 'Khu vực B - Vị trí 05',
     customer: 'Trần Thị B',
@@ -120,7 +120,7 @@ export const mockCars = [
   {
     id: 'VF006',
     model: 'VinFast VF 8',
-    licensePlate: '59A-777.88',
+    licensePlate: '51A-777.88',
     battery: 90,
     location: 'Khu vực A - Vị trí 06',
     customer: 'Lê Minh C',
@@ -140,7 +140,7 @@ export const mockCars = [
   {
     id: 'VF007',
     model: 'VinFast VF e34',
-    licensePlate: '59A-999.00',
+    licensePlate: '51A-999.00',
     battery: 82,
     location: 'Khu vực B - Vị trí 07',
     customer: 'Phạm Thu D',
@@ -162,7 +162,7 @@ export const mockCars = [
   {
     id: 'VF008',
     model: 'VinFast VF 9',
-    licensePlate: '59A-666.33',
+    licensePlate: '51A-666.33',
     battery: 45,
     location: 'Đang sử dụng',
     customer: 'Hoàng Văn E',
@@ -182,7 +182,7 @@ export const mockCars = [
   {
     id: 'VF009',
     model: 'VinFast VF 8',
-    licensePlate: '59A-888.11',
+    licensePlate: '51A-888.11',
     battery: 62,
     location: 'Đang sử dụng',
     customer: 'Võ Thị F',
