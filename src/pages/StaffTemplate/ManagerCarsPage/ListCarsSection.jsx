@@ -34,6 +34,10 @@ export default function ListCarsSection({ cars, activeTab }) {
   const handleApprovalReview = (car) => {
     navigate(`/staff/manage-cars/approval-review/${car.id}`);
   };
+  // hàm chuyển trang kiểm tra xe
+  const handleInspectionlCar = (car) => {
+    navigate(`/staff/manage-cars/inspection/${car.id}`);
+  };
   // hàm định dạng tiền
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -147,7 +151,9 @@ export default function ListCarsSection({ cars, activeTab }) {
           <div className="flex space-x-2 pt-4 border-t border-gray-100">
             {activeTab === 'available' && (
               <>
-                <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                <button 
+                onClick={() => handleInspectionlCar(car)} 
+                className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
                   Kiểm tra xe
                 </button>
                 <button className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors">

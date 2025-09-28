@@ -1,4 +1,3 @@
-// src/pages/StaffTemplate/ManagerCarsPage/mockCars.js
 
 export const mockCars = [
   // Xe có sẵn (available)
