@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { mockCustomers } from '../../../data/mockCustomers'; 
 import CustomerStatsHeader from './CustomerStatsHeader';
 import CustomerList from './CustomerList';
 import CustomerFilterSearch from './CustomerFilterSearch';
 
 export default function CustomerManagementPage() {
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState([]); // đặt state cho mảng khách hàng
   const [searchTerm, setSearchTerm] = useState(''); // đặt state cho từ khóa tìm kiếm
   const [statusFilter, setStatusFilter] = useState('all'); // đặt state cho bộ lọc trạng thái
@@ -53,14 +55,6 @@ export default function CustomerManagementPage() {
       setLoading(false);
     }, 500);
   };
-  // hàm kiểm tra tài khoản khách hàng
-  const handleVerifyAccount = (customer) => {
-    alert(`Kiểm tra tài khoản: ${customer.name}\n(Chức năng sẽ được phát triển)`);
-  };
-  // hàm phân loại khách hàng
-  const handleClassifyCustomer = (customer) => {
-    alert(`Phân loại khách hàng: ${customer.name}\n(Chức năng sẽ được phát triển)`);
-  };
   
   // hàm chuyển trang
   const handlePageChange = (page) => {
@@ -96,8 +90,6 @@ export default function CustomerManagementPage() {
           totalPages={totalPages}
           startIndex={startIndex}
           endIndex={endIndex}
-          onVerifyAccount={handleVerifyAccount}
-          onClassifyCustomer={handleClassifyCustomer}
           onPageChange={handlePageChange}
         />
       )}

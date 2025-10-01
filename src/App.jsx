@@ -13,6 +13,7 @@ import CarDeliveryPage from './pages/StaffTemplate/CarDeliveryPage/';
 import ApprovalReviewPage from './pages/StaffTemplate/ApprovalReviewPage';
 import CarInspectionPage from './pages/StaffTemplate/CarInspectionPage';
 import CustomerManagementPage from './pages/StaffTemplate/CustomerManagementPage';
+import CustomerVerificationPage from './pages/StaffTemplate/CustomerVerificationPage';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import './App.css';
 
@@ -29,6 +30,7 @@ function App() {
                 <Route path="manage-cars/approval-review/:carId" element={<ApprovalReviewPage />} />
                 <Route path="manage-cars/inspection/:carId" element={<CarInspectionPage />} />
                 <Route path="manage-customer" element={<CustomerManagementPage />} />
+                <Route path="manage-customer/verify/:customerId" element={<CustomerVerificationPage />} />
               </Route>
               <Route path="*" element={
                 <>

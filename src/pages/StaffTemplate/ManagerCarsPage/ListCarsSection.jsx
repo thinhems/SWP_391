@@ -1,4 +1,3 @@
-// src/pages/StaffTemplate/ManagerCarsPage/ListCarsSection.jsx
 
 import { useNavigate } from 'react-router-dom';
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 export default function CustomerList({ 
   customers = [], 
   allCustomersCount = 0,
@@ -7,10 +7,9 @@ export default function CustomerList({
   totalPages = 1,
   startIndex = 0,
   endIndex = 0,
-  onVerifyAccount, 
-  onClassifyCustomer,
   onPageChange
 }) {
+  const navigate = useNavigate();
   const [openDropdown, setOpenDropdown] = useState(null);
   // Mảng các loại khách hàng
   const customerTypes = [
@@ -69,9 +68,13 @@ export default function CustomerList({
   const toggleDropdown = (customerId) => {
     setOpenDropdown(openDropdown === customerId ? null : customerId);
   };
+  // hàm kiểm tra tài khoản khách hàng
+  const handleVerifyAccount = (customer) => {
+    navigate(`/staff/manage-customer/verify/${customer.id}`);
+  };
   // hàm xử lý chọn loại khách hàng
   const handleClassifySelect = (customer, type) => {
-    onClassifyCustomer(customer, type);
+    alert(`Phân loại khách hàng: ${customer.name}\n(Chức năng sẽ được phát triển)`);
     setOpenDropdown(null); // Đóng dropdown sau khi chọn
   };
   // hàm render phân trang
@@ -253,7 +256,7 @@ export default function CustomerList({
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">
                       <button
-                        onClick={() => onVerifyAccount(customer)}
+                        onClick={() => handleVerifyAccount(customer)}
                         className="text-blue-600 hover:text-blue-900 px-3 py-1 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
                         title="Kiểm tra tài khoản"
                       >
