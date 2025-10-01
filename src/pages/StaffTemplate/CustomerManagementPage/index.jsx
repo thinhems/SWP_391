@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useStaffData } from '../../../contexts/StaffDataContext';
+import { useCustomers } from '../../../contexts/CustomersContext';
 import CustomerStatsHeader from './CustomerStatsHeader';
 import CustomerList from './CustomerList';
 import CustomerFilterSearch from './CustomerFilterSearch';
 
 export default function CustomerManagementPage() {
-  const { customersData, loading, refreshCustomers } = useStaffData(); 
+  const { customersData, loading, refreshCustomers } = useCustomers(); 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -14,7 +14,7 @@ export default function CustomerManagementPage() {
 
   const customers = customersData.allCustomers;
   
-  // filter khách hàng
+  // Filter khách hàng
   const filteredCustomers = customers.filter((customer) => {
     const searchMatch = 
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -33,15 +33,17 @@ export default function CustomerManagementPage() {
   const endIndex = startIndex + itemsPerPage;
   const currentCustomers = filteredCustomers.slice(startIndex, endIndex);
 
-  // reset trang khi filter thay đổi
+  // Reset trang khi filter thay đổi
   useEffect(() => {
     setCurrentPage(1);
   }, [filteredCustomers.length]);
-  // làm mới dữ liệu khách hàng
+
+  // Làm mới dữ liệu khách hàng
   const handleRefresh = () => {
     refreshCustomers();
   };
-  // chuyển trang
+
+  // Chuyển trang
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });

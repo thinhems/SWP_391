@@ -2,6 +2,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCarSide, faUsers, faCircleCheck, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 export default function StatsCards({ carsData, customersData }) {
+  // các thẻ thống kê với các thuộc tính tương ứng
+  // bao gồm nhãn, giá trị, biểu tượng, màu nền, màu văn bản, thay đổi so với trước đó, v.v.
   const stats = [
     {
       label: 'Tổng số xe',
@@ -40,7 +42,10 @@ export default function StatsCards({ carsData, customersData }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {stats.map((stat, index) => (
-        <div key={index} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+        <div 
+          key={index} 
+          className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+        >
           <div className="flex items-center justify-between mb-4">
             <div className={`p-3 rounded-lg ${stat.bgColor}`}>
               <FontAwesomeIcon icon={stat.icon} className={`w-6 h-6 ${stat.textColor}`} />

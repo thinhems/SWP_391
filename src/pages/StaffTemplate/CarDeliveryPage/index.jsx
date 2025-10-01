@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useStaffData } from '../../../contexts/StaffDataContext';
+import { useCars } from '../../../contexts/CarsContext';
+import { useActivities } from '../../../contexts/ActivitiesContext';
 import ContractInfoStep from './ContractInfoStep';
 import CarInspectionStep from './CarInspectionStep';
 import ConfirmationStep from './ConfirmationStep';
@@ -9,12 +10,13 @@ import CompletionStep from './CompletionStep';
 export default function CarDeliveryPage() {
   const { carId } = useParams();
   const navigate = useNavigate();
-  const { getContractByCarId, getChecklistByCarId, getFlatChecklistByCarId, updateCar, addActivity } = useStaffData();
+  const { getContractByCarId, getChecklistByCarId, getFlatChecklistByCarId, updateCar } = useCars();
+  const { addActivity } = useActivities();
   const [currentStep, setCurrentStep] = useState(1);
   const [contractData, setContractData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+  // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
     photos: [],
@@ -22,7 +24,7 @@ export default function CarDeliveryPage() {
   });
 
   const [isStaffExplanationConfirmed, setIsStaffExplanationConfirmed] = useState(false);
-
+  // load dữ liệu hợp đồng
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -48,26 +50,26 @@ export default function CarDeliveryPage() {
       }
     }, 500);
   }, [carId, getContractByCarId, getFlatChecklistByCarId]);
-
+  // các bước giao xe
   const steps = [
     { id: 1, title: 'Thông tin hợp đồng', desc: 'Xem thông tin chi tiết' },
     { id: 2, title: 'Kiểm tra xe', desc: 'Ghi nhận tình trạng' },
     { id: 3, title: 'Xác nhận', desc: 'Xác nhận lại thông tin' },
     { id: 4, title: 'Hoàn tất', desc: 'Bàn giao xe' }
   ];
-
+  // chuyển đến bước tiếp theo
   const nextStep = () => {
     if (currentStep < 4) {
       setCurrentStep(prev => prev + 1);
     }
   };
-
+  // quay lại bước trước
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
     }
   };
-
+  // kiểm tra có thể chuyển bước tiếp theo không
   const canProceedToNextStep = () => {
     switch (currentStep) {
       case 1:
@@ -80,13 +82,11 @@ export default function CarDeliveryPage() {
         return false;
     }
   };
-
+  // hoàn tất bàn giao xe
   const handleCompleteDelivery = async () => {
     try {
-      // Update car status to rented
       updateCar(carId, { status: 'rented' });
       
-      // Add activity
       addActivity({
         type: 'delivery',
         title: `Đã giao xe ${contractData.car.model} (${contractData.car.licensePlate})`,
@@ -162,8 +162,7 @@ export default function CarDeliveryPage() {
             <span>Quay lại trang quản lý</span>
           </button>
         </div>
-
-        {/* Steps indicator */}
+        {/* thanh step */}
         <div className="relative flex items-center justify-center">
           {steps.map((step, index) => (
             <div key={step.id} className="flex flex-col items-center mx-4">
@@ -203,13 +202,11 @@ export default function CarDeliveryPage() {
           ))}
         </div>
       </div>
-
       {/* Step content */}
       <div className="min-h-96">
         {currentStep === 1 && (
           <ContractInfoStep contractData={contractData} />
         )}
-        
         {currentStep === 2 && (
           <CarInspectionStep 
             inspectionData={inspectionData}
@@ -218,7 +215,6 @@ export default function CarDeliveryPage() {
             getChecklistByCarId={getChecklistByCarId}
           />
         )}
-        
         {currentStep === 3 && (
           <ConfirmationStep 
             contractData={contractData}
@@ -227,7 +223,6 @@ export default function CarDeliveryPage() {
             setIsStaffExplanationConfirmed={setIsStaffExplanationConfirmed}
           />
         )}
-        
         {currentStep === 4 && (
           <CompletionStep 
             contractData={contractData}
@@ -236,7 +231,6 @@ export default function CarDeliveryPage() {
           />
         )}
       </div>
-
       {/* Navigation buttons */}
       {currentStep < 4 && (
         <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">

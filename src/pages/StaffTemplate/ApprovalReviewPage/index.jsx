@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useStaffData } from '../../../contexts/StaffDataContext';
+import { useCars } from '../../../contexts/CarsContext';
+import { useActivities } from '../../../contexts/ActivitiesContext';
 import CustomerInfoSection from './CustomerInfoSection';
 import CarInfoSection from './CarInfoSection';
 import RentalInfoSection from './RentalInfoSection';
@@ -9,12 +10,13 @@ import ApprovalActionsSection from './ApprovalActionsSection';
 export default function ApprovalReviewPage() {
   const { carId } = useParams();
   const navigate = useNavigate();
-  const { getApprovalRequestByCarId, updateCar, addActivity } = useStaffData();
+  const { getApprovalRequestByCarId, updateCar } = useCars();
+  const { addActivity } = useActivities();
   const [requestData, setRequestData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-
+  // load dữ liệu yêu cầu duyệt
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -35,13 +37,12 @@ export default function ApprovalReviewPage() {
       }
     }, 500);
   }, [carId, getApprovalRequestByCarId]);
-
+  // xử lý duyệt yêu cầu
   const handleApprove = async () => {
     setIsProcessing(true);
     try {
-      // cập nhật trạng thái xe
       updateCar(carId, { status: 'pending_contract' });
-      // thêm hoạt động
+      
       addActivity({
         type: 'approval',
         title: `Đã duyệt yêu cầu thuê xe ${requestData.car.model}`,
@@ -61,14 +62,12 @@ export default function ApprovalReviewPage() {
       setIsProcessing(false);
     }
   };
-
+  // xử lý từ chối yêu cầu
   const handleReject = async (reason) => {
     setIsProcessing(true);
     try {
-      // cập nhật trạng thái xe
       updateCar(carId, { status: 'available' });
       
-      // thêm hoạt động
       addActivity({
         type: 'rejection',
         title: `Đã từ chối yêu cầu thuê xe ${requestData.car.model}`,

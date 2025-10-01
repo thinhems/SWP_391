@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useStaffData } from '../../../contexts/StaffDataContext';
+import { useCars } from '../../../contexts/CarsContext';
+import { useActivities } from '../../../contexts/ActivitiesContext';
 import CarInspectionHeader from './CarInspectionHeader';
 import CarInspectionContent from './CarInspectionContent';
 import CarInspectionSummary from './CarInspectionSummary';
@@ -8,11 +9,12 @@ import CarInspectionSummary from './CarInspectionSummary';
 export default function CarInspectionPage() {
   const { carId } = useParams();
   const navigate = useNavigate();
-  const { carsData, getChecklistByCarId, getFlatChecklistByCarId, updateCar, addActivity } = useStaffData();
+  const { carsData, getChecklistByCarId, getFlatChecklistByCarId, updateCar } = useCars();
+  const { addActivity } = useActivities();
   const [carData, setCarData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+  // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
     photos: [],
@@ -22,7 +24,7 @@ export default function CarInspectionPage() {
 
   const [photos, setPhotos] = useState([]);
   const [notes, setNotes] = useState('');
-
+  // load dữ liệu xe
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -47,12 +49,12 @@ export default function CarInspectionPage() {
       }
     }, 500);
   }, [carId, carsData, getFlatChecklistByCarId]);
-
+  // xử lý cập nhật dữ liệu xe
   const handleCarDataUpdate = (updatedCarData) => {
     setCarData(updatedCarData);
     updateCar(carId, updatedCarData);
   };
-
+  // xử lý thay đổi trạng thái kiểm tra
   const handleStatusChange = (itemId, newStatus) => {
     setInspectionData(prev => ({
       ...prev,
@@ -96,7 +98,7 @@ export default function CarInspectionPage() {
       photos: prev.photos.filter(photo => photo.id !== photoId)
     }));
   };
-
+  // xử lý thay đổi ghi chú
   const handleNotesChange = (e) => {
     const newNotes = e.target.value;
     setNotes(newNotes);
@@ -105,10 +107,9 @@ export default function CarInspectionPage() {
       notes: newNotes
     }));
   };
-
+  // xử lý lưu kết quả kiểm tra
   const handleSaveInspection = async () => {
     try {
-      // thêm hoạt động kiểm tra xe
       addActivity({
         type: 'inspection',
         title: `Đã kiểm tra xe ${carData.model} (${carData.licensePlate})`,

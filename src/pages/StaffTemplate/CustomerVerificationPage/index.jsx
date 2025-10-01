@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useStaffData } from '../../../contexts/StaffDataContext';
+import { useCustomers } from '../../../contexts/CustomersContext';
+import { useActivities } from '../../../contexts/ActivitiesContext';
 import CustomerInfoSection from './CustomerInfoSection';
 import CustomerDocumentsSection from './CustomerDocumentsSection';
 import VerificationActionsSection from './VerificationActionsSection';
@@ -8,12 +9,13 @@ import VerificationActionsSection from './VerificationActionsSection';
 export default function CustomerVerificationPage() {
   const { customerId } = useParams();
   const navigate = useNavigate();
-  const { customersData, updateCustomer, addActivity } = useStaffData();
+  const { customersData, updateCustomer } = useCustomers();
+  const { addActivity } = useActivities();
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-
+  // load dữ liệu khách hàng
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -34,14 +36,12 @@ export default function CustomerVerificationPage() {
       }
     }, 500);
   }, [customerId, customersData]);
-
+  // xử lý duyệt khách hàng
   const handleApprove = async () => {
     setIsProcessing(true);
     try {
-      // cập nhật trạng thái khách hàng
       updateCustomer(customerId, { status: 'verified' });
       
-      // thêm hoạt động
       addActivity({
         type: 'customer_verified',
         title: `Đã xác thực khách hàng ${customer.name}`,
@@ -60,7 +60,7 @@ export default function CustomerVerificationPage() {
       setIsProcessing(false);
     }
   };
-
+  // xử lý từ chối khách hàng
   const handleReject = async (rejectReason) => {
     if (!rejectReason.trim()) {
       alert('Vui lòng nhập lý do từ chối');
@@ -69,7 +69,6 @@ export default function CustomerVerificationPage() {
     
     setIsProcessing(true);
     try {
-      // thêm hoạt động
       addActivity({
         type: 'customer_rejected',
         title: `Đã từ chối xác thực khách hàng ${customer.name}`,

@@ -1,13 +1,19 @@
 import { useNavigate } from 'react-router-dom';
-import { useStaffData } from '../../../contexts/StaffDataContext';
+import { useCars } from '../../../contexts/CarsContext';
+import { useCustomers } from '../../../contexts/CustomersContext';
+import { useActivities } from '../../../contexts/ActivitiesContext';
 import StatsCards from './StatsCards';
 import QuickActions from './QuickActions';
 import RecentActivities from './RecentActivities';
-import SystemStatus from './SystemStatus';
 
 export default function OverviewPage() {
   const navigate = useNavigate();
-  const { carsData, customersData, activities, loading, error, fetchAllData } = useStaffData();
+  const { carsData, loading: carsLoading, error: carsError, fetchCars } = useCars();
+  const { customersData, loading: customersLoading, error: customersError } = useCustomers();
+  const { activities } = useActivities();
+
+  const loading = carsLoading || customersLoading;
+  const error = carsError || customersError;
 
   if (loading) {
     return (
@@ -29,7 +35,7 @@ export default function OverviewPage() {
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Có lỗi xảy ra</h2>
         <p className="text-gray-600 mb-4">{error}</p>
         <button
-          onClick={fetchAllData}
+          onClick={fetchCars}
           className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Thử lại
@@ -40,23 +46,9 @@ export default function OverviewPage() {
 
   return (
     <div className="space-y-6">
-      <StatsCards 
-        carsData={carsData} 
-        customersData={customersData} 
-      />
-      <QuickActions 
-        pendingApprovals={carsData.pending_approval}
-        pendingContracts={carsData.pending_contract}
-        navigate={navigate}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <RecentActivities activities={activities} />
-        </div>
-        <div className="lg:col-span-1">
-          <SystemStatus carsData={carsData} />
-        </div>
-      </div>
+      <StatsCards carsData={carsData} customersData={customersData} />
+      <QuickActions carsData={carsData} navigate={navigate} />
+      <RecentActivities activities={activities} />
     </div>
   );
 }

@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { useStaffData } from '../../../contexts/StaffDataContext';
+import { useCars } from '../../../contexts/CarsContext';
 import StatsSection from './StatsSection';
 import TabsSection from './TabsSection';
 import ListCarsSection from './ListCarsSection';
 
 export default function ManagerCarsPage() {
   const [activeTab, setActiveTab] = useState('available');
-  const { carsData, loading, refreshCars } = useStaffData();
+  const { carsData, loading, refreshCars } = useCars();
 
-  // phân loại xe theo trạng thái
+  // Phân loại xe theo trạng thái
   const organizedCars = {
     available: carsData.getCarsByStatus('available'),
     pending_approval: carsData.getCarsByStatus('pending_approval'),
@@ -17,13 +17,13 @@ export default function ManagerCarsPage() {
     rented: carsData.getCarsByStatus('rented')
   };
 
-  // priority cho việc sắp xếp ưu tiên render xe chờ phê duyệt trước
+  // Priority cho việc sắp xếp ưu tiên render xe chờ phê duyệt trước
   const priority = {
     pending_approval: 1,
     pending_contract: 2
   };
 
-  // lọc và sắp xếp xe theo tab
+  // Lọc và sắp xếp xe theo tab
   const filteredCars = activeTab === 'pending_approval'
     ? [...organizedCars.pending_approval, ...organizedCars.pending_contract]
         .sort((a, b) => (priority[a.status] || 99) - (priority[b.status] || 99))

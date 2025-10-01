@@ -1,11 +1,20 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClock, faCalendarCheck, faUsers, faCarSide, faChartLine, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faClock, 
+  faCalendarCheck, 
+  faUsers, 
+  faCarSide, 
+  faChartLine, 
+  faArrowRight 
+} from '@fortawesome/free-solid-svg-icons';
 
-export default function QuickActions({ pendingApprovals, pendingContracts, navigate }) {
+export default function QuickActions({ carsData, navigate }) {
+  // các hành động nhanh với các thuộc tính tương ứng
+  // bao gồm tiêu đề, biểu tượng, màu sắc, hành động khi nhấn nút, v.v.
   const actions = [
     {
       title: 'Xe chờ xác nhận',
-      count: pendingApprovals,
+      count: carsData.pending_approval,
       icon: faClock,
       bgColor: 'bg-yellow-50',
       borderColor: 'border-yellow-200',
@@ -16,7 +25,7 @@ export default function QuickActions({ pendingApprovals, pendingContracts, navig
     },
     {
       title: 'Xe chờ ký HĐ',
-      count: pendingContracts,
+      count: carsData.pending_contract,
       icon: faCalendarCheck,
       bgColor: 'bg-blue-50',
       borderColor: 'border-blue-200',
@@ -55,9 +64,13 @@ export default function QuickActions({ pendingApprovals, pendingContracts, navig
         <h2 className="text-xl font-bold text-gray-900">Hành động nhanh</h2>
         <FontAwesomeIcon icon={faChartLine} className="w-5 h-5 text-gray-400" />
       </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {actions.map((action, index) => (
-          <div key={index} className={`${action.bgColor} border ${action.borderColor} rounded-lg p-4`}>
+          <div 
+            key={index} 
+            className={`${action.bgColor} border ${action.borderColor} rounded-lg p-4`}
+          >
             <div className="flex items-center justify-between mb-3">
               <FontAwesomeIcon icon={action.icon} className={`w-6 h-6 ${action.textColor}`} />
               {action.count !== null && (
@@ -66,8 +79,12 @@ export default function QuickActions({ pendingApprovals, pendingContracts, navig
                 </span>
               )}
             </div>
-            <h3 className={`font-semibold ${action.textColor} mb-1`}>{action.title}</h3>
-            <p className="text-xs text-gray-600 mb-3">{action.description}</p>
+            <h3 className={`font-semibold ${action.textColor} mb-1`}>
+              {action.title}
+            </h3>
+            <p className="text-xs text-gray-600 mb-3">
+              {action.description}
+            </p>
             <button
               onClick={action.action}
               className={`w-full ${action.buttonColor} text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2`}
