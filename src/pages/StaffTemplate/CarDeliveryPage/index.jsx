@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockContractsData } from '../../../data/mockContractsData';
-import { listItemCar } from '../../../data/mockListItem';
+import { useStaffData } from '../../../contexts/StaffDataContext';
 import ContractInfoStep from './ContractInfoStep';
 import CarInspectionStep from './CarInspectionStep';
 import ConfirmationStep from './ConfirmationStep';
@@ -10,43 +9,21 @@ import CompletionStep from './CompletionStep';
 export default function CarDeliveryPage() {
   const { carId } = useParams();
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1); // đặt state cho bước hiện tại
-  const [contractData, setContractData] = useState(null); // đặt state cho dữ liệu hợp đồng
+  const { getContractByCarId, getChecklistByCarId, getFlatChecklistByCarId, updateCar, addActivity } = useStaffData();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [contractData, setContractData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // hàm lấy list category
-  const getChecklistByCarId = (carId) => {
-    return listItemCar[carId] || [];
-  };
-
-  // hàm lấy checklist và set lại thành 1 mảng phẳng
-  const getFlatChecklistByCarId = (carId) => {
-    const checklist = listItemCar[carId] || [];
-    return checklist.flatMap(category => category.items);
-  };
-
-  // đặt state cho dữ liệu kiểm tra xe và ghi nhận
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
     photos: [],
     notes: ''
-  }); 
+  });
 
-  // đặt state để theo dõi việc nhân viên đã giải thích cho khách hàng chưa
   const [isStaffExplanationConfirmed, setIsStaffExplanationConfirmed] = useState(false);
-  
-  // hàm lấy hợp đồng theo carId, sau có call api thì xóa đi
-  const getContractByCarId = (carId) => {
-    const contract = mockContractsData.find(contract => contract.carId === carId);
-    if (!contract) {
-      return null;
-    }
-    return contract;
-  }
 
   useEffect(() => {
-    // Simulate loading contract data by carId
     setLoading(true);
     setError(null);
     
@@ -55,7 +32,6 @@ export default function CarDeliveryPage() {
         const contract = getContractByCarId(carId);
         if (contract) {
           setContractData(contract);
-          // Cập nhật inspectionData với checklist đúng cho carId này
           setInspectionData({
             checklist: getFlatChecklistByCarId(carId),
             photos: [],
@@ -70,56 +46,57 @@ export default function CarDeliveryPage() {
       } finally {
         setLoading(false);
       }
-    }, 1000);
-  }, [carId]);
+    }, 500);
+  }, [carId, getContractByCarId, getFlatChecklistByCarId]);
 
-  // các step của quy trình giao xe
   const steps = [
     { id: 1, title: 'Thông tin hợp đồng', desc: 'Xem thông tin chi tiết' },
     { id: 2, title: 'Kiểm tra xe', desc: 'Ghi nhận tình trạng' },
     { id: 3, title: 'Xác nhận', desc: 'Xác nhận lại thông tin' },
     { id: 4, title: 'Hoàn tất', desc: 'Bàn giao xe' }
   ];
-  // hàm chuyển step
+
   const nextStep = () => {
     if (currentStep < 4) {
       setCurrentStep(prev => prev + 1);
     }
   };
-  // hàm quay lại step
+
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
     }
   };
-  // kiểm tra xem có thể chuyển sang bước tiếp theo không
+
   const canProceedToNextStep = () => {
     switch (currentStep) {
       case 1:
-        return true; 
+        return true;
       case 2:
         return true;
       case 3:
-        return isStaffExplanationConfirmed; // chỉ cho next nếu đã tick xác nhận
+        return isStaffExplanationConfirmed;
       default:
         return false;
     }
   };
 
-  // hàm xử lý khi hoàn tất bàn giao xe, call api khi có backend
   const handleCompleteDelivery = async () => {
     try {
-      console.log('Completing car delivery...', {
-        carId,
-        contractData,
-        inspectionData,
-        completedAt: new Date().toISOString()
-      });
-
-      // Show success message
-      alert(`Bàn giao xe ${contractData.car.licensePlate} thành công! Xe đã chuyển sang trạng thái cho thuê.`);
+      // Update car status to rented
+      updateCar(carId, { status: 'rented' });
       
-      // Navigate back to car management
+      // Add activity
+      addActivity({
+        type: 'delivery',
+        title: `Đã giao xe ${contractData.car.model} (${contractData.car.licensePlate})`,
+        customer: contractData.customer.name,
+        icon: 'car',
+        color: 'text-green-600',
+        bgColor: 'bg-green-100'
+      });
+      
+      alert(`Bàn giao xe ${contractData.car.licensePlate} thành công! Xe đã chuyển sang trạng thái cho thuê.`);
       navigate('/staff/manage-cars');
     } catch (error) {
       console.error('Error completing delivery:', error);
@@ -149,9 +126,6 @@ export default function CarDeliveryPage() {
         </div>
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy thông tin hợp đồng</h2>
         <p className="text-gray-600 mb-4">{error || `Hợp đồng với xe ID "${carId}" không tồn tại hoặc đã bị xóa.`}</p>
-        <div className="space-y-2">
-          <p className="text-sm text-gray-500">Car ID được yêu cầu: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{carId}</span></p>
-        </div>
         <button
           onClick={() => navigate('/staff/manage-cars')}
           className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -164,8 +138,8 @@ export default function CarDeliveryPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* render header */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 ">
+      {/* Header */}
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Thủ tục giao xe điện</h1>
@@ -189,7 +163,7 @@ export default function CarDeliveryPage() {
           </button>
         </div>
 
-        {/*render tình trạng các step */}
+        {/* Steps indicator */}
         <div className="relative flex items-center justify-center">
           {steps.map((step, index) => (
             <div key={step.id} className="flex flex-col items-center mx-4">
@@ -230,7 +204,7 @@ export default function CarDeliveryPage() {
         </div>
       </div>
 
-      {/* render content từng step */}
+      {/* Step content */}
       <div className="min-h-96">
         {currentStep === 1 && (
           <ContractInfoStep contractData={contractData} />
@@ -263,7 +237,7 @@ export default function CarDeliveryPage() {
         )}
       </div>
 
-      {/* nút back/next */}
+      {/* Navigation buttons */}
       {currentStep < 4 && (
         <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
           <div className="flex items-center justify-between">
@@ -306,7 +280,6 @@ export default function CarDeliveryPage() {
             </button>
           </div>
 
-          {/* text nhỏ cho từng step */}
           <div className="mt-4 p-3 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">
               {currentStep === 1 && "Kiểm tra kỹ thông tin hợp đồng trước khi tiếp tục"}

@@ -1,5 +1,3 @@
-// src/App.jsx - Updated
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route  } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
@@ -8,6 +6,7 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import StaffTemplate from './pages/StaffTemplate';
+import OverviewPage from './pages/StaffTemplate/OverviewPage';
 import ManagerCarsPage from './pages/StaffTemplate/ManagerCarsPage';
 import CarDeliveryPage from './pages/StaffTemplate/CarDeliveryPage/';
 import ApprovalReviewPage from './pages/StaffTemplate/ApprovalReviewPage';
@@ -25,6 +24,7 @@ function App() {
           <main className="main-content">
             <Routes>
               <Route path="/staff/*" element={<StaffTemplate />}>
+                <Route index element={<OverviewPage />} />
                 <Route path="manage-cars" element={<ManagerCarsPage />} />
                 <Route path="manage-cars/car-delivery/:carId" element={<CarDeliveryPage />} />
                 <Route path="manage-cars/approval-review/:carId" element={<ApprovalReviewPage />} />

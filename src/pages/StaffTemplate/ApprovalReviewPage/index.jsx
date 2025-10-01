@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockApprovalRequests } from '../../../data/mockApprovalRequests';
+import { useStaffData } from '../../../contexts/StaffDataContext';
 import CustomerInfoSection from './CustomerInfoSection';
 import CarInfoSection from './CarInfoSection';
 import RentalInfoSection from './RentalInfoSection';
@@ -10,22 +9,16 @@ import ApprovalActionsSection from './ApprovalActionsSection';
 export default function ApprovalReviewPage() {
   const { carId } = useParams();
   const navigate = useNavigate();
+  const { getApprovalRequestByCarId, updateCar, addActivity } = useStaffData();
   const [requestData, setRequestData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false); 
-
-  // Hàm tìm yêu cầu approval theo carId
-  const getApprovalRequestByCarId = (carId) => {
-    const request = mockApprovalRequests.find(req => req.carId === carId);
-    return request || null;
-  };
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     setError(null);
     
-    // Simulate API call
     setTimeout(() => {
       try {
         const request = getApprovalRequestByCarId(carId);
@@ -40,17 +33,26 @@ export default function ApprovalReviewPage() {
       } finally {
         setLoading(false);
       }
-    }, 1000);
-  }, [carId]);
+    }, 500);
+  }, [carId, getApprovalRequestByCarId]);
 
-  // hàm xử lý duyệt yêu cầu ( sẽ xử lý sau khi có backend)
   const handleApprove = async () => {
     setIsProcessing(true);
     try {
-      // Show success message
+      // cập nhật trạng thái xe
+      updateCar(carId, { status: 'pending_contract' });
+      // thêm hoạt động
+      addActivity({
+        type: 'approval',
+        title: `Đã duyệt yêu cầu thuê xe ${requestData.car.model}`,
+        customer: requestData.customer.name,
+        icon: 'check',
+        color: 'text-green-600',
+        bgColor: 'bg-green-100'
+      });
+      
       alert(`Đã duyệt yêu cầu thuê xe thành công!\n\nThông báo đã được gửi tới: ${requestData.customer.name}\nEmail: ${requestData.customer.email}\nSĐT: ${requestData.customer.phone}\n\nHợp đồng điện tử sẽ được tạo và gửi cho khách hàng trong vòng 5 phút.`);
       
-      // Navigate back to car management
       navigate('/staff/manage-cars');
     } catch (error) {
       console.error('Error approving request:', error);
@@ -60,15 +62,24 @@ export default function ApprovalReviewPage() {
     }
   };
 
-  // hàm xử lý từ chối yêu cầu ( sẽ xử lý sau khi có backend)
   const handleReject = async (reason) => {
     setIsProcessing(true);
     try {
-
-      // Show success message
+      // cập nhật trạng thái xe
+      updateCar(carId, { status: 'available' });
+      
+      // thêm hoạt động
+      addActivity({
+        type: 'rejection',
+        title: `Đã từ chối yêu cầu thuê xe ${requestData.car.model}`,
+        customer: requestData.customer.name,
+        icon: 'clock',
+        color: 'text-red-600',
+        bgColor: 'bg-red-100'
+      });
+      
       alert(`Đã từ chối yêu cầu thuê xe!\n\nLý do từ chối: ${reason}\n\nThông báo đã được gửi tới: ${requestData.customer.name}\nEmail: ${requestData.customer.email}\nSĐT: ${requestData.customer.phone}`);
       
-      // Navigate back to car management
       navigate('/staff/manage-cars');
     } catch (error) {
       console.error('Error rejecting request:', error);
@@ -100,9 +111,6 @@ export default function ApprovalReviewPage() {
         </div>
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy yêu cầu duyệt</h2>
         <p className="text-gray-600 mb-4">{error || `Yêu cầu duyệt với xe ID "${carId}" không tồn tại hoặc đã bị xóa.`}</p>
-        <div className="space-y-2">
-          <p className="text-sm text-gray-500">Car ID được yêu cầu: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{carId}</span></p>
-        </div>
         <button
           onClick={() => navigate('/staff/manage-cars')}
           className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -150,23 +158,19 @@ export default function ApprovalReviewPage() {
           </button>
         </div>
       </div>
-      {/* Thông tin khách hàng */}
       <CustomerInfoSection customer={requestData.customer} />
-      {/* Thông tin xe */}
       <CarInfoSection car={requestData.car} />
-      {/* Thông tin thuê xe */}
       <RentalInfoSection 
         rental={requestData.rental}
         requestTime={requestData.requestTime}
         notes={requestData.notes}
       />
-      {/* Hành động duyệt */}
       <ApprovalActionsSection 
         onApprove={handleApprove}
         onReject={handleReject}
         isProcessing={isProcessing}
       />
-      {/* Footer thông tin */}
+      {/* Footer info */}
       <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
         <div className="flex items-center justify-center space-x-6 text-sm text-gray-600">
           <div className="flex items-center space-x-2">

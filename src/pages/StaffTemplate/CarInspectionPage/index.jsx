@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockCars } from '../../../data/mockCars';
-import { listItemCar } from '../../../data/mockListItem';
+import { useStaffData } from '../../../contexts/StaffDataContext';
 import CarInspectionHeader from './CarInspectionHeader';
 import CarInspectionContent from './CarInspectionContent';
 import CarInspectionSummary from './CarInspectionSummary';
@@ -9,11 +8,11 @@ import CarInspectionSummary from './CarInspectionSummary';
 export default function CarInspectionPage() {
   const { carId } = useParams();
   const navigate = useNavigate();
+  const { carsData, getChecklistByCarId, getFlatChecklistByCarId, updateCar, addActivity } = useStaffData();
   const [carData, setCarData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // state cho inspection data
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
     photos: [],
@@ -21,38 +20,18 @@ export default function CarInspectionPage() {
     inspectionDate: new Date().toISOString()
   });
 
-  // state cho photos
   const [photos, setPhotos] = useState([]);
-  // state cho notes
   const [notes, setNotes] = useState('');
 
-  // lấy thông tin xe theo carId
-  const getCarById = (carId) => {
-    return mockCars.find(car => car.id === carId);
-  };
-
-  // hàm lấy list category
-  const getChecklistByCarId = (carId) => {
-    return listItemCar[carId] || [];
-  };
-
-  // hàm lấy checklist và set lại thành 1 mảng phẳng
-  const getFlatChecklistByCarId = (carId) => {
-    const checklist = listItemCar[carId] || [];
-    return checklist.flatMap(category => category.items);
-  };
-
-  // load dữ liệu
   useEffect(() => {
     setLoading(true);
     setError(null);
     
     setTimeout(() => {
       try {
-        const car = getCarById(carId);
+        const car = carsData.getCarById(carId);
         if (car) {
           setCarData(car);
-          // Khởi tạo checklist
           setInspectionData(prev => ({
             ...prev,
             checklist: getFlatChecklistByCarId(carId)
@@ -67,14 +46,13 @@ export default function CarInspectionPage() {
         setLoading(false);
       }
     }, 500);
-  }, [carId]);
+  }, [carId, carsData, getFlatChecklistByCarId]);
 
-  // xử lý cập nhật thông tin xe
   const handleCarDataUpdate = (updatedCarData) => {
     setCarData(updatedCarData);
+    updateCar(carId, updatedCarData);
   };
 
-  // xử lý thay đổi status của item
   const handleStatusChange = (itemId, newStatus) => {
     setInspectionData(prev => ({
       ...prev,
@@ -84,7 +62,6 @@ export default function CarInspectionPage() {
     }));
   };
 
-  // xử lý upload ảnh
   const handlePhotoUpload = (event) => {
     const files = Array.from(event.target.files);
 
@@ -102,8 +79,6 @@ export default function CarInspectionPage() {
           };
           
           setPhotos(prev => [...prev, newPhoto]);
-          
-          // cập nhật photos vào inspectionData
           setInspectionData(prev => ({
             ...prev,
             photos: [...prev.photos, newPhoto]
@@ -114,7 +89,6 @@ export default function CarInspectionPage() {
     });
   };
 
-  // xóa ảnh
   const removePhoto = (photoId) => {
     setPhotos(prev => prev.filter(photo => photo.id !== photoId));
     setInspectionData(prev => ({
@@ -123,7 +97,6 @@ export default function CarInspectionPage() {
     }));
   };
 
-  // xử lý thay đổi ghi chú
   const handleNotesChange = (e) => {
     const newNotes = e.target.value;
     setNotes(newNotes);
@@ -133,19 +106,25 @@ export default function CarInspectionPage() {
     }));
   };
 
-  // lưu kết quả kiểm tra sẽ call api sau khi có backend
   const handleSaveInspection = async () => {
     try {
-      // Hiển thị thông báo thành công
+      // thêm hoạt động kiểm tra xe
+      addActivity({
+        type: 'inspection',
+        title: `Đã kiểm tra xe ${carData.model} (${carData.licensePlate})`,
+        customer: `${inspectionData.checklist.filter(i => i.status === 'minor_issue').length} vấn đề nhỏ`,
+        icon: 'wrench',
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-100'
+      });
+      
       alert(`Đã lưu kết quả kiểm tra xe ${carData.licensePlate} thành công!`);
-      // Chuyển về trang quản lý xe
       navigate('/staff/manage-cars');
     } catch (error) {
       alert('Có lỗi xảy ra khi lưu kết quả kiểm tra. Vui lòng thử lại.');
     }
   };
 
-  // tạo organized checklist từ inspectionData
   const organizedChecklist = getChecklistByCarId(carId).map(category => ({
     ...category,
     items: category.items.map(templateItem => {
@@ -188,14 +167,12 @@ export default function CarInspectionPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* header với thông tin xe và chỉnh sửa */}
       <CarInspectionHeader 
         carData={carData}
         carId={carId}
         onCarDataUpdate={handleCarDataUpdate}
         onNavigateBack={() => navigate('/staff/manage-cars')}
       />
-      {/* chi tiết về xe */}
       <CarInspectionContent
         organizedChecklist={organizedChecklist}
         photos={photos}
@@ -205,7 +182,6 @@ export default function CarInspectionPage() {
         onRemovePhoto={removePhoto}
         onNotesChange={handleNotesChange}
       />
-      {/* tóm tắt và nút lưu */}
       <CarInspectionSummary
         inspectionData={inspectionData}
         photos={photos}

@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockCustomers } from '../../../data/mockCustomers';
+import { useStaffData } from '../../../contexts/StaffDataContext';
 import CustomerInfoSection from './CustomerInfoSection';
 import CustomerDocumentsSection from './CustomerDocumentsSection';
 import VerificationActionsSection from './VerificationActionsSection';
@@ -9,18 +8,19 @@ import VerificationActionsSection from './VerificationActionsSection';
 export default function CustomerVerificationPage() {
   const { customerId } = useParams();
   const navigate = useNavigate();
+  const { customersData, updateCustomer, addActivity } = useStaffData();
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  // Lấy thông tin khách hàng
+
   useEffect(() => {
     setLoading(true);
     setError(null);
     
     setTimeout(() => {
       try {
-        const foundCustomer = mockCustomers.find(c => c.id === customerId);
+        const foundCustomer = customersData.getCustomerById(customerId);
         if (foundCustomer) {
           setCustomer(foundCustomer);
         } else {
@@ -33,13 +33,24 @@ export default function CustomerVerificationPage() {
         setLoading(false);
       }
     }, 500);
-  }, [customerId]);
-  // xử lý duyệt khách hàng
+  }, [customerId, customersData]);
+
   const handleApprove = async () => {
     setIsProcessing(true);
     try {
-      // Call API ở đây khi có backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // cập nhật trạng thái khách hàng
+      updateCustomer(customerId, { status: 'verified' });
+      
+      // thêm hoạt động
+      addActivity({
+        type: 'customer_verified',
+        title: `Đã xác thực khách hàng ${customer.name}`,
+        customer: customer.email,
+        icon: 'check',
+        color: 'text-green-600',
+        bgColor: 'bg-green-100'
+      });
+      
       alert(`Đã duyệt khách hàng: ${customer.name}\n\nThông báo đã được gửi tới email: ${customer.email}`);
       navigate('/staff/manage-customer');
     } catch (error) {
@@ -49,16 +60,24 @@ export default function CustomerVerificationPage() {
       setIsProcessing(false);
     }
   };
-  // xử lý từ chối khách hàng
+
   const handleReject = async (rejectReason) => {
     if (!rejectReason.trim()) {
       alert('Vui lòng nhập lý do từ chối');
       return false;
     }
+    
     setIsProcessing(true);
     try {
-      // Call API ở đây khi có backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // thêm hoạt động
+      addActivity({
+        type: 'customer_rejected',
+        title: `Đã từ chối xác thực khách hàng ${customer.name}`,
+        customer: rejectReason,
+        icon: 'clock',
+        color: 'text-red-600',
+        bgColor: 'bg-red-100'
+      });
       
       alert(`Đã từ chối khách hàng: ${customer.name}\n\nLý do: ${rejectReason}\n\nThông báo đã được gửi tới email: ${customer.email}`);
       navigate('/staff/manage-customer');
@@ -71,10 +90,11 @@ export default function CustomerVerificationPage() {
       setIsProcessing(false);
     }
   };
-  // xử lý quay lại
+
   const handleNavigateBack = () => {
     navigate('/staff/manage-customer');
   };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-96">
@@ -85,6 +105,7 @@ export default function CustomerVerificationPage() {
       </div>
     );
   }
+
   if (error || !customer) {
     return (
       <div className="text-center py-12">
@@ -104,17 +125,15 @@ export default function CustomerVerificationPage() {
       </div>
     );
   }
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* thông tin khách hàng với header */}
       <CustomerInfoSection 
         customer={customer}
         onNavigateBack={handleNavigateBack}
         isProcessing={isProcessing}
       />
-      {/* giấy tờ tùy thân */}
       <CustomerDocumentsSection customer={customer} />
-      {/* quyết định xác thực */}
       <VerificationActionsSection 
         customer={customer}
         onApprove={handleApprove}
