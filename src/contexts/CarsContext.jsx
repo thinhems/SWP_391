@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mockCars } from '../data/mockCars';
-import { mockApprovalRequests } from '../data/mockApprovalRequests';
-import { mockContractsData } from '../data/mockContractsData';
+import { mockOrders } from '../data/mockOrders'
 import { listItemCar } from '../data/mockListItem';
 
 const CarsContext = createContext();
@@ -16,8 +15,7 @@ export const useCars = () => {
 
 export const CarsProvider = ({ children }) => {
   const [cars, setCars] = useState([]);
-  const [approvalRequests, setApprovalRequests] = useState([]);
-  const [contracts, setContracts] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -29,8 +27,7 @@ export const CarsProvider = ({ children }) => {
       await new Promise(resolve => setTimeout(resolve, 800));
       
       setCars(mockCars);
-      setApprovalRequests(mockApprovalRequests);
-      setContracts(mockContractsData);
+      setOrders(mockOrders);
     } catch (err) {
       console.error('Error fetching cars data:', err);
       setError('Có lỗi xảy ra khi tải dữ liệu xe');
@@ -63,15 +60,9 @@ export const CarsProvider = ({ children }) => {
       prevCars.map(car => car.id === carId ? { ...car, ...updatedData } : car)
     );
   };
-
-  // Lấy yêu cầu phê duyệt theo carId
-  const getApprovalRequestByCarId = (carId) => {
-    return approvalRequests.find(req => req.carId === carId);
-  };
-
-  // Lấy hợp đồng theo carId
-  const getContractByCarId = (carId) => {
-    return contracts.find(contract => contract.carId === carId);
+  // Lấy đơn hàng theo carId
+  const getOrderByCarId = (carId) => {
+    return orders.find(order => order.carId === carId);
   };
 
   // Lấy checklist theo carId
@@ -100,14 +91,12 @@ export const CarsProvider = ({ children }) => {
 
   const value = {
     carsData,
-    approvalRequests,
-    contracts,
+    orders,
     loading,
     error,
     fetchCars,
     updateCar,
-    getApprovalRequestByCarId,
-    getContractByCarId,
+    getOrderByCarId,
     getChecklistByCarId,
     getFlatChecklistByCarId,
     refreshCars

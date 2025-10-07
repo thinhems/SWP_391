@@ -10,7 +10,7 @@ import ApprovalActionsSection from './ApprovalActionsSection';
 export default function ApprovalReviewPage() {
   const { carId } = useParams();
   const navigate = useNavigate();
-  const { getApprovalRequestByCarId, updateCar } = useCars();
+  const { getOrderByCarId, updateCar } = useCars();
   const { addActivity } = useActivities();
   const [requestData, setRequestData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,7 +23,7 @@ export default function ApprovalReviewPage() {
     
     setTimeout(() => {
       try {
-        const request = getApprovalRequestByCarId(carId);
+        const request = getOrderByCarId(carId);
         if (request) {
           setRequestData(request);
         } else {
@@ -36,7 +36,7 @@ export default function ApprovalReviewPage() {
         setLoading(false);
       }
     }, 500);
-  }, [carId, getApprovalRequestByCarId]);
+  }, [carId, getOrderByCarId]);
   // xử lý duyệt yêu cầu
   const handleApprove = async () => {
     setIsProcessing(true);

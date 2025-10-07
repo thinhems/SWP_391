@@ -10,7 +10,7 @@ import CompletionStep from './CompletionStep';
 export default function CarDeliveryPage() {
   const { carId } = useParams();
   const navigate = useNavigate();
-  const { getContractByCarId, getChecklistByCarId, getFlatChecklistByCarId, updateCar } = useCars();
+  const { getOrderByCarId, getChecklistByCarId, getFlatChecklistByCarId, updateCar } = useCars();
   const { addActivity } = useActivities();
   const [currentStep, setCurrentStep] = useState(1);
   const [contractData, setContractData] = useState(null);
@@ -31,7 +31,7 @@ export default function CarDeliveryPage() {
     
     setTimeout(() => {
       try {
-        const contract = getContractByCarId(carId);
+        const contract = getOrderByCarId(carId);
         if (contract) {
           setContractData(contract);
           setInspectionData({
@@ -49,7 +49,7 @@ export default function CarDeliveryPage() {
         setLoading(false);
       }
     }, 500);
-  }, [carId, getContractByCarId, getFlatChecklistByCarId]);
+  }, [carId, getOrderByCarId, getFlatChecklistByCarId]);
   // các bước giao xe
   const steps = [
     { id: 1, title: 'Thông tin hợp đồng', desc: 'Xem thông tin chi tiết' },
