@@ -19,7 +19,6 @@ export default function CarDeliveryPage() {
   // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
-    photos: [],
     notes: ''
   });
 
@@ -36,7 +35,6 @@ export default function CarDeliveryPage() {
           setContractData(contract);
           setInspectionData({
             checklist: getFlatChecklistByCarId(carId),
-            photos: [],
             notes: ''
           });
         } else {
@@ -103,6 +101,11 @@ export default function CarDeliveryPage() {
       alert('Có lỗi xảy ra khi hoàn tất bàn giao. Vui lòng thử lại.');
     }
   };
+  // nếu không phải yêu cầu duyệt thì báo lỗi
+  if (contractData && contractData.type !== 'booked') {
+    setError("Yêu cầu bàn giao không hợp lệ (xe không ở trạng thái đã đặt).");
+    setContractData(null);
+  }
 
   if (loading) {
     return (

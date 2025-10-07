@@ -1,6 +1,12 @@
 import { useState } from 'react';
 
-export default function CarInspectionHeader({ carData, carId, onCarDataUpdate, onNavigateBack }) {
+export default function CarInspectionHeader({ 
+  carData, 
+  carId, 
+  onCarDataUpdate, 
+  onNavigateBack,
+  onOpenReport
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     model: carData.model,
@@ -10,20 +16,17 @@ export default function CarInspectionHeader({ carData, carId, onCarDataUpdate, o
     battery: carData.battery,
     location: carData.location
   });
-  // hàm xử lý nút chỉnh sửa/lưu
+
   const handleEditToggle = () => {
     if (isEditing) {
-      // Lưu thay đổi
       onCarDataUpdate({ ...carData, ...editData });
       setIsEditing(false);
     } else {
-      // Bắt đầu chỉnh sửa
       setIsEditing(true);
     }
   };
-  // hàm xử lý nút hủy
+
   const handleCancel = () => {
-    // Khôi phục dữ liệu gốc
     setEditData({
       model: carData.model,
       licensePlate: carData.licensePlate,
@@ -34,7 +37,7 @@ export default function CarInspectionHeader({ carData, carId, onCarDataUpdate, o
     });
     setIsEditing(false);
   };
-  // hàm xử lý thay đổi input
+
   const handleInputChange = (field, value) => {
     setEditData(prev => ({
       ...prev,
@@ -57,15 +60,26 @@ export default function CarInspectionHeader({ carData, carId, onCarDataUpdate, o
             </span>
           </div>
         </div>
-        <button
-          onClick={onNavigateBack}
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center space-x-2"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          <span>Quay lại trang quản lý</span>
-        </button>
+        <div className="flex space-x-3">
+          <button
+            onClick={onOpenReport}
+            className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <span>Báo cáo Admin</span>
+          </button>
+          <button
+            onClick={onNavigateBack}
+            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center space-x-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Quay lại trang quản lý</span>
+          </button>
+        </div>
       </div>
 
       {/* thông tin xe với input chỉnh sửa */}

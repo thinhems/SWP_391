@@ -76,7 +76,7 @@ export default function ConfirmationStep({
                     </svg>
                     <span className="font-semibold">Phát hiện {issuesCount} vấn đề nhỏ</span>
                   </div>
-                  <p className="text-sm text-gray-600">Chi tiết đã được ghi nhận và chụp ảnh</p>
+                  <p className="text-sm text-gray-600">Chi tiết đã được ghi nhận</p>
                 </div>
               )}
               
@@ -123,7 +123,7 @@ export default function ConfirmationStep({
               <li>• Hai bên đã kiểm tra và xác nhận tình trạng xe chi tiết</li>
               <li>• Khách hàng cam kết sử dụng xe đúng mục đích và quy định</li>
               <li>• Mọi vấn đề phát sinh sẽ được giải quyết theo hợp đồng đã ký</li>
-              <li>• Xe cần được trả đúng thời gian và địa điểm đã thỏa thuận</li>
+              <li>• Xe cần được trả đúng thời gian, địa điểm và số km/pin đã thỏa thuận</li>
             </ul>
           </div>
         </div>

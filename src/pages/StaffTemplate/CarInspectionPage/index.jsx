@@ -3,17 +3,26 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCars } from '../../../contexts/CarsContext';
 import { useActivities } from '../../../contexts/ActivitiesContext';
 import CarInspectionHeader from './CarInspectionHeader';
+import CarImagesSection from './CarImagesSection';
 import CarInspectionContent from './CarInspectionContent';
 import CarInspectionSummary from './CarInspectionSummary';
+import ReportModal from './ReportModal';
 
 export default function CarInspectionPage() {
   const { carId } = useParams();
   const navigate = useNavigate();
-  const { carsData, getChecklistByCarId, getFlatChecklistByCarId, updateCar } = useCars();
+  const { carsData, getChecklistByCarId, getFlatChecklistByCarId, updateCar, getOrderByCarId } = useCars();
   const { addActivity } = useActivities();
   const [carData, setCarData] = useState(null);
+  const [carImages, setCarImages] = useState([]);
+  const [inspectionPhotos, setInspectionPhotos] = useState([]); // ← State cho ảnh kiểm tra
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // State cho report modal
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportContent, setReportContent] = useState('');
+  
   // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
@@ -22,8 +31,8 @@ export default function CarInspectionPage() {
     inspectionDate: new Date().toISOString()
   });
 
-  const [photos, setPhotos] = useState([]);
   const [notes, setNotes] = useState('');
+  
   // load dữ liệu xe
   useEffect(() => {
     setLoading(true);
@@ -34,6 +43,15 @@ export default function CarInspectionPage() {
         const car = carsData.getCarById(carId);
         if (car) {
           setCarData(car);
+          
+          // Load ảnh từ order nếu có
+          const order = getOrderByCarId(carId);
+          if (order && order.car && order.car.images) {
+            setCarImages(order.car.images);
+          } else if (car.images) {
+            setCarImages(car.images);
+          }
+          
           setInspectionData(prev => ({
             ...prev,
             checklist: getFlatChecklistByCarId(carId)
@@ -48,12 +66,22 @@ export default function CarInspectionPage() {
         setLoading(false);
       }
     }, 500);
-  }, [carId, carsData, getFlatChecklistByCarId]);
+  }, [carId, carsData, getFlatChecklistByCarId, getOrderByCarId]);
+  
+  // Cập nhật inspectionData khi inspectionPhotos thay đổi
+  useEffect(() => {
+    setInspectionData(prev => ({
+      ...prev,
+      photos: inspectionPhotos
+    }));
+  }, [inspectionPhotos]);
+  
   // xử lý cập nhật dữ liệu xe
   const handleCarDataUpdate = (updatedCarData) => {
     setCarData(updatedCarData);
     updateCar(carId, updatedCarData);
   };
+  
   // xử lý thay đổi trạng thái kiểm tra
   const handleStatusChange = (itemId, newStatus) => {
     setInspectionData(prev => ({
@@ -63,41 +91,7 @@ export default function CarInspectionPage() {
       )
     }));
   };
-
-  const handlePhotoUpload = (event) => {
-    const files = Array.from(event.target.files);
-
-    files.forEach(file => {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const newPhoto = {
-            id: Date.now() + Math.random(),
-            file: file,
-            preview: e.target.result,
-            name: file.name,
-            timestamp: new Date().toLocaleString('vi-VN'),
-            size: file.size
-          };
-          
-          setPhotos(prev => [...prev, newPhoto]);
-          setInspectionData(prev => ({
-            ...prev,
-            photos: [...prev.photos, newPhoto]
-          }));
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  };
-
-  const removePhoto = (photoId) => {
-    setPhotos(prev => prev.filter(photo => photo.id !== photoId));
-    setInspectionData(prev => ({
-      ...prev,
-      photos: prev.photos.filter(photo => photo.id !== photoId)
-    }));
-  };
+  
   // xử lý thay đổi ghi chú
   const handleNotesChange = (e) => {
     const newNotes = e.target.value;
@@ -107,6 +101,7 @@ export default function CarInspectionPage() {
       notes: newNotes
     }));
   };
+  
   // xử lý lưu kết quả kiểm tra
   const handleSaveInspection = async () => {
     try {
@@ -123,6 +118,26 @@ export default function CarInspectionPage() {
       navigate('/staff/manage-cars');
     } catch (error) {
       alert('Có lỗi xảy ra khi lưu kết quả kiểm tra. Vui lòng thử lại.');
+    }
+  };
+  
+  // xử lý gửi báo cáo
+  const handleSubmitReport = () => {
+    try {
+      addActivity({
+        type: 'report',
+        title: `Báo cáo xe ${carData.model} (${carData.licensePlate})`,
+        customer: reportContent.substring(0, 50) + '...',
+        icon: 'bell',
+        color: 'text-orange-600',
+        bgColor: 'bg-orange-100'
+      });
+      
+      alert(`Đã gửi báo cáo cho Admin!\n\nXe: ${carData.model} (${carData.licensePlate})\nNội dung: ${reportContent}`);
+      setShowReportModal(false);
+      setReportContent('');
+    } catch (error) {
+      alert('Có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.');
     }
   };
 
@@ -168,26 +183,45 @@ export default function CarInspectionPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      {/* Header với nút báo cáo */}
       <CarInspectionHeader 
         carData={carData}
         carId={carId}
         onCarDataUpdate={handleCarDataUpdate}
         onNavigateBack={() => navigate('/staff/manage-cars')}
+        onOpenReport={() => setShowReportModal(true)}
       />
+      
+      {/* ẢNH XE + ẢNH KIỂM TRA - Tất cả trong 1 section */}
+      <CarImagesSection 
+        carImages={carImages}
+        setCarImages={setCarImages}
+      />
+      
+      {/* Checklist kiểm tra + Ghi chú (không có upload ảnh) */}
       <CarInspectionContent
         organizedChecklist={organizedChecklist}
-        photos={photos}
         notes={notes}
         onStatusChange={handleStatusChange}
-        onPhotoUpload={handlePhotoUpload}
-        onRemovePhoto={removePhoto}
         onNotesChange={handleNotesChange}
       />
+      
+      {/* Tóm tắt và nút lưu */}
       <CarInspectionSummary
         inspectionData={inspectionData}
-        photos={photos}
+        photos={inspectionPhotos}
         onCancel={() => navigate('/staff/manage-cars')}
         onSave={handleSaveInspection}
+      />
+      
+      {/* Modal báo cáo Admin */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        carData={carData}
+        reportContent={reportContent}
+        setReportContent={setReportContent}
+        onSubmit={handleSubmitReport}
       />
     </div>
   );

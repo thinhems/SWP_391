@@ -87,6 +87,11 @@ export default function ApprovalReviewPage() {
       setIsProcessing(false);
     }
   };
+  // nếu không phải yêu cầu duyệt thì báo lỗi
+  if (requestData && requestData.type !== 'pending_approval') {
+    setError("Yêu cầu duyệt không còn hợp lệ (xe không ở trạng thái chờ duyệt)."); 
+    setRequestData(null);  
+  }
 
   if (loading) {
     return (

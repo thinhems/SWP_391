@@ -1,4 +1,3 @@
-
 export const mockCars = [
   // Xe có sẵn (available)
   {
@@ -6,33 +5,75 @@ export const mockCars = [
     model: 'VinFast VF e34',
     licensePlate: '51A-123.45',
     battery: 85,
+    initialBattery: 85,
+    initialOdometer: 5200,
     location: 'Khu vực A - Vị trí 01',
     lastMaintenance: '2025-09-15',
     status: 'available',
     color: 'Trắng',
-    year: 2025
+    year: 2025,
+    images: [
+      '/images/vinfast-vf8-red-1.jpg',
+      '/images/vinfast-vf8-red-2.jpg',
+      '/images/vinfast-vf8-red-3.jpg',
+      '/images/vinfast-vf8-red-4.jpg'
+    ],
+    specifications: {
+      chargingTime: '30 phút (DC)',
+      power: '110 kW',
+      seats: 5,
+      transmission: 'Tự động'
+    }
   },
   {
     id: 'VF002',
     model: 'VinFast VF 8',
     licensePlate: '51A-678.90',
     battery: 92,
+    initialBattery: 92,
+    initialOdometer: 8500,
     location: 'Khu vực A - Vị trí 02',
     lastMaintenance: '2025-09-10',
     status: 'available',
     color: 'Đen',
-    year: 2025
+    year: 2025,
+    images: [
+      '/images/vinfast-vf8-black-1.jpg',
+      '/images/vinfast-vf8-black-2.jpg',
+      '/images/vinfast-vf8-black-3.jpg',
+      '/images/vinfast-vf8-black-4.jpg'
+    ],
+    specifications: {
+      chargingTime: '45 phút (DC)',
+      power: '300 kW',
+      seats: 7,
+      transmission: 'Tự động'
+    }
   },
   {
     id: 'VF003',
     model: 'VinFast VF e34',
     licensePlate: '51A-111.22',
     battery: 78,
+    initialBattery: 78,
+    initialOdometer: 12300,
     location: 'Khu vực B - Vị trí 03',
     lastMaintenance: '2025-09-12',
     status: 'available',
     color: 'Xanh',
-    year: 2025
+    year: 2025,
+    images: [
+      '/images/vinfast-e34-blue-1.jpg',
+      '/images/vinfast-e34-blue-2.jpg',
+      '/images/vinfast-e34-blue-3.jpg',
+      '/images/vinfast-e34-blue-4.jpg'
+    ],
+    specifications: {
+      chargingTime: '30 phút (DC)',
+      power: '110 kW',
+      seats: 5,
+      transmission: 'Tự động'
+    }
   },
 
   // Xe chờ ký hợp đồng (pending_contract)
@@ -41,6 +82,8 @@ export const mockCars = [
     model: 'VinFast VF 8',
     licensePlate: '51A-222.33',
     battery: 91,
+    initialBattery: 91,
+    initialOdometer: 9800,
     location: 'Khu vực A - Vị trí 08',
     customer: 'Đặng Minh G',
     phone: '0967890123',
@@ -53,13 +96,27 @@ export const mockCars = [
     deposit: 2200000,
     status: 'pending_contract',
     color: 'Xanh dương',
-    year: 2025
+    year: 2025,
+    images: [
+      '/images/vinfast-vf8-blue-1.jpg',
+      '/images/vinfast-vf8-blue-2.jpg',
+      '/images/vinfast-vf8-blue-3.jpg',
+      '/images/vinfast-vf8-blue-4.jpg'
+    ],
+    specifications: {
+      chargingTime: '45 phút (DC)',
+      power: '300 kW',
+      seats: 7,
+      transmission: 'Tự động'
+    }
   },
   {
     id: 'VF011',
     model: 'VinFast VF e34',
     licensePlate: '51A-444.55',
     battery: 87,
+    initialBattery: 87,
+    initialOdometer: 6700,
     location: 'Khu vực B - Vị trí 09',
     customer: 'Bùi Thị H',
     phone: '0978901234',
@@ -72,7 +129,19 @@ export const mockCars = [
     deposit: 1900000,
     status: 'pending_contract',
     color: 'Vàng',
-    year: 2025
+    year: 2025,
+    images: [
+      '/images/vinfast-e34-yellow-1.jpg',
+      '/images/vinfast-e34-yellow-2.jpg',
+      '/images/vinfast-e34-yellow-3.jpg',
+      '/images/vinfast-e34-yellow-4.jpg'
+    ],
+    specifications: {
+      chargingTime: '30 phút (DC)',
+      power: '110 kW',
+      seats: 5,
+      transmission: 'Tự động'
+    }
   },
 
   // Xe chờ xác nhận thuê (pending_approval)
@@ -81,6 +150,8 @@ export const mockCars = [
     model: 'VinFast VF 8',
     licensePlate: '51A-333.44',
     battery: 88,
+    initialBattery: 88,
+    initialOdometer: 10500,
     location: 'Khu vực A - Vị trí 04',
     customer: 'Nguyễn Văn A',
     phone: '0901234567',
@@ -93,13 +164,27 @@ export const mockCars = [
     deposit: 2000000,
     status: 'pending_approval',
     color: 'Đỏ',
-    year: 2025
+    year: 2025,
+    images: [
+      '/images/vinfast-vf8-red-1.jpg',
+      '/images/vinfast-vf8-red-2.jpg',
+      '/images/vinfast-vf8-red-3.jpg',
+      '/images/vinfast-vf8-red-4.jpg'
+    ],
+    specifications: {
+      chargingTime: '45 phút (DC)',
+      power: '300 kW',
+      seats: 7,
+      transmission: 'Tự động'
+    }
   },
   {
     id: 'VF005',
     model: 'VinFast VF e34',
     licensePlate: '51A-555.66',
     battery: 95,
+    initialBattery: 95,
+    initialOdometer: 8200,
     location: 'Khu vực B - Vị trí 05',
     customer: 'Trần Thị B',
     phone: '0912345678',
@@ -112,7 +197,19 @@ export const mockCars = [
     deposit: 1500000,
     status: 'pending_approval',
     color: 'Trắng',
-    year: 2025
+    year: 2025,
+    images: [
+      '/images/vinfast-vf8-red-1.jpg',
+      '/images/vinfast-vf8-red-2.jpg',
+      '/images/vinfast-vf8-red-3.jpg',
+      '/images/vinfast-vf8-red-4.jpg'
+    ],
+    specifications: {
+      chargingTime: '30 phút (DC)',
+      power: '110 kW',
+      seats: 5,
+      transmission: 'Tự động'
+    }
   },
 
   // Xe đã đặt (approved/booked)
@@ -121,6 +218,8 @@ export const mockCars = [
     model: 'VinFast VF 8',
     licensePlate: '51A-777.88',
     battery: 90,
+    initialBattery: 90,
+    initialOdometer: 12000,
     location: 'Khu vực A - Vị trí 06',
     customer: 'Lê Minh C',
     phone: '0923456789',
@@ -134,13 +233,27 @@ export const mockCars = [
     deposit: 3000000,
     status: 'booked',
     color: 'Xám',
-    year: 2025
+    year: 2025,
+    images: [
+      '/images/vinfast-vf8-gray-1.jpg',
+      '/images/vinfast-vf8-gray-2.jpg',
+      '/images/vinfast-vf8-gray-3.jpg',
+      '/images/vinfast-vf8-gray-4.jpg'
+    ],
+    specifications: {
+      chargingTime: '45 phút (DC)',
+      power: '300 kW',
+      seats: 7,
+      transmission: 'Tự động'
+    }
   },
   {
     id: 'VF007',
     model: 'VinFast VF e34',
     licensePlate: '51A-999.00',
     battery: 82,
+    initialBattery: 82,
+    initialOdometer: 8500,
     location: 'Khu vực B - Vị trí 07',
     customer: 'Phạm Thu D',
     phone: '0934567890',
@@ -154,7 +267,19 @@ export const mockCars = [
     deposit: 2000000,
     status: 'booked',
     color: 'Xanh lá',
-    year: 2025
+    year: 2025,
+    images: [
+      '/images/vinfast-e34-green-1.jpg',
+      '/images/vinfast-e34-green-2.jpg',
+      '/images/vinfast-e34-green-3.jpg',
+      '/images/vinfast-e34-green-4.jpg'
+    ],
+    specifications: {
+      chargingTime: '30 phút (DC)',
+      power: '110 kW',
+      seats: 5,
+      transmission: 'Tự động'
+    }
   },
 
   // Xe đang cho thuê (rented)
@@ -163,6 +288,8 @@ export const mockCars = [
     model: 'VinFast VF 9',
     licensePlate: '51A-666.33',
     battery: 45,
+    initialBattery: 90,
+    initialOdometer: 15000,
     location: 'Đang sử dụng',
     customer: 'Hoàng Văn E',
     phone: '0945678901',
@@ -176,13 +303,27 @@ export const mockCars = [
     deposit: 1800000,
     status: 'rented',
     color: 'Đen',
-    year: 2025
+    year: 2025,
+    images: [
+      '/images/vinfast-vf9-black-1.jpg',
+      '/images/vinfast-vf9-black-2.jpg',
+      '/images/vinfast-vf9-black-3.jpg',
+      '/images/vinfast-vf9-black-4.jpg'
+    ],
+    specifications: {
+      chargingTime: '50 phút (DC)',
+      power: '350 kW',
+      seats: 7,
+      transmission: 'Tự động'
+    }
   },
   {
     id: 'VF009',
     model: 'VinFast VF 8',
     licensePlate: '51A-888.11',
     battery: 62,
+    initialBattery: 85,
+    initialOdometer: 20000,
     location: 'Đang sử dụng',
     customer: 'Võ Thị F',
     phone: '0956789012',
@@ -196,6 +337,18 @@ export const mockCars = [
     deposit: 2500000,
     status: 'rented',
     color: 'Bạc',
-    year: 2025
+    year: 2025,
+    images: [
+      '/images/vinfast-vf8-silver-1.jpg',
+      '/images/vinfast-vf8-silver-2.jpg',
+      '/images/vinfast-vf8-silver-3.jpg',
+      '/images/vinfast-vf8-silver-4.jpg'
+    ],
+    specifications: {
+      chargingTime: '45 phút (DC)',
+      power: '300 kW',
+      seats: 7,
+      transmission: 'Tự động'
+    }
   }
 ];

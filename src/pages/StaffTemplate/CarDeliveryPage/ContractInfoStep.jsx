@@ -76,6 +76,10 @@ export default function ContractInfoStep({ contractData }) {
               <span className="text-gray-900 font-semibold">{contractData.car.year}</span>
             </div>
             <div className="flex justify-between items-center">
+              <span className="text-gray-600 font-medium">Số km hiện tại:</span>
+              <span className="text-gray-900 font-semibold">{contractData.car.initialOdometer} km</span>
+            </div>
+            <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Mức pin hiện tại:</span>
               <div className="flex items-center space-x-2">
                 <div className="w-16 h-2 bg-gray-200 rounded-full">
@@ -97,6 +101,10 @@ export default function ContractInfoStep({ contractData }) {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800">Thời gian thuê</h3>
             <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-blue-600 font-medium">Số km chạy tối đa:</span>
+                <span className="text-blue-800 font-bold">{contractData.rental.totalMaxKm} km</span>
+              </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-blue-600 font-medium">Ngày nhận xe:</span>
                 <span className="text-blue-800 font-bold">{formatDate(contractData.rental.startDate)}</span>
@@ -147,7 +155,8 @@ export default function ContractInfoStep({ contractData }) {
             <ul className="text-yellow-700 text-sm space-y-1">
               <li>• Khách hàng vui lòng kiểm tra kỹ thông tin trước khi ký hợp đồng</li>
               <li>• Mọi thay đổi sau khi ký sẽ phát sinh phí bổ sung</li>
-              <li>• Xe cần được trả với mức pin tối thiểu 20%</li>
+              <li>• Xe cần được trả với mức pin bằng với mức pin được giao</li>
+              <li>• Khi trả xe quá số km theo hợp đồng sẽ có phụ phí</li>
             </ul>
           </div>
         </div>

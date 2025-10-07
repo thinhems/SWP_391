@@ -25,6 +25,10 @@ export default function ListCarsSection({ cars, activeTab }) {
       </span>
     );
   };
+  // hàm chuyển trang nhận xe trả
+  const handleCarReturn = (car) => {
+    navigate(`/staff/manage-cars/car-return/${car.id}`);
+  };
   // hàm chuyển trang giao xe
   const handleCarDelivery = (car) => {
     navigate(`/staff/manage-cars/car-delivery/${car.id}`);
@@ -194,7 +198,10 @@ export default function ListCarsSection({ cars, activeTab }) {
             
             {activeTab === 'rented' && (
               <>
-                <button className="flex-1 bg-purple-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors">
+                <button 
+                  onClick={() => handleCarReturn(car)}
+                  className="flex-1 bg-purple-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+                >
                   Nhận xe trả
                 </button>
                 <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">

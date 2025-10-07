@@ -9,6 +9,7 @@ import StaffTemplate from './pages/StaffTemplate';
 import OverviewPage from './pages/StaffTemplate/OverviewPage';
 import ManagerCarsPage from './pages/StaffTemplate/ManagerCarsPage';
 import CarDeliveryPage from './pages/StaffTemplate/CarDeliveryPage/';
+import CarReturnPage from './pages/StaffTemplate/CarReturnPage/';
 import ApprovalReviewPage from './pages/StaffTemplate/ApprovalReviewPage';
 import CarInspectionPage from './pages/StaffTemplate/CarInspectionPage';
 import CustomerManagementPage from './pages/StaffTemplate/CustomerManagementPage';
@@ -27,6 +28,7 @@ function App() {
                 <Route index element={<OverviewPage />} />
                 <Route path="manage-cars" element={<ManagerCarsPage />} />
                 <Route path="manage-cars/car-delivery/:carId" element={<CarDeliveryPage />} />
+                <Route path="manage-cars/car-return/:carId" element={<CarReturnPage />} />
                 <Route path="manage-cars/approval-review/:carId" element={<ApprovalReviewPage />} />
                 <Route path="manage-cars/inspection/:carId" element={<CarInspectionPage />} />
                 <Route path="manage-customer" element={<CustomerManagementPage />} />
