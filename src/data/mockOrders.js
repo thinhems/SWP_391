@@ -1,7 +1,7 @@
 export const mockOrders = [
   {
     id: 'ORDER_001',
-    type: 'contract',
+    type: 'booked',
     carId: 'VF006',
     customer: {
       name: 'Lê Minh C',
@@ -33,7 +33,7 @@ export const mockOrders = [
   },
   {
     id: 'ORDER_002',
-    type: 'contract',
+    type: 'booked',
     carId: 'VF007',
     customer: {
       name: 'Hoàng Văn E',
@@ -65,7 +65,7 @@ export const mockOrders = [
   },
   {
     id: 'ORDER_003',
-    type: 'approval_request',
+    type: 'pending_approval',
     carId: 'VF004',
     status: 'pending_approval',
     requestTime: '2025-09-23T10:00:00',
@@ -122,7 +122,7 @@ export const mockOrders = [
   },
   {
     id: 'ORDER_004',
-    type: 'approval_request',
+    type: 'pending_approval',
     carId: 'VF005',
     status: 'pending_approval',
     requestTime: '2025-09-23T09:30:00',
