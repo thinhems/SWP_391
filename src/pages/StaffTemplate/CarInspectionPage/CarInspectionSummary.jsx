@@ -3,11 +3,10 @@ import {
   faExclamationTriangle, 
   faBolt, 
   faCheckCircle, 
-  faClipboardList,
-  faLightbulb 
+  faClipboardList
 } from '@fortawesome/free-solid-svg-icons';
 
-export default function CarInspectionSummary({ inspectionData, photos, onCancel, onSave }) {
+export default function CarInspectionSummary({ inspectionData, onCancel, onSave }) {
   // tính toán thống kê
   const goodCount = inspectionData.checklist.filter(item => item.status === 'good').length;
   const minorIssueCount = inspectionData.checklist.filter(item => item.status === 'minor_issue').length;
@@ -80,7 +79,7 @@ export default function CarInspectionSummary({ inspectionData, photos, onCancel,
       {/* tóm tắt kiểm tra */}
       <div className="mb-6">
         <h4 className="font-semibold text-gray-800 mb-3">Tóm tắt kiểm tra</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
           <div className="bg-green-50 rounded-lg p-4 border border-green-200">
             <div className="text-3xl font-bold text-green-600">{goodCount}</div>
             <div className="text-green-600 font-medium text-sm">Tốt</div>
@@ -92,10 +91,6 @@ export default function CarInspectionSummary({ inspectionData, photos, onCancel,
           <div className="bg-red-50 rounded-lg p-4 border border-red-200">
             <div className="text-3xl font-bold text-red-600">{majorIssueCount}</div>
             <div className="text-red-600 font-medium text-sm">Cần sửa chữa</div>
-          </div>
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-            <div className="text-3xl font-bold text-blue-600">{photos.length}</div>
-            <div className="text-blue-600 font-medium text-sm">Ảnh chụp</div>
           </div>
         </div>
       </div>
@@ -128,29 +123,6 @@ export default function CarInspectionSummary({ inspectionData, photos, onCancel,
           </div>
         </div>
       </div>
-      {/* khuyến nghị */}
-      {(minorIssueCount > 0 || majorIssueCount > 0 || photos.length < 3) && (
-        <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg mb-6">
-          <h4 className="font-semibold text-orange-800 mb-2 flex items-center">
-            <FontAwesomeIcon icon={faLightbulb} className="w-4 h-4 mr-2" />
-            Khuyến nghị
-          </h4>
-          <ul className="text-orange-700 text-sm space-y-1">
-            {majorIssueCount > 0 && (
-              <li>• Cần thực hiện bảo trì ngay trước khi cho thuê</li>
-            )}
-            {minorIssueCount > 0 && (
-              <li>• Theo dõi các vấn đề nhỏ trong lần kiểm tra tiếp theo</li>
-            )}
-            {photos.length < 3 && (
-              <li>• Khuyến nghị chụp thêm ảnh để ghi nhận đầy đủ tình trạng xe</li>
-            )}
-            {totalChecked < totalItems && (
-              <li>• Hoàn thành kiểm tra tất cả hạng mục trước khi lưu kết quả</li>
-            )}
-          </ul>
-        </div>
-      )}
       {/* action Buttons */}
       <div className="flex justify-between items-center pt-4 border-t border-gray-200">
         <button

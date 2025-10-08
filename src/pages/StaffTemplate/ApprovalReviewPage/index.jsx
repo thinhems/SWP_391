@@ -54,7 +54,7 @@ export default function ApprovalReviewPage() {
       
       alert(`Đã duyệt yêu cầu thuê xe thành công!\n\nThông báo đã được gửi tới: ${requestData.customer.name}\nEmail: ${requestData.customer.email}\nSĐT: ${requestData.customer.phone}\n\nHợp đồng điện tử sẽ được tạo và gửi cho khách hàng trong vòng 5 phút.`);
       
-      navigate('/staff/manage-cars');
+      navigate('/staff/manage-cars?tab=pending_contract');
     } catch (error) {
       console.error('Error approving request:', error);
       alert('Có lỗi xảy ra khi duyệt yêu cầu. Vui lòng thử lại.');
@@ -79,7 +79,7 @@ export default function ApprovalReviewPage() {
       
       alert(`Đã từ chối yêu cầu thuê xe!\n\nLý do từ chối: ${reason}\n\nThông báo đã được gửi tới: ${requestData.customer.name}\nEmail: ${requestData.customer.email}\nSĐT: ${requestData.customer.phone}`);
       
-      navigate('/staff/manage-cars');
+      navigate('/staff/manage-cars?tab=pending_approval');
     } catch (error) {
       console.error('Error rejecting request:', error);
       alert('Có lỗi xảy ra khi từ chối yêu cầu. Vui lòng thử lại.');
@@ -116,7 +116,7 @@ export default function ApprovalReviewPage() {
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy yêu cầu duyệt</h2>
         <p className="text-gray-600 mb-4">{error || `Yêu cầu duyệt với xe ID "${carId}" không tồn tại hoặc đã bị xóa.`}</p>
         <button
-          onClick={() => navigate('/staff/manage-cars')}
+          onClick={() => navigate('/staff/manage-cars?tab=pending_approval')}
           className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Quay lại danh sách xe
@@ -147,7 +147,7 @@ export default function ApprovalReviewPage() {
             </div>
           </div>
           <button
-            onClick={() => navigate('/staff/manage-cars')}
+            onClick={() => navigate('/staff/manage-cars?tab=pending_approval')}
             disabled={isProcessing}
             className={`px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
               isProcessing 

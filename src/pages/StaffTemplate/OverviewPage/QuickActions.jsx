@@ -20,7 +20,7 @@ export default function QuickActions({ carsData, navigate }) {
       borderColor: 'border-yellow-200',
       textColor: 'text-yellow-700',
       buttonColor: 'bg-yellow-600 hover:bg-yellow-700',
-      action: () => navigate('/staff/manage-cars'),
+      onClick: () => navigate('/staff/manage-cars?tab=pending_approval'),
       description: 'Xử lý yêu cầu thuê xe'
     },
     {
@@ -31,7 +31,7 @@ export default function QuickActions({ carsData, navigate }) {
       borderColor: 'border-blue-200',
       textColor: 'text-blue-700',
       buttonColor: 'bg-blue-600 hover:bg-blue-700',
-      action: () => navigate('/staff/manage-cars'),
+      onClick: () => navigate('/staff/manage-cars?tab=booked'),
       description: 'Chuẩn bị giao xe'
     },
     {
@@ -42,7 +42,7 @@ export default function QuickActions({ carsData, navigate }) {
       borderColor: 'border-green-200',
       textColor: 'text-green-700',
       buttonColor: 'bg-green-600 hover:bg-green-700',
-      action: () => navigate('/staff/manage-customer'),
+      onClick: () => navigate('/staff/manage-cars?tab=rented'),
       description: 'Xem và xác thực KH'
     },
     {
@@ -53,7 +53,7 @@ export default function QuickActions({ carsData, navigate }) {
       borderColor: 'border-purple-200',
       textColor: 'text-purple-700',
       buttonColor: 'bg-purple-600 hover:bg-purple-700',
-      action: () => navigate('/staff/manage-cars'),
+      onClick: () => navigate('/staff/manage-cars?tab=available'),
       description: 'Kiểm tra và bảo trì'
     }
   ];
@@ -86,7 +86,7 @@ export default function QuickActions({ carsData, navigate }) {
               {action.description}
             </p>
             <button
-              onClick={action.action}
+              onClick={action.onClick}
               className={`w-full ${action.buttonColor} text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2`}
             >
               <span>Xem chi tiết</span>

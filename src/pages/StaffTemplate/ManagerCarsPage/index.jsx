@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCars } from '../../../contexts/CarsContext';
+import { useSearchParams } from 'react-router-dom';
 import StatsSection from './StatsSection';
 import TabsSection from './TabsSection';
 import ListCarsSection from './ListCarsSection';
 
 export default function ManagerCarsPage() {
-  const [activeTab, setActiveTab] = useState('available');
+  // Lấy tab từ URL nếu có
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  // State quản lý tab hiện tại
+  const [activeTab, setActiveTab] = useState(tabFromUrl || 'available');
   const { carsData, loading, refreshCars } = useCars();
-
+  // Cập nhật tab khi URL thay đổi
+  useEffect(() => {
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
   // Phân loại xe theo trạng thái
   const organizedCars = {
     available: carsData.getCarsByStatus('available'),

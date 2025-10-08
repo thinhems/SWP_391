@@ -6,32 +6,29 @@ import CarInspectionHeader from './CarInspectionHeader';
 import CarImagesSection from './CarImagesSection';
 import CarInspectionContent from './CarInspectionContent';
 import CarInspectionSummary from './CarInspectionSummary';
-import ReportModal from './ReportModal';
+import PopupReport from './PopupReport';
 
 export default function CarInspectionPage() {
   const { carId } = useParams();
   const navigate = useNavigate();
   const { carsData, getChecklistByCarId, getFlatChecklistByCarId, updateCar, getOrderByCarId } = useCars();
   const { addActivity } = useActivities();
+  
   const [carData, setCarData] = useState(null);
   const [carImages, setCarImages] = useState([]);
-  const [inspectionPhotos, setInspectionPhotos] = useState([]); // ← State cho ảnh kiểm tra
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
   // State cho report modal
-  const [showReportModal, setShowReportModal] = useState(false);
+  const [showPopupReport, setShowPopupReport] = useState(false);
   const [reportContent, setReportContent] = useState('');
   
   // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
-    photos: [],
     notes: '',
     inspectionDate: new Date().toISOString()
   });
-
-  const [notes, setNotes] = useState('');
   
   // load dữ liệu xe
   useEffect(() => {
@@ -68,14 +65,6 @@ export default function CarInspectionPage() {
     }, 500);
   }, [carId, carsData, getFlatChecklistByCarId, getOrderByCarId]);
   
-  // Cập nhật inspectionData khi inspectionPhotos thay đổi
-  useEffect(() => {
-    setInspectionData(prev => ({
-      ...prev,
-      photos: inspectionPhotos
-    }));
-  }, [inspectionPhotos]);
-  
   // xử lý cập nhật dữ liệu xe
   const handleCarDataUpdate = (updatedCarData) => {
     setCarData(updatedCarData);
@@ -95,7 +84,6 @@ export default function CarInspectionPage() {
   // xử lý thay đổi ghi chú
   const handleNotesChange = (e) => {
     const newNotes = e.target.value;
-    setNotes(newNotes);
     setInspectionData(prev => ({
       ...prev,
       notes: newNotes
@@ -115,7 +103,7 @@ export default function CarInspectionPage() {
       });
       
       alert(`Đã lưu kết quả kiểm tra xe ${carData.licensePlate} thành công!`);
-      navigate('/staff/manage-cars');
+      navigate('/staff/manage-cars?tab=available');
     } catch (error) {
       alert('Có lỗi xảy ra khi lưu kết quả kiểm tra. Vui lòng thử lại.');
     }
@@ -134,7 +122,7 @@ export default function CarInspectionPage() {
       });
       
       alert(`Đã gửi báo cáo cho Admin!\n\nXe: ${carData.model} (${carData.licensePlate})\nNội dung: ${reportContent}`);
-      setShowReportModal(false);
+      setShowPopupReport(false);
       setReportContent('');
     } catch (error) {
       alert('Có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.');
@@ -172,7 +160,7 @@ export default function CarInspectionPage() {
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy thông tin xe</h2>
         <p className="text-gray-600 mb-4">{error || `Xe với ID "${carId}" không tồn tại.`}</p>
         <button
-          onClick={() => navigate('/staff/manage-cars')}
+          onClick={() => navigate('/staff/manage-cars?tab=available')}
           className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Quay lại danh sách xe
@@ -183,41 +171,35 @@ export default function CarInspectionPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Header với nút báo cáo */}
       <CarInspectionHeader 
         carData={carData}
         carId={carId}
         onCarDataUpdate={handleCarDataUpdate}
-        onNavigateBack={() => navigate('/staff/manage-cars')}
-        onOpenReport={() => setShowReportModal(true)}
+        onNavigateBack={() => navigate('/staff/manage-cars?tab=available')}
+        onOpenReport={() => setShowPopupReport(true)}
       />
       
-      {/* ẢNH XE + ẢNH KIỂM TRA - Tất cả trong 1 section */}
       <CarImagesSection 
         carImages={carImages}
         setCarImages={setCarImages}
       />
       
-      {/* Checklist kiểm tra + Ghi chú (không có upload ảnh) */}
       <CarInspectionContent
         organizedChecklist={organizedChecklist}
-        notes={notes}
+        notes={inspectionData.notes}
         onStatusChange={handleStatusChange}
         onNotesChange={handleNotesChange}
       />
       
-      {/* Tóm tắt và nút lưu */}
       <CarInspectionSummary
         inspectionData={inspectionData}
-        photos={inspectionPhotos}
-        onCancel={() => navigate('/staff/manage-cars')}
+        onCancel={() => navigate('/staff/manage-cars?tab=available')}
         onSave={handleSaveInspection}
       />
       
-      {/* Modal báo cáo Admin */}
-      <ReportModal
-        isOpen={showReportModal}
-        onClose={() => setShowReportModal(false)}
+      <PopupReport
+        isOpen={showPopupReport}
+        onClose={() => setShowPopupReport(false)}
         carData={carData}
         reportContent={reportContent}
         setReportContent={setReportContent}

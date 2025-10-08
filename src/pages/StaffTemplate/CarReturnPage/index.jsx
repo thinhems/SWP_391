@@ -104,7 +104,7 @@ export default function CarReturnPage() {
         `Số tiền hoàn trả: ${Math.abs(netAmount).toLocaleString()} đ\n\n` +
         `Xe đã được cập nhật trạng thái về "Có sẵn".`
       );
-      navigate('/staff/manage-cars');
+      navigate('/staff/manage-cars?tab=rented');
     }
   };
   // xử lý xác nhận đã nhận thanh toán từ khách
@@ -133,7 +133,7 @@ export default function CarReturnPage() {
       `Số tiền đã thu: ${Math.abs(netAmount).toLocaleString()} đ\n\n` +
       `Xe đã được cập nhật trạng thái về "Có sẵn".`
     );
-    navigate('/staff/manage-cars');
+    navigate('/staff/manage-cars?tab=rented');
   };
 
   if (loading) {
@@ -159,7 +159,7 @@ export default function CarReturnPage() {
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy đơn thuê xe</h2>
         <p className="text-gray-600 mb-4">{error || `Đơn thuê với xe ID "${carId}" không tồn tại hoặc xe chưa được giao.`}</p>
         <button
-          onClick={() => navigate('/staff/manage-cars')}
+          onClick={() => navigate('/staff/manage-cars?tab=rented')}
           className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Quay lại danh sách xe
@@ -185,7 +185,7 @@ export default function CarReturnPage() {
             </p>
           </div>
           <button
-            onClick={() => navigate('/staff/manage-cars')}
+            onClick={() => navigate('/staff/manage-cars?tab=rented')}
             className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center space-x-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

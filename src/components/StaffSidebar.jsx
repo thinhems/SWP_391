@@ -16,7 +16,7 @@ export default function StaffSidebar({ isOpen }) {
     },
     {
       name: 'Quản lý xe',
-      path: '/staff/manage-cars',
+      path: '/staff/manage-cars?tab=available',
       icon: (
         <FontAwesomeIcon icon={faCar} />
       )
@@ -31,8 +31,14 @@ export default function StaffSidebar({ isOpen }) {
   ];
 
   const isActive = (path) => {
-    return location.pathname === path || (path !== '/staff' && location.pathname.startsWith(path));
+    console.log('Current path:', location.pathname, 'Checking against:', path);
+    return (
+      location.pathname === path ||
+      (path !== '/staff' && location.pathname.startsWith(path)) ||
+      (path.startsWith('/staff/manage-cars') && location.pathname.startsWith('/staff/manage-cars'))
+    );
   };
+
 
   return (
     <div className="h-full bg-gray-800 text-white relative">

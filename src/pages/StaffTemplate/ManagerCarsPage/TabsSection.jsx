@@ -1,5 +1,13 @@
+import { useNavigate } from 'react-router-dom';
 
 export default function TabsSection({ activeTab, setActiveTab, cars }) {
+  const navigate = useNavigate();
+
+  const handleTabChange = (newTab) => {
+    setActiveTab(newTab);
+    navigate(`/staff/manage-cars?tab=${newTab}`);
+  };
+  
   // mảng tab để render
   const tabs = [
     { id: 'available', label: 'Xe có sẵn', count: cars.available.length },
@@ -15,7 +23,7 @@ export default function TabsSection({ activeTab, setActiveTab, cars }) {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === tab.id
                   ? 'border-green-500 text-green-600'
