@@ -63,7 +63,7 @@ export default function CarInspectionHeader({
         <div className="flex space-x-3">
           <button
             onClick={onOpenReport}
-            className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2"
+            className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2 cursor-pointer"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -72,7 +72,7 @@ export default function CarInspectionHeader({
           </button>
           <button
             onClick={onNavigateBack}
-            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center space-x-2"
+            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center space-x-2 cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -90,14 +90,14 @@ export default function CarInspectionHeader({
             {isEditing && (
               <button
                 onClick={handleCancel}
-                className="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition-colors text-sm"
+                className="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition-colors text-sm cursor-pointer"
               >
                 Hủy
               </button>
             )}
             <button
               onClick={handleEditToggle}
-              className={`px-3 py-1 rounded-lg transition-colors text-sm ${
+              className={`cursor-pointer px-3 py-1 rounded-lg transition-colors text-sm ${
                 isEditing 
                   ? 'bg-green-600 text-white hover:bg-green-700' 
                   : 'bg-blue-600 text-white hover:bg-blue-700'

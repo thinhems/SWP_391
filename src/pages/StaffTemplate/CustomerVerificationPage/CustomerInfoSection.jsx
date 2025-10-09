@@ -41,38 +41,6 @@ export default function CustomerInfoSection({ customer, onNavigateBack, isProces
 
   return (
     <>
-      {/* header */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <svg className="w-8 h-8 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              Kiểm tra khách hàng
-            </h1>
-            <div className="mt-2 flex items-center space-x-4">
-              <p className="text-gray-600">ID: {customer.id}</p>
-              {getStatusBadge(customer.status)}
-              {getTypeBadge(customer.customerType)}
-            </div>
-          </div>
-          <button
-            onClick={onNavigateBack}
-            disabled={isProcessing}
-            className={`px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
-              isProcessing 
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                : 'bg-gray-500 text-white hover:bg-gray-600'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span>Quay lại trang quản lý</span>
-          </button>
-        </div>
-      </div>
       {/* thông tin cá nhân */}
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">

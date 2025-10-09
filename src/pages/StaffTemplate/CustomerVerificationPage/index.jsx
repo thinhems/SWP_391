@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCustomers } from '../../../contexts/CustomersContext';
 import { useActivities } from '../../../contexts/ActivitiesContext';
+import HeaderSection from './HeaderSection';
 import CustomerInfoSection from './CustomerInfoSection';
 import CustomerDocumentsSection from './CustomerDocumentsSection';
 import VerificationActionsSection from './VerificationActionsSection';
@@ -127,6 +128,11 @@ export default function CustomerVerificationPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      <HeaderSection 
+        customer={customer}
+        onNavigateBack={handleNavigateBack}
+        isProcessing={isProcessing}
+      />
       <CustomerInfoSection 
         customer={customer}
         onNavigateBack={handleNavigateBack}

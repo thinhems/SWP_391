@@ -15,7 +15,7 @@ export const authService = {
     } catch (error) {
       // fake login for staff, xóa khi có backend
       const { email, password } = credentials;
-      if (email === 'staff@gmail.com' && password === '1') {
+      if (email === 'staff@gmail.com' && password === '123456') {
         // Tạo user giả lập
         const user = {
           name: 'Staff User',

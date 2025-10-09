@@ -117,7 +117,7 @@ export default function CompletionStep({
       <div className="text-center">
         <button
           onClick={onCompleteDelivery}
-          className={`px-8 py-4 rounded-lg font-semibold text-lg transition-all bg-green-600 text-white hover:bg-green-700 transform hover:scale-105 `}>
+          className={`px-8 py-4 rounded-lg font-semibold text-lg transition-all bg-green-600 text-white hover:bg-green-700 transform hover:scale-105 cursor-pointer `}>
           Hoàn tất bàn giao xe
         </button>
         <p className="text-gray-600 text-sm mt-3">

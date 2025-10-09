@@ -93,7 +93,7 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
                 <button
                   onClick={confirmApprove}
                   disabled={isProcessing}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
                     isProcessing
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-green-600 text-white hover:bg-green-700'
@@ -104,7 +104,7 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
                 <button
                   onClick={cancelAction}
                   disabled={isProcessing}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                 >
                   Hủy bỏ
                 </button>
@@ -146,7 +146,7 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
                 <button
                   onClick={confirmReject}
                   disabled={isProcessing}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
                     isProcessing
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-red-600 text-white hover:bg-red-700'
@@ -157,7 +157,7 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
                 <button
                   onClick={cancelAction}
                   disabled={isProcessing}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                 >
                   Hủy bỏ
                 </button>
@@ -172,7 +172,7 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
           <button
             onClick={handleApprove}
             disabled={isProcessing}
-            className={`px-6 py-3 rounded-lg font-semibold border transition-colors ${
+            className={`px-6 py-3 rounded-lg font-semibold border transition-colors cursor-pointer ${
               isProcessing
                 ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
                 : 'bg-white text-green-700 border-green-300 hover:bg-green-50 hover:border-green-400'
@@ -189,7 +189,7 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
           <button
             onClick={handleReject}
             disabled={isProcessing}
-            className={`px-6 py-3 rounded-lg font-semibold border transition-colors ${
+            className={`px-6 py-3 rounded-lg font-semibold border transition-colors cursor-pointer ${
               isProcessing
                 ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
                 : 'bg-white text-red-700 border-red-300 hover:bg-red-50 hover:border-red-400'

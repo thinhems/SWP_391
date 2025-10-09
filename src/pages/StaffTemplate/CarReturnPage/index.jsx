@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCars } from '../../../contexts/CarsContext';
 import { useActivities } from '../../../contexts/ActivitiesContext';
+import HeaderSection from './HeaderSection';  
 import VehicleReturnInfo from './VehicleReturnInfo';
 import VehicleInspectionForm from './VehicleInspectionForm';
 import FeeCalculationSummary from './FeeCalculationSummary';
@@ -160,7 +161,7 @@ export default function CarReturnPage() {
         <p className="text-gray-600 mb-4">{error || `Đơn thuê với xe ID "${carId}" không tồn tại hoặc xe chưa được giao.`}</p>
         <button
           onClick={() => navigate('/staff/manage-cars?tab=rented')}
-          className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="cursor-pointer mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Quay lại danh sách xe
         </button>
@@ -170,32 +171,7 @@ export default function CarReturnPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      {/* header */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <svg className="w-8 h-8 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-              </svg>
-              Nhận xe trả - Thanh toán
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Kiểm tra xe và tính toán các khoản phí khi khách hàng trả xe
-            </p>
-          </div>
-          <button
-            onClick={() => navigate('/staff/manage-cars?tab=rented')}
-            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center space-x-2"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span>Quay lại trang quản lý</span>
-          </button>
-        </div>
-      </div>
-
+      <HeaderSection onNavigateBack={() => navigate('/staff/manage-cars?tab=rented')} />
       {!showQRCode ? (
         <>
           <VehicleReturnInfo order={order} />
@@ -212,7 +188,7 @@ export default function CarReturnPage() {
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
             <button
               onClick={handleCompleteReturn}
-              className="w-full bg-purple-600 text-white py-4 px-6 rounded-lg text-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
+              className="cursor-pointer w-full bg-purple-600 text-white py-4 px-6 rounded-lg text-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -230,13 +206,13 @@ export default function CarReturnPage() {
           <div className="text-center space-y-4">
             <button
               onClick={handleConfirmPayment}
-              className="bg-green-600 text-white py-3 px-8 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors"
+              className="cursor-pointer bg-green-600 text-white py-3 px-8 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors"
             >
               Xác nhận đã nhận thanh toán
             </button>
             <button
               onClick={() => setShowQRCode(false)}
-              className="block mx-auto text-gray-600 hover:text-gray-800 underline"
+              className="cursor-pointer block mx-auto text-gray-600 hover:text-gray-800 underline"
             >
               Quay lại chỉnh sửa
             </button>

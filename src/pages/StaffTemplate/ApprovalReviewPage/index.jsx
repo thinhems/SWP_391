@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCars } from '../../../contexts/CarsContext';
 import { useActivities } from '../../../contexts/ActivitiesContext';
+import HeaderSection from './HeaderSection';  
 import CustomerInfoSection from './CustomerInfoSection';
 import CarInfoSection from './CarInfoSection';
 import RentalInfoSection from './RentalInfoSection';
@@ -117,7 +118,7 @@ export default function ApprovalReviewPage() {
         <p className="text-gray-600 mb-4">{error || `Yêu cầu duyệt với xe ID "${carId}" không tồn tại hoặc đã bị xóa.`}</p>
         <button
           onClick={() => navigate('/staff/manage-cars?tab=pending_approval')}
-          className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
         >
           Quay lại danh sách xe
         </button>
@@ -127,41 +128,11 @@ export default function ApprovalReviewPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <svg className="w-8 h-8 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Duyệt yêu cầu thuê xe
-            </h1>
-            <div className="mt-2 flex items-center space-x-4">
-              <p className="text-gray-600">
-                Xe {requestData.car.model} - Biển số <span className="font-bold text-red-600">{requestData.car.licensePlate}</span>
-              </p>
-              <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
-                Chờ duyệt
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={() => navigate('/staff/manage-cars?tab=pending_approval')}
-            disabled={isProcessing}
-            className={`px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
-              isProcessing 
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                : 'bg-gray-500 text-white hover:bg-gray-600'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span>Quay lại trang quản lý</span>
-          </button>
-        </div>
-      </div>
+      <HeaderSection 
+        requestData={requestData} 
+        isProcessing={isProcessing}
+        onNavigateBack={() => navigate('/staff/manage-cars?tab=pending_approval')}
+      />
       <CustomerInfoSection customer={requestData.customer} />
       <CarInfoSection car={requestData.car} />
       <RentalInfoSection 
@@ -174,29 +145,6 @@ export default function ApprovalReviewPage() {
         onReject={handleReject}
         isProcessing={isProcessing}
       />
-      {/* Footer info */}
-      <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-        <div className="flex items-center justify-center space-x-6 text-sm text-gray-600">
-          <div className="flex items-center space-x-2">
-            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Yêu cầu từ: {new Date(requestData.requestTime).toLocaleString('vi-VN')}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <span>Đã xác minh giấy tờ</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12a3 3 0 000-6m-9 6V9a9 9 0 019-9h6a9 9 0 019 9v6a9 9 0 01-9 9H9a9 9 0 01-9-9z" />
-            </svg>
-            <span>Xe sẵn sàng</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

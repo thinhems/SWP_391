@@ -31,7 +31,6 @@ export default function StaffSidebar({ isOpen }) {
   ];
 
   const isActive = (path) => {
-    console.log('Current path:', location.pathname, 'Checking against:', path);
     return (
       location.pathname === path ||
       (path !== '/staff' && location.pathname.startsWith(path)) ||

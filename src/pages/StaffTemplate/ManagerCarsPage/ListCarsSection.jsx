@@ -156,10 +156,10 @@ export default function ListCarsSection({ cars, activeTab }) {
               <>
                 <button 
                 onClick={() => handleInspectionlCar(car)} 
-                className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer">
                   Kiểm tra xe
                 </button>
-                <button className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors">
+                <button className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors cursor-pointer">
                   Bảo trì
                 </button>
               </>
@@ -170,12 +170,12 @@ export default function ListCarsSection({ cars, activeTab }) {
                 {car.status === 'pending_approval' && (
                   <button 
                     onClick={() => handleApprovalReview(car)}
-                    className="flex-1 bg-yellow-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-yellow-700 transition-colors"
+                    className="flex-1 bg-yellow-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-yellow-700 transition-colors cursor-pointer"
                   >
                     Duyệt xe
                   </button>
                 )}
-                <button className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors">
+                <button className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors cursor-pointer">
                   Liên hệ KH
                 </button>
               </>
@@ -186,11 +186,11 @@ export default function ListCarsSection({ cars, activeTab }) {
               <>
                 <button 
                   onClick={() => handleCarDelivery(car)}
-                  className="flex-1 bg-orange-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors"
+                  className="flex-1 bg-orange-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors cursor-pointer"
                 >
                   Giao xe
                 </button>
-                <button className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors">
+                <button className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors cursor-pointer">
                   Liên hệ KH
                 </button>
               </>
@@ -200,11 +200,11 @@ export default function ListCarsSection({ cars, activeTab }) {
               <>
                 <button 
                   onClick={() => handleCarReturn(car)}
-                  className="flex-1 bg-purple-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+                  className="flex-1 bg-purple-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors cursor-pointer"
                 >
                   Nhận xe trả
                 </button>
-                <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer">
                   Liên hệ KH
                 </button>
               </>

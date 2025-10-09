@@ -92,7 +92,7 @@ export default function CustomerList({
         key="prev"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`px-3 py-2 rounded-lg border ${
+        className={`px-3 py-2 rounded-lg border cursor-pointer ${
           currentPage === 1
             ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
@@ -106,7 +106,7 @@ export default function CustomerList({
         <button
           key={1}
           onClick={() => onPageChange(1)}
-          className="px-4 py-2 rounded-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+          className="px-4 py-2 rounded-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 cursor-pointer"
         >
           1
         </button>
@@ -125,7 +125,7 @@ export default function CustomerList({
           className={`px-4 py-2 rounded-lg border ${
             currentPage === i
               ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 cursor-pointer'
           }`}
         >
           {i}
@@ -142,7 +142,7 @@ export default function CustomerList({
         <button
           key={totalPages}
           onClick={() => onPageChange(totalPages)}
-          className="px-4 py-2 rounded-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+          className="px-4 py-2 rounded-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 cursor-pointer"
         >
           {totalPages}
         </button>
@@ -257,7 +257,7 @@ export default function CustomerList({
                     <div className="flex justify-end space-x-2">
                       <button
                         onClick={() => handleVerifyAccount(customer)}
-                        className="text-blue-600 hover:text-blue-900 px-3 py-1 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+                        className="text-blue-600 hover:text-blue-900 px-3 py-1 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
                         title="Kiểm tra tài khoản"
                       >
                         Kiểm tra
@@ -266,7 +266,7 @@ export default function CustomerList({
                       <div className="relative">
                         <button
                           onClick={() => toggleDropdown(customer.id)}
-                          className="text-purple-600 hover:text-purple-900 px-3 py-1 border border-purple-300 rounded-lg hover:bg-purple-50 transition-colors"
+                          className="text-purple-600 hover:text-purple-900 px-3 py-1 border border-purple-300 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer"
                           title="Phân loại khách hàng"
                         > Phân loại ▼ </button>
                         {openDropdown === customer.id && (
@@ -285,7 +285,7 @@ export default function CustomerList({
                                   key={type.value}
                                   onClick={() => handleClassifySelect(customer, type.value)}
                                   disabled={customer.customerType === type.value}
-                                  className={`w-full text-left px-4 py-2 ${type.hoverBg} transition-colors flex items-center space-x-2 ${
+                                  className={`w-full text-left px-4 py-2 ${type.hoverBg} transition-colors flex items-center space-x-2 cursor-pointer ${
                                     customer.customerType === type.value ? 'opacity-50 cursor-not-allowed' : ''
                                   }`}
                                 >
@@ -302,7 +302,7 @@ export default function CustomerList({
                               <div className="border-t border-gray-200 mt-2 pt-2 px-4">
                                 <button
                                   onClick={() => setOpenDropdown(null)}
-                                  className="w-full text-center text-xs text-gray-500 hover:text-gray-700 py-1"
+                                  className="w-full text-center text-xs text-gray-500 hover:text-gray-700 py-1 cursor-pointer"
                                 >Đóng</button>
                               </div>
                             </div>

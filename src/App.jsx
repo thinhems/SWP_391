@@ -1,20 +1,25 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route  } from 'react-router-dom';
-import Navbar from './components/Navbar.jsx';
-import Home from './pages/Home.jsx';
-import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
-import Dashboard from './pages/Dashboard.jsx';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// Import Templates
+import HomeTemplate from './pages/HomeTemplate';
 import StaffTemplate from './pages/StaffTemplate';
+// Import Home Pages
+import Home from './pages/Home';
+import LoginPage from './pages/HomeTemplate/LoginPage';
+import RegisterPage from './pages/HomeTemplate/RegisterPage';
+import Dashboard from './pages/Dashboard';
+// Import Staff Pages
 import OverviewPage from './pages/StaffTemplate/OverviewPage';
 import ManagerCarsPage from './pages/StaffTemplate/ManagerCarsPage';
-import CarDeliveryPage from './pages/StaffTemplate/CarDeliveryPage/';
-import CarReturnPage from './pages/StaffTemplate/CarReturnPage/';
+import CarDeliveryPage from './pages/StaffTemplate/CarDeliveryPage';
+import CarReturnPage from './pages/StaffTemplate/CarReturnPage';
 import ApprovalReviewPage from './pages/StaffTemplate/ApprovalReviewPage';
 import CarInspectionPage from './pages/StaffTemplate/CarInspectionPage';
 import CustomerManagementPage from './pages/StaffTemplate/CustomerManagementPage';
 import CustomerVerificationPage from './pages/StaffTemplate/CustomerVerificationPage';
-import { AuthProvider } from './contexts/AuthContext.jsx';
+// Context Providers
+import { AuthProvider } from './contexts/AuthContext';
+
 import './App.css';
 
 function App() {
@@ -22,31 +27,26 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="App">
-          <main className="main-content">
-            <Routes>
-              <Route path="/staff/*" element={<StaffTemplate />}>
-                <Route index element={<OverviewPage />} />
-                <Route path="manage-cars" element={<ManagerCarsPage />} />
-                <Route path="manage-cars/car-delivery/:carId" element={<CarDeliveryPage />} />
-                <Route path="manage-cars/car-return/:carId" element={<CarReturnPage />} />
-                <Route path="manage-cars/approval-review/:carId" element={<ApprovalReviewPage />} />
-                <Route path="manage-cars/inspection/:carId" element={<CarInspectionPage />} />
-                <Route path="manage-customer" element={<CustomerManagementPage />} />
-                <Route path="manage-customer/verify/:customerId" element={<CustomerVerificationPage />} />
-              </Route>
-              <Route path="*" element={
-                <>
-                  <Navbar />
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                  </Routes>
-                </>
-              }/>
-            </Routes>
-          </main>
+          <Routes>
+            {/* STAFF ROUTES */}
+            <Route path="/staff/*" element={<StaffTemplate />}>
+              <Route index element={<OverviewPage />} />
+              <Route path="manage-cars" element={<ManagerCarsPage />} />
+              <Route path="manage-cars/car-delivery/:carId" element={<CarDeliveryPage />} />
+              <Route path="manage-cars/car-return/:carId" element={<CarReturnPage />} />
+              <Route path="manage-cars/approval-review/:carId" element={<ApprovalReviewPage />} />
+              <Route path="manage-cars/inspection/:carId" element={<CarInspectionPage />} />
+              <Route path="manage-customer" element={<CustomerManagementPage />} />
+              <Route path="manage-customer/verify/:customerId" element={<CustomerVerificationPage />} />
+            </Route>
+            {/* HOME ROUTES*/}
+            <Route path="/*" element={<HomeTemplate />}>
+              <Route index element={<Home />} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="register" element={<RegisterPage />} />
+              <Route path="dashboard" element={<Dashboard />} />
+            </Route>
+          </Routes>
         </div>
       </Router>
     </AuthProvider>

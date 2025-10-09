@@ -13,6 +13,17 @@ export default function QuickActions({ carsData, navigate }) {
   // bao gồm tiêu đề, biểu tượng, màu sắc, hành động khi nhấn nút, v.v.
   const actions = [
     {
+      title: 'Quản lý xe',
+      count: null,
+      icon: faCarSide,
+      bgColor: 'bg-purple-50',
+      borderColor: 'border-purple-200',
+      textColor: 'text-purple-700',
+      buttonColor: 'bg-purple-600 hover:bg-purple-700',
+      onClick: () => navigate('/staff/manage-cars?tab=available'),
+      description: 'Kiểm tra và bảo trì'
+    },
+    {
       title: 'Xe chờ xác nhận',
       count: carsData.pending_approval,
       icon: faClock,
@@ -42,19 +53,8 @@ export default function QuickActions({ carsData, navigate }) {
       borderColor: 'border-green-200',
       textColor: 'text-green-700',
       buttonColor: 'bg-green-600 hover:bg-green-700',
-      onClick: () => navigate('/staff/manage-cars?tab=rented'),
+      onClick: () => navigate('/staff/manage-customer'),
       description: 'Xem và xác thực KH'
-    },
-    {
-      title: 'Quản lý xe',
-      count: null,
-      icon: faCarSide,
-      bgColor: 'bg-purple-50',
-      borderColor: 'border-purple-200',
-      textColor: 'text-purple-700',
-      buttonColor: 'bg-purple-600 hover:bg-purple-700',
-      onClick: () => navigate('/staff/manage-cars?tab=available'),
-      description: 'Kiểm tra và bảo trì'
     }
   ];
 
@@ -87,7 +87,7 @@ export default function QuickActions({ carsData, navigate }) {
             </p>
             <button
               onClick={action.onClick}
-              className={`w-full ${action.buttonColor} text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2`}
+              className={`w-full ${action.buttonColor} text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 cursor-pointer`}
             >
               <span>Xem chi tiết</span>
               <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" />
