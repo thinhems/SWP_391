@@ -18,7 +18,7 @@ const registerValidationSchema = Yup.object({
     .required('Số điện thoại là bắt buộc'),
   password: Yup.string()
     .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường và 1 số')
+    .matches(/^(?=.*[a-zA-Z])(?=.*\d)/, 'Mật khẩu phải chứa ít nhất 1 chữ cái và 1 số')
     .required('Mật khẩu là bắt buộc'),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password'), null], 'Mật khẩu xác nhận không khớp')

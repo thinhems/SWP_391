@@ -7,7 +7,7 @@ import ListCarsSection from './ListCarsSection';
 
 export default function ManagerCarsPage() {
   // Lấy tab từ URL nếu có
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
   // State quản lý tab hiện tại
   const [activeTab, setActiveTab] = useState(tabFromUrl || 'available');
@@ -42,6 +42,13 @@ export default function ManagerCarsPage() {
   const handleRefresh = () => {
     refreshCars();
   };
+  // đảm bảo luôn có tab trong URL
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (!tabFromUrl) {
+      setSearchParams({ tab: 'available' }, { replace: true });
+    }
+  }, []);
 
   if (loading) {
     return (

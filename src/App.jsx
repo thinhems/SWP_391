@@ -7,6 +7,8 @@ import StaffTemplate from './pages/StaffTemplate';
 import Home from './pages/Home';
 import LoginPage from './pages/HomeTemplate/LoginPage';
 import RegisterPage from './pages/HomeTemplate/RegisterPage';
+import ProfilePage from './pages/HomeTemplate/ProfilePage';
+import CarListPage from './pages/HomeTemplate/CarListPage';
 import Dashboard from './pages/Dashboard';
 // Import Staff Pages
 import OverviewPage from './pages/StaffTemplate/OverviewPage';
@@ -44,6 +46,8 @@ function App() {
               <Route index element={<Home />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="cars-rental" element={<CarListPage />} />
               <Route path="dashboard" element={<Dashboard />} />
             </Route>
           </Routes>

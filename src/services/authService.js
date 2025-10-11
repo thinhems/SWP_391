@@ -20,10 +20,28 @@ export const authService = {
         const user = {
           name: 'Staff User',
           email: 'staff@gmail.com',
+          phone: '0123456789',
           role: 'staff',
-          station: 'Nguyễn Huệ Quận 1'
+          station: 'Nguyễn Huệ Quận 1',
+          isVerified: "verified",
         };
         const token = 'fake-jwt-token'; // token giả
+
+        // Lưu vào localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        return { success: true, data: { token, user } };
+      } else if (email === 'mdtrong1305@gmail.com' && password === '123456') {
+        const user = {
+          name: 'Trọng',
+          email: 'mdtrong1305@gmail.com',
+          phone: '0999999999',
+          role: 'customer',
+          station: null,
+          isVerified: "not_started",
+        };
+        const token = 'fake-jwt-token-admin'; // token giả
 
         // Lưu vào localStorage
         localStorage.setItem('token', token);
