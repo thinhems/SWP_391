@@ -35,17 +35,11 @@ export default function Navbar() {
 
   const menuItems = [
     { path: '/', label: 'Trang chủ' },
-    { path: '/services', label: 'Dịch vụ' },
+    { path: '/model-rental', label: 'Thuê xe' },
     { path: '/vehicles', label: 'Xe điện' },
     { path: '/about', label: 'Giới thiệu' },
     { path: '/contact', label: 'Liên hệ' },
   ];
-
-  // Lấy chữ cái đầu của tên
-  const getInitials = (name) => {
-    if (!name) return 'U';
-    return name.charAt(0).toUpperCase();
-  };
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-100">

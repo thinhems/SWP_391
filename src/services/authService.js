@@ -22,7 +22,7 @@ export const authService = {
           email: 'staff@gmail.com',
           phone: '0123456789',
           role: 'staff',
-          station: 'Nguyễn Huệ Quận 1',
+          station: 'Quận 1',
           isVerified: "verified",
         };
         const token = 'fake-jwt-token'; // token giả
@@ -39,7 +39,7 @@ export const authService = {
           phone: '0999999999',
           role: 'customer',
           station: null,
-          isVerified: "not_started",
+          isVerified: "verified",
         };
         const token = 'fake-jwt-token-admin'; // token giả
 

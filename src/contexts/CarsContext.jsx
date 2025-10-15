@@ -18,6 +18,7 @@ export const CarsProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userStation, setUserStation] = useState(null);
 
   // Fetch dữ liệu xe
   const fetchCars = async () => {
@@ -40,18 +41,23 @@ export const CarsProvider = ({ children }) => {
     fetchCars();
   }, []);
 
-  // Tính toán số liệu cho xe
+  // Lọc xe theo station của user
+  const filteredCars = userStation 
+    ? cars.filter(car => car.station === userStation)
+    : cars;
+
+  // Tính toán số liệu cho xe đã lọc theo station
   const carsData = {
-    total: cars.length,
-    available: cars.filter(car => car.status === 'available').length,
-    pending_approval: cars.filter(car => car.status === 'pending_approval').length,
-    pending_contract: cars.filter(car => car.status === 'pending_contract').length,
-    booked: cars.filter(car => car.status === 'booked').length,
-    rented: cars.filter(car => car.status === 'rented').length,
-    allCars: cars,
+    total: filteredCars.length,
+    available: filteredCars.filter(car => car.status === 'available').length,
+    pending_approval: filteredCars.filter(car => car.status === 'pending_approval').length,
+    pending_contract: filteredCars.filter(car => car.status === 'pending_contract').length,
+    booked: filteredCars.filter(car => car.status === 'booked').length,
+    rented: filteredCars.filter(car => car.status === 'rented').length,
+    allCars: filteredCars,
     
-    getCarsByStatus: (status) => cars.filter(car => car.status === status),
-    getCarById: (id) => cars.find(car => car.id === id)
+    getCarsByStatus: (status) => filteredCars.filter(car => car.status === status),
+    getCarById: (id) => filteredCars.find(car => car.id === id)
   };
 
   // Cập nhật xe
@@ -99,7 +105,8 @@ export const CarsProvider = ({ children }) => {
     getOrderByCarId,
     getChecklistByCarId,
     getFlatChecklistByCarId,
-    refreshCars
+    refreshCars,
+    setUserStation // Thêm function để set station từ bên ngoài
   };
 
   return (

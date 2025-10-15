@@ -1,24 +1,36 @@
 import { useState, useEffect } from 'react';
 import { useCars } from '../../../contexts/CarsContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import { useSearchParams } from 'react-router-dom';
 import StatsSection from './StatsSection';
 import TabsSection from './TabsSection';
 import ListCarsSection from './ListCarsSection';
 
 export default function ManagerCarsPage() {
-  // Lấy tab từ URL nếu có
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
-  // State quản lý tab hiện tại
   const [activeTab, setActiveTab] = useState(tabFromUrl || 'available');
-  const { carsData, loading, refreshCars } = useCars();
-  // Cập nhật tab khi URL thay đổi
+  const { carsData, loading, refreshCars, setUserStation } = useCars();
+  const { user } = useAuth();
+  // Set userStation trong CarsContext khi user thay đổi
   useEffect(() => {
-    if (tabFromUrl && tabFromUrl !== activeTab) {
-      setActiveTab(tabFromUrl);
+    if (user?.station) {
+      setUserStation(user.station);
+    }
+  }, [user?.station, setUserStation]);
+  // xử lý đồng bộ tab với URL 
+  useEffect(() => {
+    if (tabFromUrl) {
+      if (tabFromUrl !== activeTab) {
+        setActiveTab(tabFromUrl);
+      }
+    } else {
+      const tabToSet = activeTab || 'available';
+      setSearchParams({ tab: tabToSet }, { replace: true });
     }
   }, [tabFromUrl]);
-  // Phân loại xe theo trạng thái
+
+  // Phân loại xe theo trạng thái (đã được lọc theo station trong CarsContext)
   const organizedCars = {
     available: carsData.getCarsByStatus('available'),
     pending_approval: carsData.getCarsByStatus('pending_approval'),
@@ -26,7 +38,7 @@ export default function ManagerCarsPage() {
     booked: carsData.getCarsByStatus('booked'),
     rented: carsData.getCarsByStatus('rented')
   };
-
+  
   // Priority cho việc sắp xếp ưu tiên render xe chờ phê duyệt trước
   const priority = {
     pending_approval: 1,
@@ -42,13 +54,6 @@ export default function ManagerCarsPage() {
   const handleRefresh = () => {
     refreshCars();
   };
-  // đảm bảo luôn có tab trong URL
-  useEffect(() => {
-    const tabFromUrl = searchParams.get('tab');
-    if (!tabFromUrl) {
-      setSearchParams({ tab: 'available' }, { replace: true });
-    }
-  }, []);
 
   if (loading) {
     return (

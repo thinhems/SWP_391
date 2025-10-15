@@ -1,16 +1,26 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useCars } from '../../../contexts/CarsContext';
 import { useCustomers } from '../../../contexts/CustomersContext';
 import { useActivities } from '../../../contexts/ActivitiesContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import StatsCards from './StatsCards';
 import QuickActions from './QuickActions';
 import RecentActivities from './RecentActivities';
 
 export default function OverviewPage() {
   const navigate = useNavigate();
-  const { carsData, loading: carsLoading, error: carsError, fetchCars } = useCars();
+  const { carsData, loading: carsLoading, error: carsError, fetchCars, setUserStation } = useCars();
   const { customersData, loading: customersLoading, error: customersError } = useCustomers();
   const { activities } = useActivities();
+  const { user } = useAuth();
+
+  // Set userStation trong CarsContext khi user thay đổi
+  useEffect(() => {
+    if (user?.station) {
+      setUserStation(user.station);
+    }
+  }, [user?.station, setUserStation]);
 
   const loading = carsLoading || customersLoading;
   const error = carsError || customersError;

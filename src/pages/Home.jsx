@@ -20,7 +20,7 @@ const Home = () => {
               Thuê xe linh hoạt, chi phí tối ưu, thân thiện với môi trường.
             </p>
             <div className="hero-buttons">
-              <Link to="/cars-rental" className="btn btn-primary btn-large">
+              <Link to="/model-rental" className="btn btn-primary btn-large">
                 Đặt xe ngay
               </Link>
               {isAuthenticated ? (
