@@ -54,13 +54,10 @@ export default function StaffSidebar({ isOpen }) {
     <div className="h-full bg-gray-800 text-white relative">
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center space-x-3">
-          <div className="flex items-center group">
-            <img
-              src="https://i.ibb.co/JjfV90qY/logo-Staff.png"
-              alt="Green Future logo"
-              className="h-10 w-auto object-contain transform transition-transform duration-200"
-              loading="lazy"
-            />
+          <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
           </div>
           {isOpen && (
             <div>
