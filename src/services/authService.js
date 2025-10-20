@@ -13,8 +13,23 @@ export const authService = {
       
       return { success: true, data: response.data };
     } catch (error) {
-      // fake login for staff, xóa khi có backend
+      // fake login for staff/admin/customer, xóa khi có backend
       const { email, password } = credentials;
+      // Admin account (fake)
+      if (email === 'admin@gmail.com' && password === '123456') {
+        const user = {
+          name: 'Admin User',
+          email: 'admin@gmail.com',
+          phone: '0888888888',
+          role: 'admin',
+          station: null,
+          isVerified: "verified",
+        };
+        const token = 'fake-jwt-token-admin';
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        return { success: true, data: { token, user } };
+      }
       if (email === 'staff@gmail.com' && password === '123456') {
         // Tạo user giả lập
         const user = {

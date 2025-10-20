@@ -147,6 +147,17 @@ export default function Navbar() {
                           </svg>
                           Trang quản lý Staff
                         </Link>
+                      ) : user?.role === 'admin' ? (
+                        <Link
+                          to="/admin"
+                          onClick={() => setIsProfileMenuOpen(false)}
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+                        >
+                          <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M3 12h18M3 17h18" />
+                          </svg>
+                          Trang quản trị Admin
+                        </Link>
                       ) : (
                         <Link
                           to="/my-contracts"
