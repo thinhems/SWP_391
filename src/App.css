@@ -456,3 +456,45 @@
     justify-content: center;
   }
 }
+
+/* Mũi tên SVG bên trong */
+.rdp-chevron polygon {
+  fill: #10b981 !important;
+}
+
+
+/* Nút ngày được chọn (cả start, middle, end) */
+.rdp-day_selected .rdp-day_button,
+.rdp-range_start .rdp-day_button,
+.rdp-range_end .rdp-day_button {
+  background-color: #10b981 !important; /* xanh lá */
+  color: white !important;
+  border: none !important;
+}
+
+/* Khoảng giữa range */
+.rdp-range_middle .rdp-day_button {
+  color: #065f46 !important; /* xanh đậm chữ */
+}
+
+/* Hover khi chọn ngày */
+.rdp-day_button:hover {
+  background-color: #059669 !important; /* xanh đậm khi hover */
+  color: white !important;
+}
+
+/* Bo tròn nút ngày */
+.rdp-day_button {
+  border-radius: 50% !important;
+}
+
+/* Loại bỏ viền mặc định khi focus */
+.rdp-day_button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.rdp-today {
+  color: #04ad37 !important; /* xanh đậm chữ */
+}
+

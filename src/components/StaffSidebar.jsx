@@ -82,7 +82,7 @@ export default function StaffSidebar({ isOpen }) {
               className="flex items-center w-full px-4 py-3 text-sm text-gray-300 hover:bg-red-600 hover:text-white transition-colors duration-200"
             >
               <FontAwesomeIcon icon={faRightFromBracket} />
-              {isOpen && <span className="ml-3 font-medium">Logout</span>}
+              {isOpen && <span className="ml-3 font-medium">Đăng xuất</span>}
             </button>
           </li>
         </ul>
