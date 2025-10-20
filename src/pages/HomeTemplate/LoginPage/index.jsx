@@ -18,11 +18,13 @@ const loginValidationSchema = Yup.object({
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, isAuthenticated, loading } = useAuth();
+  const { login, isAuthenticated, loading, user } = useAuth();
 
-  // nếu đã đăng nhập, chuyển hướng đến trang dashboard
+  // nếu đã đăng nhập, chuyển hướng theo vai trò
   if (isAuthenticated && !loading) {
-    return <Navigate to="/staff" replace />;
+    if (user?.role === 'admin') return <Navigate to="/admin" replace />;
+    if (user?.role === 'staff') return <Navigate to="/staff" replace />;
+    return <Navigate to="/" replace />;
   }
   // giá trị ban đầu cho form đăng nhập
   const initialValues = {
@@ -40,8 +42,14 @@ export default function LoginPage() {
         rememberMe: values.rememberMe
       });
       if (result.success) {
-        // đăng nhập thành công, chuyển hướng đến trang dashboard
-        navigate('/staff', { replace: true });
+        const role = result?.data?.user?.role;
+        if (role === 'admin') {
+          navigate('/admin', { replace: true });
+        } else if (role === 'staff') {
+          navigate('/staff', { replace: true });
+        } else {
+          navigate('/', { replace: true });
+        }
       } else {
         // đăng nhập thất bại
         setStatus(result.message || 'Đăng nhập thất bại');
