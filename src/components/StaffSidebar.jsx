@@ -1,11 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHouse, faCar, faUsers, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faCar, faUsers, faRightFromBracket, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 export default function StaffSidebar({ isOpen }) {
   const location = useLocation();
   const { logout } = useAuth(); 
-
+  // menu items
   const menuItems = [
     {
       name: 'Tổng quan',
@@ -27,10 +27,22 @@ export default function StaffSidebar({ isOpen }) {
       icon: (
         <FontAwesomeIcon icon={faUsers} />
       )
+    },
+    {
+      name: 'Quay về trang khách hàng',
+      path: '/',
+      icon: (
+        <FontAwesomeIcon icon={faArrowLeft} />
+      )
     }
   ];
-
+  // hàm để check xem đang ở trang nào để highlight menu tương ứng
   const isActive = (path) => {
+    // console.log('location path:', location.pathname, 'path:', path);
+    // Nếu path là '/' thì luôn trả về false
+    if (path === '/') {
+      return false;
+    }
     return (
       location.pathname === path ||
       (path !== '/staff' && location.pathname.startsWith(path)) ||
@@ -38,15 +50,17 @@ export default function StaffSidebar({ isOpen }) {
     );
   };
 
-
   return (
     <div className="h-full bg-gray-800 text-white relative">
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+          <div className="flex items-center group">
+            <img
+              src="https://i.ibb.co/JjfV90qY/logo-Staff.png"
+              alt="Green Future logo"
+              className="h-10 w-auto object-contain transform transition-transform duration-200"
+              loading="lazy"
+            />
           </div>
           {isOpen && (
             <div>
@@ -56,7 +70,6 @@ export default function StaffSidebar({ isOpen }) {
           )}
         </div>
       </div>
-
       <nav className="mt-4">
         <ul className="space-y-1">
           {menuItems.map((item) => (
@@ -87,7 +100,6 @@ export default function StaffSidebar({ isOpen }) {
           </li>
         </ul>
       </nav>
-
       {isOpen && (
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
           <div className="flex items-center space-x-3">
