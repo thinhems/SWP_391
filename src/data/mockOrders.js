@@ -143,7 +143,7 @@ export const mockOrders = [
     id: 'ORDER_003',
     type: 'pending_approval',
     status: 'pending_approval',
-    carId: 'VF004',
+    carId: 'VF012',
     requestTime: '2025-09-23T10:00:00',
     customer: {
       name: 'Nguyễn Văn A',
@@ -163,7 +163,7 @@ export const mockOrders = [
       ]
     },
     car: {
-      id: 'VF004',
+      id: 'VF012',
       model: 'VinFast VF 8',
       licensePlate: '51A-333.44',
       color: 'Đỏ',

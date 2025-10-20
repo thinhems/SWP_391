@@ -4,11 +4,12 @@ import { useNavigate } from 'react-router-dom';
 
 export default function SearchFilterSection({ 
   activeTab,
-  onSearch, 
+  onSearch,
+  selectedLocation
 }) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [formLocation, setFormLocation] = useState('Quận 1'); // state mặc định cho select
+  const [formLocation, setFormLocation] = useState(selectedLocation);
   // xử lý tìm kiếm với loading giả lập
   const handleSearch = () => {
     setIsLoading(true);

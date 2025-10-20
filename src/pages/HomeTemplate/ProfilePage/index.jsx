@@ -23,9 +23,8 @@ export default function ProfilePage() {
     setActiveTab(newTab);
     setSearchParams({ tab: newTab });
   };
-
+  // Nếu chưa đăng nhập, chuyển đến trang login
   useEffect(() => {
-    // Nếu chưa đăng nhập, chuyển đến trang login
     if (!loading && !isAuthenticated) {
       navigate('/login');
     }
@@ -66,19 +65,21 @@ export default function ProfilePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">
-                {user?.name?.charAt(0).toUpperCase() || 'U'}
-              </span>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Xin chào, {user?.name || 'User'}!
-              </h1>
-              <p className="text-gray-600">
-                Quản lý thông tin cá nhân và tài khoản của bạn
-              </p>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
+                <span className="text-2xl font-bold text-white">
+                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                </span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Xin chào, {user?.name || 'User'}!
+                </h1>
+                <p className="text-gray-600">
+                  Quản lý thông tin cá nhân và tài khoản của bạn
+                </p>
+              </div>
             </div>
           </div>
         </div>

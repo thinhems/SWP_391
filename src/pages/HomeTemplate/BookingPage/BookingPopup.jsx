@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-export default function BookingPopup({ isOpen, onClose, carModel, selectedStation }) {
+export default function BookingPopup({ isOpen, onClose, carModel, selectedLocation }) {
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'daily';
   // Mock data voucher
@@ -149,7 +149,7 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedStatio
     const bookingData = {
       ...formData,
       carModel: carModel.name,
-      station: selectedStation,
+      station: selectedLocation,
       rentalType: activeTab,
       pricing
     };
@@ -335,7 +335,7 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedStatio
                   className={`w-full py-4 px-6 text-lg font-bold rounded-lg shadow-lg transition-all duration-200 ${
                     !formData.agreeTerms
                       ? 'bg-gray-400 text-gray-500 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white transform hover:scale-105'
+                      : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white transform hover:scale-105 cursor-pointer'
                   }`}
                 >
                   Gửi yêu cầu thuê xe
@@ -361,7 +361,7 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedStatio
               </div>
               {/* hình thức thuê */}
               <div className="bg-green-50 rounded-lg border border-green-300 p-4">
-                <p className="text-gray-600 text-sm mb-1">Khu vực thuê: {selectedStation}</p>
+                <p className="text-gray-600 text-sm mb-1">Khu vực thuê: {selectedLocation}</p>
                 {/* Hiển thị thông tin thời gian thuê */}
                 {(() => {
                   const pricing = calculatePrice();

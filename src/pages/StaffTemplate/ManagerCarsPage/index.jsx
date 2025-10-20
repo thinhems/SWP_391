@@ -12,12 +12,10 @@ export default function ManagerCarsPage() {
   const [activeTab, setActiveTab] = useState(tabFromUrl || 'available');
   const { carsData, loading, refreshCars, setUserStation } = useCars();
   const { user } = useAuth();
-  // Set userStation trong CarsContext khi user thay đổi
+  // Cập nhật station của user vào CarsContext khi component mount
   useEffect(() => {
-    if (user?.station) {
-      setUserStation(user.station);
-    }
-  }, [user?.station, setUserStation]);
+    setUserStation(user.station);
+  }, [user.station]);
   // xử lý đồng bộ tab với URL 
   useEffect(() => {
     if (tabFromUrl) {

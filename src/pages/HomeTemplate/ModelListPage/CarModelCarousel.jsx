@@ -1,53 +1,38 @@
 import { useState } from 'react';
-import { mockCars } from '../../../data/mockCars';
-import { mockListModels } from '../../../data/mockListModels';
 import CarModelCard from './CarModelCard';
 
-export default function CarModelCarousel({ selectedLocation, onModelSelect, activeTab = 'daily' }) {
-  const [currentIndex, setCurrentIndex] = useState(2); // Bắt đầu từ giữa (VF7)
-  // console.log('currentIndex:', currentIndex);
-  // Tính số xe available cho mỗi model tại station được chọn
-  const getAvailableCount = (modelId) => {
-    const modelNumber = modelId.replace('VF', 'VF ');
-    const modelName = `VinFast ${modelNumber}`;
-    return mockCars.filter(car => 
-      car.model === modelName && 
-      car.status === 'available' && 
-      car.station === selectedLocation
-    ).length;
-  };
-
+export default function CarModelCarousel({ selectedLocation, onModelSelect, activeTab = 'daily', modelsData }) {
+  // Lấy dữ liệu models từ context
+  const models = modelsData?.allModels || [];
+  const [currentIndex, setCurrentIndex] = useState(2); // lấy index model bắt đầu ở giữa (VF7)
   // Xử lý nút tiến
   const goToNext = () => {
     setCurrentIndex((prevIndex) => 
-      prevIndex === mockListModels.length - 1 ? 0 : prevIndex + 1
+      prevIndex === models.length - 1 ? 0 : prevIndex + 1
     );
   };
   // xử lý nút lùi
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? mockListModels.length - 1 : prevIndex - 1
+      prevIndex === 0 ? models.length - 1 : prevIndex - 1
     );
   };
   // Xử lý chọn slide trực tiếp
   const goToSlide = (index) => {
     setCurrentIndex(index);
   };
-
-  // Lấy 3 model để hiển thị (trước, hiện tại, sau)
+  // Lấy ra 3 model để render
   const getVisibleModels = () => {
-    const models = [];
+    const visibleModels = [];
     for (let i = -1; i <= 1; i++) {
       let index = currentIndex + i;
-      if (index < 0) index = mockListModels.length + index;
-      if (index >= mockListModels.length) index = index - mockListModels.length;
-      models.push({ ...mockListModels[index], position: i });
+      if (index < 0) index = models.length + index;
+      if (index >= models.length) index = index - models.length;
+      visibleModels.push({ ...models[index], position: i });
     }
-    return models;
+    return visibleModels;
   };
-
   const visibleModels = getVisibleModels();
-  // console.log('Visible Models:', visibleModels);
   return (
     <div className="relative pt-8 pb-16">
       <div className="max-w-7xl mx-auto px-4">
@@ -55,14 +40,13 @@ export default function CarModelCarousel({ selectedLocation, onModelSelect, acti
         <div className="relative px-20">
           <div className="flex justify-center items-center gap-10 mb-12 ">
             {visibleModels.map((model, idx) => {
-              const availableCount = getAvailableCount(model.id);
               const isCenter = model.position === 0;
               return (
                 <CarModelCard
                   key={`${model.id}-${idx}`}
                   model={model}
                   isCenter={isCenter}
-                  availableCount={availableCount}
+                  availableCount={model.availableCount}
                   activeTab={activeTab}
                   onModelSelect={onModelSelect}
                 />
@@ -71,7 +55,7 @@ export default function CarModelCarousel({ selectedLocation, onModelSelect, acti
           </div>
           {/* nút tiến */}
           <div className="flex justify-center gap-3 mb-4">
-            {mockListModels.map((_, index) => (
+            {models.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}

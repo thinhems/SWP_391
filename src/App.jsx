@@ -10,6 +10,8 @@ import RegisterPage from './pages/HomeTemplate/RegisterPage';
 import ProfilePage from './pages/HomeTemplate/ProfilePage';
 import ModelListPage from './pages/HomeTemplate/ModelListPage';
 import BookingPage from './pages/HomeTemplate/BookingPage';
+import MyContractsPage from './pages/HomeTemplate/MyContractsPage';
+import ContractDetailPage from './pages/HomeTemplate/ContractDetailPage';
 import Dashboard from './pages/Dashboard';
 // Import Staff Pages
 import OverviewPage from './pages/StaffTemplate/OverviewPage';
@@ -22,7 +24,6 @@ import CustomerManagementPage from './pages/StaffTemplate/CustomerManagementPage
 import CustomerVerificationPage from './pages/StaffTemplate/CustomerVerificationPage';
 // Context Providers
 import { AuthProvider } from './contexts/AuthContext';
-
 import './App.css';
 
 function App() {
@@ -50,6 +51,8 @@ function App() {
               <Route path="profile" element={<ProfilePage />} />
               <Route path="model-rental" element={<ModelListPage />} />
               <Route path="booking/:modelId" element={<BookingPage />} />
+              <Route path="my-contracts" element={<MyContractsPage />} />
+              <Route path="contract-detail/:id" element={<ContractDetailPage />} />
               <Route path="dashboard" element={<Dashboard />} />
             </Route>
           </Routes>

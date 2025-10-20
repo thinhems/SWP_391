@@ -1,5 +1,5 @@
 
-export default function BookingForm({ carModel, selectedStation, onStationChange, getAvailableCount }) {
+export default function LocationFormSection({ carModel, selectedLocation, onStationChange, availableCount }) {
   // Danh sách các trạm
   const stations = [
     'Quận 1',
@@ -7,7 +7,6 @@ export default function BookingForm({ carModel, selectedStation, onStationChange
     'Quận 9',
     'Quận Bình Thạnh'
   ];
-  const availableCount = getAvailableCount();
   const isOutOfStock = availableCount === 0;
 
   return (
@@ -20,9 +19,9 @@ export default function BookingForm({ carModel, selectedStation, onStationChange
             Điểm thuê xe
           </label>
           <select
-            value={selectedStation || ''}
+            value={selectedLocation || ''}
             onChange={(e) => onStationChange(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 cursor-pointer"
           >
             {stations.map((station) => (
               <option key={station} value={station}>
@@ -32,14 +31,14 @@ export default function BookingForm({ carModel, selectedStation, onStationChange
           </select>
         </div>
         {/* Trạng thái có sẵn */}
-        {selectedStation && (
+        {selectedLocation && (
           <div className={`p-4 rounded-lg mb-6 ${isOutOfStock ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
             <div className="flex items-center">
               <div className={`w-3 h-3 rounded-full mr-3 ${isOutOfStock ? 'bg-red-500' : 'bg-green-500'}`}></div>
               <span className={`font-medium ${isOutOfStock ? 'text-red-700' : 'text-green-700'}`}>
                 {isOutOfStock 
                   ? 'Không có xe khả dụng tại điểm này'
-                  : `Còn ${availableCount} xe khả dụng tại ${selectedStation}`
+                  : `Còn ${availableCount} xe khả dụng tại ${selectedLocation}`
                 }
               </span>
             </div>
@@ -74,9 +73,9 @@ export default function BookingForm({ carModel, selectedStation, onStationChange
           <h6 className="font-semibold text-yellow-800 mb-2">Lưu ý quan trọng:</h6>
           <ul className="text-sm text-yellow-700 space-y-1">
             <li>• Cần có bằng lái xe hợp lệ khi thuê</li>
-            <li>• Đặt cọc 30% giá trị đơn hàng</li>
-            <li>• Miễn phí hủy đơn trước 24h</li>
-            <li>• Xe được giao tận nơi trong vòng 2h</li>
+            <li>• Thanh toán tiền cọc và tiền thuê khi nhận xe</li>
+            <li>• Yêu cầu thuê xe sẽ được duyệt trước 24h</li>
+            <li>• Mọi thắc mắc xin liên hệ tổng đài hỗ trợ</li>
           </ul>
         </div>
       </div>

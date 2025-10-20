@@ -1,56 +1,72 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { mockListModels } from '../../../data/mockListModels';
-import { mockCars } from '../../../data/mockCars';
-import CarOverview from './CarOverview';
+import { useModels } from '../../../contexts/ModelsContext';
+import CarOverviewSection from './CarOverviewSection';
 import CarDetailsSection from './CarDetailsSection';
-import BookingForm from './BookingForm';
+import LocationFormSection from './LocationFormSection';
 import BookingPopup from './BookingPopup';
 
 export default function BookingPage() {
   const { modelId } = useParams();
+  const { modelsData, loading, error, selectedLocation, setSelectedLocation } = useModels();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabFromUrl || 'daily');
-  const [selectedStation, setSelectedStation] = useState(localStorage.getItem('station') || '');
   const [showBookingPopup, setShowBookingPopup] = useState(false);
+  // Lấy thông tin model cụ thể từ context
+  const carModel = modelsData?.getModelById?.(modelId);
+  const availableCount = carModel ? carModel.availableCount : 0; // số xe khả dụng cho model này tại selectedLocation
   // xử lý đồng bộ tab với URL đảm bảo luôn có tab trong URL
   useEffect(() => {
-      if (tabFromUrl) {
-        if (tabFromUrl !== activeTab) {
-          setActiveTab(tabFromUrl);
-        }
-      } else {
-        const tabToSet = activeTab || 'daily';
-        setSearchParams({ tab: tabToSet }, { replace: true });
+    if (tabFromUrl) {
+      if (tabFromUrl !== activeTab) {
+        setActiveTab(tabFromUrl);
       }
-    }, [tabFromUrl]);
-  // Tìm model dựa trên modelId
-  const carModel = mockListModels.find(model => model.id === modelId);
+    } else {
+      const tabToSet = activeTab || 'daily';
+      setSearchParams({ tab: tabToSet }, { replace: true });
+    }
+  }, [tabFromUrl]);
+
   // xử lý thay đổi trạm thuê xe
   const handleStationChange = (newStation) => {
-    setSelectedStation(newStation);
-    if (newStation) {
-      localStorage.setItem('station', newStation);
-    }
+    setSelectedLocation(newStation); // Cập nhật trong context
+    localStorage.setItem('station', newStation); // Lưu vào localStorage
   };
   // Xử lý click nút đặt xe
   const handleBookingClick = () => {
     setShowBookingPopup(true);
   };
-  // Tính toán số lượng xe có sẵn tại địa điểm đã chọn
-  const getAvailableCount = () => {
-    if (!selectedStation) return 0;
-    
-    const modelNumber = carModel.id.replace('VF', 'VF ');
-    const modelName = `VinFast ${modelNumber}`;
-    
-    return mockCars.filter(car => 
-      car.model === modelName && 
-      car.status === 'available' && 
-      car.station === selectedStation
-    ).length;
-  };
+  // Hiển thị loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Hiển thị error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Hiển thị khi không tìm thấy model
   if (!carModel) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
@@ -68,40 +84,45 @@ export default function BookingPage() {
   } 
   return (
     <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* header*/}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        {/* Header */}
         <div className="overflow-hidden mb-8">
-          <CarOverview 
+          <CarOverviewSection 
             carModel={carModel}
             activeTab={activeTab}
-            selectedStation={selectedStation}
-            getAvailableCount={getAvailableCount}
+            selectedLocation={selectedLocation}
+            availableCount={availableCount}
             handleBookingClick={handleBookingClick} 
           />
         </div>
-        {/* content */}
+        {/* Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <CarDetailsSection carModel={carModel} activeTab={activeTab}/>
+            <CarDetailsSection 
+              carModel={carModel} 
+              activeTab={activeTab}
+            />
           </div>
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              <BookingForm 
+              <LocationFormSection
                 carModel={carModel}
-                selectedStation={selectedStation}
+                selectedLocation={selectedLocation}
                 onStationChange={handleStationChange}
-                getAvailableCount={getAvailableCount}
+                availableCount={availableCount}
+                activeTab={activeTab}
               />
             </div>
           </div>
-          {/* Booking Popup */}
-          <BookingPopup 
-            isOpen={showBookingPopup}
-            onClose={() => setShowBookingPopup(false)}
-            carModel={carModel}
-            selectedStation={selectedStation}
-          />
         </div>
+        {/* Booking Popup */}
+        <BookingPopup 
+          isOpen={showBookingPopup}
+          onClose={() => setShowBookingPopup(false)}
+          carModel={carModel}
+          selectedLocation={selectedLocation}
+          activeTab={activeTab}
+        />
       </div>
     </div>
   );

@@ -5,10 +5,8 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faCar, faBatteryFull, faSuitcase, faGears, faShield, faBolt, faGaugeHigh } from "@fortawesome/free-solid-svg-icons";
 
-export default function CarOverview({ carModel, activeTab, selectedStation, getAvailableCount, handleBookingClick }) {
-  const availableCount = getAvailableCount();
+export default function CarOverviewSection({ carModel, activeTab, selectedLocation, availableCount, handleBookingClick }) {
   const isOutOfStock = availableCount === 0;
-
   // Kiểm tra trạng thái đăng nhập và xác thực từ localStorage
   const checkUserStatus = () => {
     const userString = localStorage.getItem('user');
@@ -116,13 +114,13 @@ export default function CarOverview({ carModel, activeTab, selectedStation, getA
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-4">
               <h1 className="text-5xl font-bold text-gray-900">{carModel.name}</h1>
-              {selectedStation && isOutOfStock && (
+              {selectedLocation && isOutOfStock && (
                 <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
                   Hết xe
                 </span>
               )}
             </div>
-            <div className={`text-3xl font-bold mb-1 ${isOutOfStock && selectedStation ? 'text-gray-400' : 'text-green-500'}`}>
+            <div className={`text-3xl font-bold mb-1 ${isOutOfStock && selectedLocation ? 'text-gray-400' : 'text-green-500'}`}>
               {carModel.price[activeTab].toLocaleString('vi-VN')} 
               <span className="text-lg font-medium text-gray-500 ml-1">
                 VNĐ/{activeTab === 'daily' ? 'ngày' : activeTab === 'weekly' ? 'tuần' : 'tháng'}
@@ -169,15 +167,15 @@ export default function CarOverview({ carModel, activeTab, selectedStation, getA
             {/* Nút đặt xe */}
             <div className="mt-auto">
               <button
-                disabled={isOutOfStock || userStatus.type !== 'verified' || !selectedStation}
+                disabled={isOutOfStock || userStatus.type !== 'verified' || !selectedLocation}
                 onClick={handleBookingClick}
                 className={`w-full py-4 px-6 text-lg font-bold rounded-lg shadow-lg transition-all duration-200 transform ${
-                  isOutOfStock || userStatus.type !== 'verified' || !selectedStation
+                  isOutOfStock || userStatus.type !== 'verified' || !selectedLocation
                     ? 'bg-gray-400 text-gray-500 cursor-not-allowed'
                     : 'hover:scale-105 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-green-200 cursor-pointer'
                 }`}
               >
-                {isOutOfStock ? 'Hết xe' : !selectedStation ? 'Chọn điểm thuê xe' : userStatus.message}
+                {isOutOfStock ? 'Hết xe' : !selectedLocation ? 'Chọn điểm thuê xe' : userStatus.message}
               </button>
             </div>
           </div>
