@@ -108,7 +108,7 @@ export default function Navbar() {
                       <div className="flex items-center space-x-2 mt-2">
                         {user?.role && (
                           <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                            {user.role === 'staff' ? '👔 Nhân viên' : '👤 Khách hàng'}
+                            {user.role === 'admin' ? '🛡️ Quản trị' : user.role === 'staff' ? '👔 Nhân viên' : '👤 Khách hàng'}
                           </span>
                         )}
                         <span className={`inline-block px-2 py-1 text-sm font-medium rounded-full ${
