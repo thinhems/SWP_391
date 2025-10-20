@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // Import Templates
 import HomeTemplate from './pages/HomeTemplate';
 import StaffTemplate from './pages/StaffTemplate';
+import AdminTemplate from './pages/AdminTemplate';
 // Import Home Pages
 import Home from './pages/Home';
 import LoginPage from './pages/HomeTemplate/LoginPage';
@@ -13,6 +14,10 @@ import BookingPage from './pages/HomeTemplate/BookingPage';
 import MyContractsPage from './pages/HomeTemplate/MyContractsPage';
 import ContractDetailPage from './pages/HomeTemplate/ContractDetailPage';
 import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminTemplate/Dashboard';
+import FleetOverview from './pages/AdminTemplate/FleetOverview';
+import Stations from './pages/AdminTemplate/Stations';
+import StaffManagement from './pages/AdminTemplate/StaffManagement';
 // Import Staff Pages
 import OverviewPage from './pages/StaffTemplate/OverviewPage';
 import ManagerCarsPage from './pages/StaffTemplate/ManagerCarsPage';
@@ -26,12 +31,33 @@ import CustomerVerificationPage from './pages/StaffTemplate/CustomerVerification
 import { AuthProvider } from './contexts/AuthContext';
 import './App.css';
 
+// Loading component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+  </div>
+);
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="App">
           <Routes>
+            {/* ADMIN ROUTES */}
+            <Route path="/admin/*" element={<AdminTemplate />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="fleet" element={<FleetOverview />} />
+              <Route path="stations" element={<Stations />} />
+              <Route path="staff" element={<StaffManagement />} />
+              <Route path="manage-cars" element={<ManagerCarsPage />} />
+              <Route path="manage-cars/car-delivery/:carId" element={<CarDeliveryPage />} />
+              <Route path="manage-cars/car-return/:carId" element={<CarReturnPage />} />
+              <Route path="manage-cars/approval-review/:carId" element={<ApprovalReviewPage />} />
+              <Route path="manage-cars/inspection/:carId" element={<CarInspectionPage />} />
+              <Route path="manage-customer" element={<CustomerManagementPage />} />
+              <Route path="manage-customer/verify/:customerId" element={<CustomerVerificationPage />} />
+            </Route>
             {/* STAFF ROUTES */}
             <Route path="/staff/*" element={<StaffTemplate />}>
               <Route index element={<OverviewPage />} />
