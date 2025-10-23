@@ -36,7 +36,6 @@ export default function Navbar() {
   const menuItems = [
     { path: '/', label: 'Trang chủ' },
     { path: '/model-rental', label: 'Thuê xe' },
-    { path: '/vehicles', label: 'Xe điện' },
     { path: '/about', label: 'Giới thiệu' },
     { path: '/contact', label: 'Liên hệ' },
   ];
@@ -47,15 +46,13 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo - Bên trái */}
           <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="flex items-center space-x-2 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-200 shadow-lg">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
-                EV Rent
-              </span>
+            <Link to="/" className="flex items-center group">
+              <img
+                src="/src/assets/images/logo.png"
+                alt="Green Future logo"
+                className="h-14 w-auto object-contain transform group-hover:scale-110 transition-transform duration-200"
+                loading="lazy"
+              />
             </Link>
           </div>
           {/* Menu chính - Giữa */}
@@ -82,7 +79,7 @@ export default function Navbar() {
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
                 >
-                  <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-white font-semibold shadow-md group-hover:shadow-lg transition-shadow">
+                  <div className="w-11 h-11 rounded-full bg-[#3dc743] flex items-center justify-center text-white font-semibold shadow-md group-hover:shadow-lg transition-shadow">
                     <FontAwesomeIcon icon={faUser} />
                   </div>
                   <div className="text-left">
@@ -107,7 +104,7 @@ export default function Navbar() {
                     <div className="px-4 py-3 border-b border-gray-100">
                       <p className="text-sm font-semibold text-gray-900">{user?.name || 'User'}</p>
                       <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-                      
+
                       <div className="flex items-center space-x-2 mt-2">
                         {user?.role && (
                           <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
@@ -165,7 +162,7 @@ export default function Navbar() {
                         <Link
                           to="/my-contracts"
                           onClick={() => setIsProfileMenuOpen(false)}
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+                          className="flex items-center px-4 py-2 text-md text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
                         >
                           <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

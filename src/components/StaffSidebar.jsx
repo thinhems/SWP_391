@@ -1,11 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHouse, faCar, faUsers, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faCar, faUsers, faRightFromBracket, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 export default function StaffSidebar({ isOpen }) {
   const location = useLocation();
   const { logout } = useAuth(); 
-
+  // menu items
   const menuItems = [
     {
       name: 'Tổng quan',
@@ -27,17 +27,28 @@ export default function StaffSidebar({ isOpen }) {
       icon: (
         <FontAwesomeIcon icon={faUsers} />
       )
+    },
+    {
+      name: 'Quay về trang khách hàng',
+      path: '/',
+      icon: (
+        <FontAwesomeIcon icon={faArrowLeft} />
+      )
     }
   ];
-
+  // hàm để check xem đang ở trang nào để highlight menu tương ứng
   const isActive = (path) => {
+    // console.log('location path:', location.pathname, 'path:', path);
+    // Nếu path là '/' thì luôn trả về false
+    if (path === '/') {
+      return false;
+    }
     return (
       location.pathname === path ||
       (path !== '/staff' && location.pathname.startsWith(path)) ||
       (path.startsWith('/staff/manage-cars') && location.pathname.startsWith('/staff/manage-cars'))
     );
   };
-
 
   return (
     <div className="h-full bg-gray-800 text-white relative">
@@ -56,7 +67,6 @@ export default function StaffSidebar({ isOpen }) {
           )}
         </div>
       </div>
-
       <nav className="mt-4">
         <ul className="space-y-1">
           {menuItems.map((item) => (
@@ -87,7 +97,6 @@ export default function StaffSidebar({ isOpen }) {
           </li>
         </ul>
       </nav>
-
       {isOpen && (
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
           <div className="flex items-center space-x-3">
