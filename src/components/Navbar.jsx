@@ -48,7 +48,7 @@ export default function Navbar() {
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="flex items-center group">
               <img
-                src="https://i.ibb.co/twYVKDdZ/logo.png"
+                src="/src/assets/images/logo.png"
                 alt="Green Future logo"
                 className="h-14 w-auto object-contain transform group-hover:scale-110 transition-transform duration-200"
                 loading="lazy"
