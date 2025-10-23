@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { vnpayService } from '../../../services/vnpayService';
 
 export default function BookingPopup({ isOpen, onClose, carModel, selectedLocation }) {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const activeTab = searchParams.get('tab') || 'daily';
+  const [isProcessing, setIsProcessing] = useState(false);
   // Mock data voucher
   const mockVouchers = [
     { code: 'VINFAST10', discount: 10, description: 'Giảm 10% cho lần thuê đầu tiên' },
@@ -119,7 +122,7 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
     }));
   };
   // Xử lý submit
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validation
     if (!formData.customerName || !formData.phone || !formData.email) {
       alert('Vui lòng điền đầy đủ thông tin!');
@@ -145,17 +148,38 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
       alert(`Vui lòng nhập số ${activeTab === 'weekly' ? 'tuần' : 'tháng'} hợp lệ!`);
       return;
     }
-    const pricing = calculatePrice();
-    const bookingData = {
-      ...formData,
-      carModel: carModel.name,
-      station: selectedLocation,
-      rentalType: activeTab,
-      pricing
-    };
-    console.log('Booking data:', bookingData);
-    alert('Đặt xe thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.');
-    onClose();
+
+    setIsProcessing(true);
+    
+    try {
+      const pricing = calculatePrice();
+      const bookingData = {
+        ...formData,
+        carModel: carModel.name,
+        carModelId: carModel.id,
+        station: selectedLocation,
+        rentalType: activeTab,
+        pricing
+      };
+
+      // Tạo dữ liệu thanh toán VNPay
+      const paymentData = vnpayService.createPaymentData(bookingData);
+      
+      // Gọi API tạo URL thanh toán VNPay
+      const result = await vnpayService.createPaymentUrl(paymentData);
+      
+      if (result.success) {
+        // Chuyển hướng đến VNPay
+        vnpayService.redirectToVNPay(result.data.paymentUrl);
+      } else {
+        alert(`Lỗi: ${result.error}`);
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      console.error('Error processing payment:', error);
+      alert('Có lỗi xảy ra khi xử lý thanh toán. Vui lòng thử lại!');
+      setIsProcessing(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -331,14 +355,21 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={!formData.agreeTerms}
+                  disabled={!formData.agreeTerms || isProcessing}
                   className={`w-full py-4 px-6 text-lg font-bold rounded-lg shadow-lg transition-all duration-200 ${
-                    !formData.agreeTerms
+                    !formData.agreeTerms || isProcessing
                       ? 'bg-gray-400 text-gray-500 cursor-not-allowed'
                       : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white transform hover:scale-105 cursor-pointer'
                   }`}
                 >
-                  Gửi yêu cầu thuê xe
+                  {isProcessing ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Đang xử lý thanh toán...
+                    </div>
+                  ) : (
+                    'Thanh toán VNPay'
+                  )}
                 </button>
               </div>
             </div>

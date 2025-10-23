@@ -10,7 +10,7 @@ export default function AdminSidebar({ isOpen }) {
   const menuItems = [
     { name: 'Tổng quan', path: '/admin', icon: (<FontAwesomeIcon icon={faHouse} />) },
     { name: 'Đội xe', path: '/admin/fleet', icon: (<FontAwesomeIcon icon={faCar} />) },
-    { name: 'Điểm thuê', path: '/admin/stations', icon: (<FontAwesomeIcon icon={faHouse} />) },
+    // { name: 'Điểm thuê', path: '/admin/stations', icon: (<FontAwesomeIcon icon={faHouse} />) },
     { name: 'Nhân viên', path: '/admin/staff', icon: (<FontAwesomeIcon icon={faUsers} />) },
     { name: 'Quản lý xe', path: '/admin/manage-cars?tab=available', icon: (<FontAwesomeIcon icon={faCar} />) },
     { name: 'Quản lý khách hàng', path: '/admin/manage-customer', icon: (<FontAwesomeIcon icon={faUsers} />) }

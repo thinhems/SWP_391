@@ -1,8 +1,8 @@
 {
-  "name": "swp-391-frontend",
+  "name": "ev-rent-frontend",
   "version": "1.0.0",
   "type": "module",
-  "description": "React.js frontend project with axios",
+  "description": "EV Rent - Dịch vụ cho thuê xe điện",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.0.1",

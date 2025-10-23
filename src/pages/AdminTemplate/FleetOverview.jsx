@@ -150,8 +150,8 @@ export default function FleetOverview() {
             <option value="rented">Đang thuê</option>
           </select>
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-            <option value="battery_desc">Pin: cao -> thấp</option>
-            <option value="battery_asc">Pin: thấp -> cao</option>
+            <option value="battery_desc">Pin: cao đến thấp</option>
+            <option value="battery_asc">Pin: thấp đến cao</option>
             <option value="station_asc">Theo điểm</option>
           </select>
         </div>

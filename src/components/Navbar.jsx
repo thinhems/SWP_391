@@ -54,7 +54,7 @@ export default function Navbar() {
                 </svg>
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
-                Green Future
+                EV Rent
               </span>
             </Link>
           </div>
