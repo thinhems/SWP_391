@@ -242,5 +242,53 @@ export const mockListModels = [
       '/images/vinfast-vf9-3.png',
       '/images/vinfast-vf9-4.png'
     ]
+  },
+  {
+    id: 'VF_FAKE_IP',
+    name: 'VinFast VF Fake IP',
+    type: 'Fake IP Model',
+    price: {
+      daily: 1000000,
+      weekly: 6500000,
+      monthly: 25000000
+    },
+    deposit: {
+      daily: 4000000,
+      weekly: 6000000,
+      monthly: 10000000
+    },
+    features: ['Fake IP Model', '~300km (NEDC)', '5 chỗ', 'Dung tích cốp 400L'],
+    specifications: {
+      seats: 5,
+      transmission: 'Tự động',
+      maxPower: '200 HP',
+      trunkCapacity: '400L',
+      range: '300km (NEDC)',
+      airbags: '6 túi khí',
+      carModel: 'Fake IP Model',
+      limitKm: 200,
+    },
+    amenities: [
+      'Màn hình giải trí 12 inch',
+      'La-zăng 18 inch',
+      'Hệ thống định vị GPS',
+      'Kết nối Bluetooth',
+      'Camera lùi'
+    ],
+    conditions: [
+      'CCCD hoặc CMND chính chủ',
+      'Bằng lái hạng B2 và có thời hạn',
+      'Thời hạn thanh toán: đặt cọc giữ xe trong 100% khi kí hợp đồng và nhận xe'
+    ],
+    paymentPolicy: [
+      'Trả trước',
+      'Thời hạn thanh toán: đặt cọc giữ xe trong 100% khi kí hợp đồng và nhận xe'
+    ],
+    images: [
+      '/images/vinfast-fake-ip-1.png',
+      '/images/vinfast-fake-ip-2.png',
+      '/images/vinfast-fake-ip-3.png',
+      '/images/vinfast-fake-ip-4.png'
+    ]
   }
 ];
