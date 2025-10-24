@@ -68,14 +68,16 @@ export default function StaffSidebar({ isOpen }) {
         </div>
       </div>
       <nav className="mt-4">
-        <ul className="space-y-1">
+        <ul className="space-y-1 px-3">
           {menuItems.map((item) => (
             <li key={item.path}>
               <Link
                 to={item.path}
-                className={`flex items-center px-4 py-3 text-sm hover:bg-gray-700 transition-colors duration-200 ${
+                className={`flex items-center py-3 text-sm hover:bg-gray-700 transition-colors duration-200 rounded rounded-xl ${
+                  isOpen ? 'px-4' : 'justify-center'
+                } ${
                   isActive(item.path) 
-                    ? 'bg-green-600 text-white border-r-4 border-green-400' 
+                    ? `bg-green-600 text-white ${isOpen && 'border-l-4 border-green-400'}` 
                     : 'text-gray-300 hover:text-white'
                 }`}
                 title={!isOpen ? item.name : ''}
@@ -85,11 +87,12 @@ export default function StaffSidebar({ isOpen }) {
               </Link>
             </li>
           ))}
-
           <li>
             <button
               onClick={logout}
-              className="flex items-center w-full px-4 py-3 text-sm text-gray-300 hover:bg-red-600 hover:text-white transition-colors duration-200"
+              className={`flex items-center w-full py-3 text-sm text-gray-300 hover:bg-red-600 hover:text-white transition-colors duration-200 rounded rounded-xl ${
+                isOpen ? 'px-4' : 'justify-center'
+              }`}
             >
               <FontAwesomeIcon icon={faRightFromBracket} />
               {isOpen && <span className="ml-3 font-medium">Đăng xuất</span>}

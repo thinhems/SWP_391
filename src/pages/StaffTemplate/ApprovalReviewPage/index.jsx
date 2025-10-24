@@ -55,7 +55,7 @@ export default function ApprovalReviewPage() {
       
       alert(`Đã duyệt yêu cầu thuê xe thành công!\n\nThông báo đã được gửi tới: ${requestData.customer.name}\nEmail: ${requestData.customer.email}\nSĐT: ${requestData.customer.phone}\n\nHợp đồng điện tử sẽ được tạo và gửi cho khách hàng trong vòng 5 phút.`);
       
-      navigate('/staff/manage-cars?tab=pending_contract');
+      navigate('/staff/manage-cars?tab=pending_approval');
     } catch (error) {
       console.error('Error approving request:', error);
       alert('Có lỗi xảy ra khi duyệt yêu cầu. Vui lòng thử lại.');
