@@ -1,5 +1,5 @@
 export const listItemCar = {
-  VF001: [
+  VF301: [
     // Ngoại thất
     {
       category: 'Ngoại thất',
@@ -48,7 +48,7 @@ export const listItemCar = {
     }
   ],
 
-  VF002: [
+  VF701: [
     // Ngoại thất
     {
       category: 'Ngoại thất',
@@ -97,7 +97,7 @@ export const listItemCar = {
     }
   ],
 
-  VF003: [
+  VF901: [
     // Ngoại thất
     {
       category: 'Ngoại thất',
@@ -146,7 +146,7 @@ export const listItemCar = {
     }
   ],
 
-  VF004: [
+  VF501: [
     // Ngoại thất
     {
       category: 'Ngoại thất',
@@ -195,7 +195,7 @@ export const listItemCar = {
     }
   ],
 
-  VF005: [
+  VF803: [
     // Ngoại thất
     {
       category: 'Ngoại thất',
@@ -244,7 +244,7 @@ export const listItemCar = {
     }
   ],
 
-  VF006: [
+  VF802: [
     // Ngoại thất
     {
       category: 'Ngoại thất',
@@ -293,7 +293,7 @@ export const listItemCar = {
     }
   ],
 
-  VF007: [
+  VF601: [
     // Ngoại thất
     {
       category: 'Ngoại thất',
@@ -342,7 +342,7 @@ export const listItemCar = {
     }
   ],
 
-  VF008: [
+  VF801: [
     // Ngoại thất
     {
       category: 'Ngoại thất',
@@ -391,7 +391,7 @@ export const listItemCar = {
     }
   ],
 
-  VF009: [
+  VF902: [
     // Ngoại thất
     {
       category: 'Ngoại thất',
@@ -440,7 +440,7 @@ export const listItemCar = {
     }
   ],
 
-  VF010: [
+  VF804: [
     // Ngoại thất
     {
       category: 'Ngoại thất',
