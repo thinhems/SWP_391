@@ -27,7 +27,7 @@ export const ActivitiesProvider = ({ children }) => {
         id: `rental_${index}`,
         type: 'rental',
         title: `Xe ${car.model} (${car.licensePlate}) đang được thuê`,
-        customer: car.customer,
+        customer: car.customer.name,
         time: '2 giờ trước',
         icon: 'car',
         color: 'text-purple-600',
@@ -40,7 +40,7 @@ export const ActivitiesProvider = ({ children }) => {
       dataActivities.push({
         id: `approval_${index}`,
         type: 'approval',
-        title: `Yêu cầu thuê mới từ ${car.customer}`,
+        title: `Yêu cầu thuê mới từ ${car.customer.name}`,
         customer: `Xe ${car.model} (${car.licensePlate})`,
         time: `${index + 1} giờ trước`,
         icon: 'clock',
