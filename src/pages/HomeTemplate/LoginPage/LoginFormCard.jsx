@@ -131,6 +131,12 @@ export default function LoginFormCard({ formikProps, onNavigateToRegister, onFor
           <button
             type="submit"
             disabled={isSubmitting}
+            onClick={(e) => {
+              if (isSubmitting) {
+                e.preventDefault();
+                return;
+              }
+            }}
             className={`cursor-pointer group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white transition-all duration-200 ${
               isSubmitting
                 ? 'bg-gray-400 cursor-not-allowed'

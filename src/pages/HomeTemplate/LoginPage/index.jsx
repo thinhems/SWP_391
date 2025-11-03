@@ -11,7 +11,7 @@ const loginValidationSchema = Yup.object({
     .email('Email không hợp lệ')
     .required('Email là bắt buộc'),
   password: Yup.string()
-    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+    .min(1, 'Mật khẩu phải có ít nhất 6 ký tự')
     .required('Mật khẩu là bắt buộc'),
   rememberMe: Yup.boolean()
 });
@@ -34,15 +34,27 @@ export default function LoginPage() {
   };
   // hàm xử lý khi submit form đăng nhập
   const handleSubmit = async (values, { setSubmitting, setFieldError, setStatus }) => {
+    if (setSubmitting) {
+      setSubmitting(true);
+    }
     setStatus(null);
+
     try {
-      const result = await login({
+      console.log('Attempting login with:', values);
+      
+      const loginResult = await login({
         email: values.email,
         password: values.password,
         rememberMe: values.rememberMe
+      }).catch(error => {
+        console.error('Login API error:', error);
+        throw error;
       });
-      if (result.success) {
-        const role = result?.data?.user?.role;
+
+      console.log('Login result:', loginResult);
+
+      if (loginResult?.success && loginResult?.data?.user) {
+        const role = loginResult.data.user.role;
         if (role === 'admin') {
           navigate('/admin', { replace: true });
         } else if (role === 'staff') {
@@ -50,15 +62,26 @@ export default function LoginPage() {
         } else {
           navigate('/', { replace: true });
         }
-      } else {
-        // đăng nhập thất bại
-        setStatus(result.message || 'Đăng nhập thất bại');
+        return;
+      }
+      
+      // Nếu không thành công, hiển thị lỗi
+      const errorMsg = loginResult?.error || 'Email hoặc mật khẩu không chính xác';
+      console.error('Login failed:', errorMsg);
+      setStatus(errorMsg);
+      setFieldError('password', errorMsg);
+      if (setSubmitting) {
+        setSubmitting(false);
       }
     } catch (error) {
       console.error('Login error:', error);
-      setStatus('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
-    } finally {
-      setSubmitting(false);
+      const errorMsg = error?.response?.data?.message || error.message || 'Có lỗi xảy ra khi đăng nhập';
+      setStatus(errorMsg);
+      setFieldError('password', errorMsg);
+      if (setSubmitting) {
+        setSubmitting(false);
+      }
+      return false; // Prevent form submission
     }
   };
   // hàm chuyển hướng đến trang đăng ký

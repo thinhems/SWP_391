@@ -4,82 +4,125 @@ export const authService = {
   // Login user
   login: async (credentials) => {
     try {
-      const response = await api.post('/auth/login', credentials);
-      const { token, user } = response.data;
-      
-      // Store token in localStorage
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      
-      return { success: true, data: response.data };
-    } catch (error) {
-      // fake login for staff/admin/customer, xóa khi có backend
-      const { email, password } = credentials;
-      // Admin account (fake)
-      if (email === 'admin@gmail.com' && password === '123456') {
-        const user = {
-          name: 'Admin User',
-          email: 'admin@gmail.com',
-          phone: '0888888888',
-          role: 'admin',
-          station: null,
-          isVerified: "verified",
-        };
-        const token = 'fake-jwt-token-admin';
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        return { success: true, data: { token, user } };
-      }
-      if (email === 'staff@gmail.com' && password === '123456') {
-        // Tạo user giả lập
-        const user = {
-          name: 'Staff User',
-          email: 'staff@gmail.com',
-          phone: '0123456789',
-          role: 'staff',
-          station: 'Quận 1',
-          isVerified: "verified",
-        };
-        const token = 'fake-jwt-token'; // token giả
-
-        // Lưu vào localStorage
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-
-        return { success: true, data: { token, user } };
-      } else if (email === 'mdtrong1305@gmail.com' && password === '123456') {
-        const user = {
-          name: 'Trọng',
-          email: 'mdtrong1305@gmail.com',
-          phone: '0999999999',
-          role: 'customer',
-          station: null,
-          isVerified: "verified",
-        };
-        const token = 'fake-jwt-token-admin'; // token giả
-
-        // Lưu vào localStorage
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-
-        return { success: true, data: { token, user } };
-      }
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Login failed' 
+      const requestBody = {
+        email: credentials.email,
+        password: credentials.password
       };
+      
+      console.log('AuthService - Request:', requestBody);
+      
+      const response = await api.post('/Auth/login', requestBody);
+      console.log('AuthService - Response:', response.data);
+
+      // Kiểm tra nếu response là error response
+      if (response.data?.error || !response.data) {
+        // Nếu server trả về error message, throw error với message đó
+        throw new Error(response.data?.message || 'Không nhận được phản hồi từ server');
+      }
+
+      // API trả về user data trực tiếp, không wrapped trong success/data
+      const userData = response.data;
+      console.log('AuthService - User data:', userData);
+
+      // Map role từ API
+      let mappedRole;
+      switch((userData.role || '').toUpperCase()) {
+        case 'STAFF':
+          mappedRole = 'staff';
+          break;
+        case 'ADMIN':
+          mappedRole = 'admin';
+          break;
+        case 'RENTER':
+          mappedRole = 'renter';
+          break;
+        default:
+          console.warn('Role không xác định:', userData.role);
+          mappedRole = 'renter';
+      }
+
+      // Tạo user object
+      const user = {
+        name: userData.fullName || '',
+        email: userData.email || '',
+        phone: userData.phoneNumber || '',
+        role: mappedRole,
+        station: userData.stationId || null,
+        isVerified: userData.isVerified || false
+      };
+
+      // Lưu thông tin user
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', userData.token || 'dummy-token');
+
+      return {
+        success: true,
+        data: {
+          token: userData.token || 'dummy-token',
+          user
+        }
+      };    } catch (error) {
+      console.error('AuthService - Error:', error);
+      console.error('Error response:', error.response);
+      
+      let errorMessage = 'Đăng nhập thất bại';
+      
+      // Kiểm tra các trường hợp lỗi khác nhau
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      console.log('Original error message:', errorMessage);
+
+      // Map error messages
+      switch(errorMessage.toLowerCase()) {
+        case 'invalid password.':
+        case 'incorrect password':
+        case 'password is incorrect':
+          errorMessage = 'Mật khẩu không chính xác';
+          break;
+        case 'user not found.':
+        case 'email not found':
+        case 'account not found':
+          errorMessage = 'Tài khoản không tồn tại';
+          break;
+        case 'invalid credentials':
+        case 'invalid username or password':
+          errorMessage = 'Thông tin đăng nhập không chính xác';
+          break;
+        default:
+          if (errorMessage.toLowerCase().includes('password')) {
+            errorMessage = 'Mật khẩu không chính xác';
+          }
+      }
+
+      // Throw the error instead of returning failure object
+      throw new Error(errorMessage);
     }
   },
 
   // Register user
   register: async (userData) => {
     try {
-      const response = await api.post('/auth/register', userData);
-      return { success: true, data: response.data };
+      const response = await api.post('/Auth/register', {
+        email: userData.email,
+        password: userData.password,
+        fullName: userData.name,
+        phoneNumber: userData.phone
+      });
+      return { 
+        success: response.data.success, 
+        data: response.data.data,
+        error: response.data.success ? null : response.data.message
+      };
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Registration failed' 
+        error: error.response?.data?.message || 'Đăng ký thất bại' 
       };
     }
   },
@@ -99,20 +142,7 @@ export const authService = {
   // Check if user is authenticated
   isAuthenticated: () => {
     return !!localStorage.getItem('token');
-  },
-
-  // Refresh token
-  refreshToken: async () => {
-    try {
-      const response = await api.post('/auth/refresh');
-      const { token } = response.data;
-      localStorage.setItem('token', token);
-      return { success: true, data: response.data };
-    } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Token refresh failed' 
-      };
-    }
   }
 };
+
+export default authService;
