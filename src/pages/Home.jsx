@@ -126,6 +126,9 @@ const Home = () => {
                 <div className="flex justify-center items-center gap-10 mb-12">
                   {visibleModels.map((model, idx) => {
                     const isCenter = model.position === 0;
+                    // Safe image and specification access to avoid runtime errors when API returns incomplete items
+                    const imgSrc = (model.images && model.images.length > 0) ? model.images[0] : 'https://via.placeholder.com/600x400?text=No+Image';
+                    const specs = model.specifications || {};
                     return (
                       <div
                         key={`${model.id}-${idx}`}
@@ -174,7 +177,7 @@ const Home = () => {
                           style={{ height: isCenter ? '200px' : '170px' }}
                         >
                           <img 
-                            src={model.images[0]} 
+                            src={imgSrc} 
                             alt={model.name}
                             className="max-h-full max-w-full object-contain drop-shadow-lg"
                           />
@@ -193,19 +196,19 @@ const Home = () => {
                               <div className={`rounded-full bg-teal-100 p-2 ${isCenter ? 'w-8 h-8' : 'w-7 h-7'} flex items-center justify-center`}>
                                 <FontAwesomeIcon icon={faBatteryFull} />
                               </div>
-                              <span className="font-medium text-slate-700">{model.specifications.range}</span>
+                              <span className="font-medium text-slate-700">{specs.range ?? 'N/A'}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className={`rounded-full bg-cyan-100 p-2 ${isCenter ? 'w-8 h-8' : 'w-7 h-7'} flex items-center justify-center`}>
                                 <FontAwesomeIcon icon={faUser} />
                               </div>
-                              <span className="font-medium text-slate-700">{model.specifications.seats} chỗ</span>
+                              <span className="font-medium text-slate-700">{specs.seats ?? 'N/A'} chỗ</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className={`rounded-full bg-blue-100 p-2 ${isCenter ? 'w-8 h-8' : 'w-7 h-7'} flex items-center justify-center`}>
                                 <FontAwesomeIcon icon={faSuitcase} />
                               </div>
-                              <span className="font-medium text-slate-700">Cốp {model.specifications.trunkCapacity}</span>
+                              <span className="font-medium text-slate-700">Cốp {specs.trunkCapacity ?? 'N/A'}</span>
                             </div>
                           </div>
                         </div>
