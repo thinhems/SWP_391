@@ -2,11 +2,15 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: '/api', // This will be proxied in development
+  baseURL: process.env.NODE_ENV === 'production'
+    ? 'https://thuexebackend.azurewebsites.net/api'
+    : '/api',
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  withCredentials: true
 });
 
 // Request interceptor to add auth token
