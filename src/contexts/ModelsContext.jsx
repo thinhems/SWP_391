@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { mockListModels } from '../data/mockListModels';
+import api from '../services/api';
 import { mockCars } from '../data/mockCars';
 
 const ModelsContext = createContext();
@@ -23,9 +23,48 @@ export const ModelsProvider = ({ children }) => {
 		setLoading(true);
 		setError(null);
 		try {
-			await new Promise(resolve => setTimeout(resolve, 800));
-			setModels(mockListModels);
-      setSelectedLocation('Quận 1');
+			// Fetch from backend API
+			const res = await api.get('/Model/GetAll');
+			let fetched = res?.data ?? [];
+			// Normalize common shapes: { data: [...] } or { items: [...] }
+			if (fetched && typeof fetched === 'object') {
+				if (Array.isArray(fetched)) {
+					// already an array
+				} else if (Array.isArray(fetched.data)) {
+					fetched = fetched.data;
+				} else if (Array.isArray(fetched.items)) {
+					fetched = fetched.items;
+				} else {
+					// fallback: not an array
+					fetched = [];
+				}
+			}
+			// Normalize API model shape to the frontend shape expected by Home.jsx
+			const normalized = fetched.map((item) => {
+				const id = item.id ?? item._id ?? item.code ?? '';
+				const name = item.modelName ?? item.name ?? item.model ?? `Model ${id}`;
+				const price = item.price ?? (item.pricing ?? {});
+				const images = item.images ?? item.photos ?? item.imageUrls ?? [
+					'https://via.placeholder.com/600x400?text=No+Image'
+				];
+				const specifications = {
+					seats: item.seat ?? item.seats ?? item.specifications?.seats ?? 4,
+					range: item.range ?? item.specifications?.range ?? 'N/A',
+					trunkCapacity: item.trunkCapatity ?? item.trunkCapacity ?? item.specifications?.trunkCapacity ?? 'N/A'
+				};
+				return {
+					id,
+					name,
+					price,
+					images,
+					type: item.type ?? item.vehicleType ?? 'Xe điện',
+					specifications,
+					quantity: item.quantity ?? item.qty ?? null,
+					_original: item // keep original in case we need raw fields
+				};
+			});
+			setModels(normalized);
+			setSelectedLocation('Quận 1');
 		} catch (err) {
 			console.error('Error fetching models data:', err);
 			setError('Có lỗi xảy ra khi tải dữ liệu models');
@@ -37,12 +76,36 @@ export const ModelsProvider = ({ children }) => {
 		fetchModels();
 	}, []);
 	// Tính số xe available cho mỗi model tại quận được chọn
-	const getAvailableCount = (modelId) => {
-		if (!modelId) return 0;
-		const modelNumber = modelId.replace('VF', 'VF ');
-		const modelName = `VinFast ${modelNumber}`;
+	// Accept either a model id, a model object, or a normalized model with `name`.
+	const getAvailableCount = (modelOrId) => {
+		if (!modelOrId) return 0;
+		let modelNameToMatch = null;
+		// If it's an object and has a frontend `name`, use it
+		if (typeof modelOrId === 'object' && modelOrId !== null) {
+			if (typeof modelOrId.name === 'string' && modelOrId.name.length > 0) {
+				modelNameToMatch = modelOrId.name;
+			} else if (typeof modelOrId.modelName === 'string') {
+				modelNameToMatch = modelOrId.modelName;
+			} else if (typeof modelOrId.id !== 'undefined') {
+				modelNameToMatch = String(modelOrId.id);
+			}
+		} else {
+			modelNameToMatch = String(modelOrId);
+		}
+		if (!modelNameToMatch) return 0;
+		// If the name already contains 'VinFast', try to match mockCars directly.
+		let possibleNames = [modelNameToMatch];
+		if (!/vinfast/i.test(modelNameToMatch)) {
+			// try to normalize VF codes: e.g. 'VF6' or 'VF 6S' forms
+			const vfNormalized = modelNameToMatch.replace(/VF\s*/i, 'VF ');
+			possibleNames.push(`VinFast ${vfNormalized}`);
+			possibleNames.push(`VinFast ${modelNameToMatch}`);
+		} else {
+			possibleNames.push(modelNameToMatch.replace(/\s+/g, ' '));
+		}
+		// Find matching cars
 		return mockCars.filter(car => 
-			car.model === modelName && 
+			possibleNames.includes(car.model) && 
 			car.status === 'available' && 
 			car.station === selectedLocation
 		).length;
