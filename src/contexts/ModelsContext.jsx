@@ -25,18 +25,20 @@ export const ModelsProvider = ({ children }) => {
 		try {
 			// Fetch from backend API
 			const res = await api.get('/Model/GetAll');
-			let fetched = res?.data ?? [];
-			// Normalize common shapes: { data: [...] } or { items: [...] }
-			if (fetched && typeof fetched === 'object') {
-				if (Array.isArray(fetched)) {
-					// already an array
-				} else if (Array.isArray(fetched.data)) {
-					fetched = fetched.data;
-				} else if (Array.isArray(fetched.items)) {
-					fetched = fetched.items;
-				} else {
-					// fallback: not an array
-					fetched = [];
+			// Ensure we have an array, even if empty
+			let fetched = [];
+			
+			if (res?.data) {
+				// Handle different response shapes
+				if (Array.isArray(res.data)) {
+					fetched = res.data;
+				} else if (typeof res.data === 'object') {
+					// Try common wrapper properties
+					if (Array.isArray(res.data.data)) fetched = res.data.data;
+					else if (Array.isArray(res.data.items)) fetched = res.data.items;
+					else if (Array.isArray(res.data.models)) fetched = res.data.models;
+					// If it's a single object, wrap it in an array
+					else if (Object.keys(res.data).length > 0) fetched = [res.data];
 				}
 			}
 			// Normalize API model shape to the frontend shape expected by Home.jsx
