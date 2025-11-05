@@ -2,15 +2,11 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  // In production, use the direct Azure URL to avoid CORS issues
-  baseURL: 'https://thuexebackend.azurewebsites.net/api',
+  baseURL: '/api', // This will be proxied in development
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  },
-  // Don't send credentials for cross-origin requests
-  withCredentials: false
+    'Content-Type': 'application/json'
+  }
 });
 
 // Request interceptor to add auth token

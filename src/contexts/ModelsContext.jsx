@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import api from '../services/api';
+import { mockListModels } from '../data/mockListModels';
 import { mockCars } from '../data/mockCars';
 
 const ModelsContext = createContext();
@@ -23,49 +23,8 @@ export const ModelsProvider = ({ children }) => {
 		setLoading(true);
 		setError(null);
 		try {
-			// Fetch from backend API
-			const res = await api.get('/Model/GetAll');
-			// Ensure we have an array, even if empty
-			let fetched = [];
-			
-			if (res?.data) {
-				// Handle different response shapes
-				if (Array.isArray(res.data)) {
-					fetched = res.data;
-				} else if (typeof res.data === 'object') {
-					// Try common wrapper properties
-					if (Array.isArray(res.data.data)) fetched = res.data.data;
-					else if (Array.isArray(res.data.items)) fetched = res.data.items;
-					else if (Array.isArray(res.data.models)) fetched = res.data.models;
-					// If it's a single object, wrap it in an array
-					else if (Object.keys(res.data).length > 0) fetched = [res.data];
-				}
-			}
-			// Normalize API model shape to the frontend shape expected by Home.jsx
-			const normalized = fetched.map((item) => {
-				const id = item.id ?? item._id ?? item.code ?? '';
-				const name = item.modelName ?? item.name ?? item.model ?? `Model ${id}`;
-				const price = item.price ?? (item.pricing ?? {});
-				const images = item.images ?? item.photos ?? item.imageUrls ?? [
-					'https://via.placeholder.com/600x400?text=No+Image'
-				];
-				const specifications = {
-					seats: item.seat ?? item.seats ?? item.specifications?.seats ?? 4,
-					range: item.range ?? item.specifications?.range ?? 'N/A',
-					trunkCapacity: item.trunkCapatity ?? item.trunkCapacity ?? item.specifications?.trunkCapacity ?? 'N/A'
-				};
-				return {
-					id,
-					name,
-					price,
-					images,
-					type: item.type ?? item.vehicleType ?? 'Xe điện',
-					specifications,
-					quantity: item.quantity ?? item.qty ?? null,
-					_original: item // keep original in case we need raw fields
-				};
-			});
-			setModels(normalized);
+			await new Promise(resolve => setTimeout(resolve, 800));
+			setModels(mockListModels);
 			setSelectedLocation('Quận 1');
 		} catch (err) {
 			console.error('Error fetching models data:', err);
