@@ -58,7 +58,8 @@ export const mockOrders = [
       totalCost: 4500000,
       grandTotal: 7500000,
       kmOverageFee: 5000,
-      batteryDeficitFee: 10000
+      batteryDeficitFee: 10000,
+      rentalType: 'daily'
     },
     booking: {
       bookingTime: '2025-09-23 15:45:00',

@@ -70,7 +70,7 @@ export default function ModelListPage() {
           selectedLocation={selectedLocation}
         />
         {/* Car Models Display */}
-        <div className="car-model-carousel">
+        <div className="">
           <CarModelCarousel 
             selectedLocation={selectedLocation}
             onModelSelect={handleModelSelect}

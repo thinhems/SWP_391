@@ -79,17 +79,16 @@ export default function ListCarsSection({ cars, activeTab }) {
               <span className="text-sm text-gray-600">Vị trí:</span>
               <span className="text-sm font-medium text-gray-900">{car.location}</span>
             </div>
-
             {/* thông tin theo từng trạng thái */}
-            {car.customer && (
+            {car.customer.name && (
               <>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Khách hàng:</span>
-                  <span className="text-sm font-medium text-gray-900">{car.customer}</span>
+                  <span className="text-sm font-medium text-gray-900">{car.customer.name}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">SĐT:</span>
-                  <span className="text-sm font-medium text-blue-600">{car.phone}</span>
+                  <span className="text-sm font-medium text-blue-600">{car.customer.phone}</span>
                 </div>
               </>
             )}
