@@ -2,15 +2,15 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: process.env.NODE_ENV === 'production'
-    ? 'https://thuexebackend.azurewebsites.net/api'
-    : '/api',
+  // In production, use the direct Azure URL to avoid CORS issues
+  baseURL: 'https://thuexebackend.azurewebsites.net/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
-  withCredentials: true
+  // Don't send credentials for cross-origin requests
+  withCredentials: false
 });
 
 // Request interceptor to add auth token

@@ -13,10 +13,17 @@
       ]
     }
   ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "methods": ["OPTIONS"],
+      "dest": "https://thuexebackend.azurewebsites.net/api/$1"
+    }
+  ],
   "rewrites": [
     {
-      "source": "/api/:match*",
-      "destination": "https://thuexebackend.azurewebsites.net/api/:match*"
+      "source": "/api/:path(.*)",
+      "destination": "https://thuexebackend.azurewebsites.net/api/:path"
     },
     {
       "source": "/(.*)",
