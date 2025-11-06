@@ -231,8 +231,63 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
           <div className="flex flex-col lg:flex-row gap-6 pb-6">
             {/* content left */}
             <div className="flex-1 lg:w-6/10 space-y-6">
-              {/* Thời gian thuê xe */}
+              {/* Thông tin khách hàng - Read only */}
               <div className="pt-6 px-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Thông tin khách hàng</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tên người thuê</label>
+                    <input
+                      type="text"
+                      value={(() => {
+                        const userString = localStorage.getItem('user');
+                        if (userString) {
+                          const user = JSON.parse(userString);
+                          return user.name || '';
+                        }
+                        return '';
+                      })()}
+                      disabled
+                      className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-700 rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                    <input
+                      type="tel"
+                      value={(() => {
+                        const userString = localStorage.getItem('user');
+                        if (userString) {
+                          const user = JSON.parse(userString);
+                          return user.phone || '';
+                        }
+                        return '';
+                      })()}
+                      disabled
+                      className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-700 rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={(() => {
+                        const userString = localStorage.getItem('user');
+                        if (userString) {
+                          const user = JSON.parse(userString);
+                          return user.email || '';
+                        }
+                        return '';
+                      })()}
+                      disabled
+                      className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-700 rounded-lg"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Thời gian thuê xe */}
+              <div className="pt-2 px-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Thời gian thuê xe</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
