@@ -13,9 +13,10 @@ export default function BookingPage() {
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabFromUrl || 'daily');
   const [showBookingPopup, setShowBookingPopup] = useState(false);
-  // Lấy thông tin model cụ thể từ context
+
+  // Get model from context
   const carModel = modelsData?.getModelById?.(modelId);
-  const availableCount = carModel ? carModel.availableCount : 0; // số xe khả dụng cho model này tại selectedLocation
+  const availableCount = carModel ? carModel.availableCount : 0;
   // xử lý đồng bộ tab với URL đảm bảo luôn có tab trong URL
   useEffect(() => {
     if (tabFromUrl) {

@@ -7,18 +7,15 @@ import { faUser, faCar, faBatteryFull, faSuitcase, faGears, faShield, faBolt, fa
 
 export default function CarOverviewSection({ carModel, activeTab, selectedLocation, availableCount, handleBookingClick }) {
   const isOutOfStock = availableCount === 0;
-  // Kiểm tra trạng thái đăng nhập và xác thực từ localStorage
+  // Kiểm tra đăng nhập và tạm thời coi là đã xác thực để thuận tiện demo
   const checkUserStatus = () => {
     const userString = localStorage.getItem('user');
     if (!userString) {
       return { type: 'no_user', message: 'Vui lòng đăng nhập' };
     }
-    
+    // TEMP: Bỏ qua bước xác thực, mọi tài khoản đăng nhập đều được phép đặt xe
     try {
-      const user = JSON.parse(userString);
-      if (!user.isVerified || user.isVerified === 'not_started' || user.isVerified === 'pending') {
-        return { type: 'not_verified', message: 'Tài khoản chưa xác thực' };
-      }
+      JSON.parse(userString); // chỉ để kiểm tra dữ liệu hợp lệ
       return { type: 'verified', message: 'Đặt xe' };
     } catch (error) {
       return { type: 'no_user', message: 'Vui lòng đăng nhập' };
