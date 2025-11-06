@@ -52,7 +52,7 @@ export default function CarDetailsSection({ carModel, activeTab }) {
       <h3 className="text-xl font-bold text-gray-900 mb-4">Các tiện nghi khác</h3>
       <div className="bg-gray-50  border border-gray-200 p-6">
         <div className="grid grid-cols-2">
-          {carModel.amenities.map((amenity, index) => (
+          {(carModel.amenities || []).map((amenity, index) => (
             <div key={index} className="flex items-start space-x-3 p-2">
               <FontAwesomeIcon 
                 icon={getAmenityIcon(amenity)} 

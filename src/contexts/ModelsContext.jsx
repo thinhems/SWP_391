@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { mockListModels } from '../data/mockListModels';
-import { mockCars } from '../data/mockCars';
+import api from '../services/api';
 
 const ModelsContext = createContext();
 
@@ -23,8 +22,49 @@ export const ModelsProvider = ({ children }) => {
 		setLoading(true);
 		setError(null);
 		try {
-			await new Promise(resolve => setTimeout(resolve, 800));
-			setModels(mockListModels);
+			const response = await api.get('/Model/GetAll');
+			const apiModels = response?.data || [];
+
+			// Transform API data to the frontend expected format
+			const transformedModels = apiModels.map(item => {
+				const specs = item.specifications || {};
+				return {
+					id: item.id,
+					name: item.modelName,
+					type: item.type || 'Xe điện',
+					images: Array.isArray(item.images) && item.images.length > 0
+						? item.images
+						: [item.imageUrl || 'https://placehold.co/800x500?text=No+Image'],
+					price: item.price && (item.price.daily || item.price.weekly || item.price.monthly)
+						? item.price
+						: {
+							// Fallbacks if backend doesn't provide full price object
+							daily: item.price?.daily || item.price || 1_250_000,
+							weekly: item.price?.weekly || Math.floor((item.price?.daily || item.price || 1_250_000) * 6.3),
+							monthly: item.price?.monthly || Math.floor((item.price?.daily || item.price || 1_250_000) * 25)
+						},
+					deposit: item.deposit || {
+						daily: 5_000_000,
+						weekly: 10_000_000,
+						monthly: 20_000_000
+					},
+					specifications: {
+						seats: specs.seat ?? 5,
+						range: `${specs.range ?? 400}km`,
+						trunkCapacity: `${specs.trunkCapatity ?? 500}L`,
+						carModel: specs.carModel || item.type || 'Minicar',
+						maxPower: specs.hoursepower ? `${specs.hoursepower} HP` : undefined,
+						limitKm: specs.moveLimit ?? 200,
+						// defaults used by UI
+						transmission: 'Tự động',
+						airbags: '6 túi khí',
+					},
+					quantity: typeof item.quantity === 'number' ? item.quantity : 0,
+					amenities: Array.isArray(item.amenities) ? item.amenities : [],
+				};
+			});
+
+			setModels(transformedModels);
 			setSelectedLocation('Quận 1');
 		} catch (err) {
 			console.error('Error fetching models data:', err);
@@ -36,51 +76,21 @@ export const ModelsProvider = ({ children }) => {
 	useEffect(() => {
 		fetchModels();
 	}, []);
-	// Tính số xe available cho mỗi model tại quận được chọn
-	// Accept either a model id, a model object, or a normalized model with `name`.
-	const getAvailableCount = (modelOrId) => {
-		if (!modelOrId) return 0;
-		let modelNameToMatch = null;
-		// If it's an object and has a frontend `name`, use it
-		if (typeof modelOrId === 'object' && modelOrId !== null) {
-			if (typeof modelOrId.name === 'string' && modelOrId.name.length > 0) {
-				modelNameToMatch = modelOrId.name;
-			} else if (typeof modelOrId.modelName === 'string') {
-				modelNameToMatch = modelOrId.modelName;
-			} else if (typeof modelOrId.id !== 'undefined') {
-				modelNameToMatch = String(modelOrId.id);
-			}
-		} else {
-			modelNameToMatch = String(modelOrId);
-		}
-		if (!modelNameToMatch) return 0;
-		// If the name already contains 'VinFast', try to match mockCars directly.
-		let possibleNames = [modelNameToMatch];
-		if (!/vinfast/i.test(modelNameToMatch)) {
-			// try to normalize VF codes: e.g. 'VF6' or 'VF 6S' forms
-			const vfNormalized = modelNameToMatch.replace(/VF\s*/i, 'VF ');
-			possibleNames.push(`VinFast ${vfNormalized}`);
-			possibleNames.push(`VinFast ${modelNameToMatch}`);
-		} else {
-			possibleNames.push(modelNameToMatch.replace(/\s+/g, ' '));
-		}
-		// Find matching cars
-		return mockCars.filter(car => 
-			possibleNames.includes(car.model) && 
-			car.status === 'available' && 
-			car.station === selectedLocation
-		).length;
+	// Tính số xe còn trống theo quy tắc: quantity > 0 là còn xe
+	const getAvailableCount = (model) => {
+		if (!model) return 0;
+		return model.quantity > 0 ? model.quantity : 0;
 	};
 	// Lọc models và thêm thông tin số xe available cho từng quận
 	const filteredModels = models.map(model => ({
 		...model,
-    station: selectedLocation,
-		availableCount: getAvailableCount(model.id)
+		station: selectedLocation,
+		availableCount: getAvailableCount(model),
 	}));
 	const modelsData = {
 		total: filteredModels.length,
 		allModels: filteredModels,
-		getModelById: (id) => filteredModels.find(model => model.id === id)
+		getModelById: (id) => filteredModels.find(model => String(model.id) === String(id))
 	};
 	const value = { 
 		modelsData, 
