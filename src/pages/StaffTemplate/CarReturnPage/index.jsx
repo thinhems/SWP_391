@@ -7,63 +7,81 @@ import VehicleReturnInfo from './VehicleReturnInfo';
 import VehicleInspectionForm from './VehicleInspectionForm';
 import FeeCalculationSummary from './FeeCalculationSummary';
 import QRCodePayment from './QRCodePayment';
+import { bookingService } from '../../../services/booking.api';
 
 export default function CarReturnPage() {
-  const { carId } = useParams();
+  let { carId } = useParams();
+  carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { getOrderByCarId, updateCar } = useCars();
+  const { updateCar, carsData } = useCars();
   const { addActivity } = useActivities();
-  
+  const [carData, setCarData] = useState(null);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showQRCode, setShowQRCode] = useState(false);
+  // state dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     currentBattery: 0,
     currentOdometer: 0,
     additionalFees: [],
     customFeeAmount: 0
   });
-
+  // fetch dữ liệu booking theo carId
+  const fetchBookingData = async (carId) => {
+    try {
+      const data = await bookingService.getBookingByCarId(carId);
+      if (!data) {
+        setError(`Không tìm thấy yêu cầu duyệt cho xe có ID: ${carId}`);
+        return;
+      }
+      setOrder(data);
+      // Lấy thông tin xe từ Context
+      const carInfo = carsData?.getCarById?.(carId);
+      if (carInfo) {
+        setCarData(carInfo);
+        // Kiểm tra trạng thái xe
+        if (carInfo.status !== 4) {
+          setError("Yêu cầu duyệt không còn hợp lệ (xe không ở trạng thái chờ duyệt).");
+          setOrder(null);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading approval request:', err);
+      setError('Có lỗi xảy ra khi tải thông tin yêu cầu');
+    }
+  };
   // Load dữ liệu order
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-    
-    setTimeout(() => {
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const foundOrder = getOrderByCarId(carId);
-        if (foundOrder && foundOrder.type === 'rented') {
-          setOrder(foundOrder);
-          setInspectionData({
-            currentBattery: foundOrder.car.initialBattery,
-            currentOdometer: foundOrder.car.initialOdometer,
-            additionalFees: [],
-            customFeeAmount: 0
-          });
-        } else {
-          setError(`Không tìm thấy đơn thuê xe hoặc xe chưa được giao cho khách với ID: ${carId}`);
-        }
-      } catch (err) {
-        console.error('Error loading order:', err);
-        setError('Có lỗi xảy ra khi tải thông tin đơn thuê');
+        await fetchBookingData(carId);
+      } catch (error) {
+        console.error('Error loading data:', error);
       } finally {
         setLoading(false);
       }
-    }, 500);
-  }, [carId, getOrderByCarId]);
+    };
+    
+    loadData();
+  }, [carId, carsData]);
   // Xử lý thay đổi dữ liệu kiểm tra xe
   const handleInspectionDataChange = (data) => {
     setInspectionData(data);
   };
-  // Tính toán số tiền cần thu hoặc hoàn trả
-  const calculateNetAmount = () => {
-    const kmDriven = inspectionData.currentOdometer - order.car.initialOdometer;
-    const kmOverage = Math.max(0, kmDriven - order.rental.totalMaxKm);
-    const kmOverageFee = kmOverage * order.rental.kmOverageFee;
+  
+  // Tính toán các khoản phí
+  const calculateFees = () => {
+    if (!carData || !order) return { kmOverageFee: 0, batteryDeficitFee: 0, additionalFeesTotal: 0, totalFees: 0, netAmount: 0 };
+    
+    const kmDriven = inspectionData.currentOdometer - carData.odometer;
+    const kmOverage = Math.max(0, kmDriven - 200);
+    const kmOverageFee = kmOverage * 10000;
 
-    const batteryDeficit = Math.max(0, order.car.initialBattery - inspectionData.currentBattery);
-    const batteryDeficitFee = batteryDeficit * order.rental.batteryDeficitFee;
+    const batteryDeficit = Math.max(0, carData.batteryLevel - inspectionData.currentBattery);
+    const batteryDeficitFee = batteryDeficit * 5000;
 
     const additionalFeesTotal = inspectionData.additionalFees.reduce((sum, fee) => {
       if (fee.isCustom) {
@@ -73,26 +91,36 @@ export default function CarReturnPage() {
     }, 0);
 
     const totalFees = kmOverageFee + batteryDeficitFee + additionalFeesTotal;
-    return order.rental.deposit - totalFees;
+    const netAmount = order.deposit - totalFees;
+    
+    return { kmOverageFee, batteryDeficitFee, additionalFeesTotal, totalFees, netAmount };
   };
   // Xử lý hoàn tất nhận xe trả
-  const handleCompleteReturn = () => {
-    const netAmount = calculateNetAmount();
+  const handleCompleteReturn = async () => {
+    const { netAmount } = calculateFees();
     
     if (netAmount < 0) {
       setShowQRCode(true);
     } else {
       // Hoàn trả tiền cho khách hàng
-      updateCar(carId, { 
-        status: 'available',
-        battery: inspectionData.currentBattery,
-        location: 'Khu vực A - Vị trí 01'
-      });
+      // Cập nhật status xe về available (0)
+      const updateData = {
+        plateNumber: carData.plateNumber,
+        modelID: carData.modelID,
+        stationID: carData.stationID,
+        location: carData.location,
+        batteryLevel: carData.batteryLevel,
+        odometer: carData.odometer,
+        color: carData.color || '',
+        status: 0
+      };
+
+      await updateCar(carId, updateData);
       
       addActivity({
         type: 'return',
-        title: `Đã nhận xe trả ${order.car.model} (${order.car.licensePlate})`,
-        customer: `Hoàn trả ${Math.abs(netAmount).toLocaleString()}đ cho ${order.customer.name}`,
+        title: `Đã nhận xe trả ${carData.modelName} (${carData.plateNumber})`,
+        customer: `Hoàn trả ${Math.abs(netAmount).toLocaleString()}đ cho ${carData.customer.fullName}`,
         icon: 'check',
         color: 'text-green-600',
         bgColor: 'bg-green-100'
@@ -100,8 +128,8 @@ export default function CarReturnPage() {
       
       alert(
         `Hoàn tất nhận xe trả!\n\n` +
-        `Xe: ${order.car.licensePlate}\n` +
-        `Khách hàng: ${order.customer.name}\n` +
+        `Xe: ${carData.plateNumber}\n` +
+        `Khách hàng: ${carData.customer.fullName}\n` +
         `Số tiền hoàn trả: ${Math.abs(netAmount).toLocaleString()} đ\n\n` +
         `Xe đã được cập nhật trạng thái về "Có sẵn".`
       );
@@ -109,14 +137,22 @@ export default function CarReturnPage() {
     }
   };
   // xử lý xác nhận đã nhận thanh toán từ khách
-  const handleConfirmPayment = () => {
-    const netAmount = calculateNetAmount();
+  const handleConfirmPayment = async () => {
+    const { netAmount } = calculateFees();
     
-    updateCar(carId, { 
-      status: 'available',
-      battery: inspectionData.currentBattery,
-      location: 'Khu vực A - Vị trí 01'
-    });
+    // Cập nhật status xe về available (0)
+    const updateData = {
+      plateNumber: carData.plateNumber,
+      modelID: carData.modelID,
+      stationID: carData.stationID,
+      location: carData.location,
+      batteryLevel: carData.batteryLevel,
+      odometer: carData.odometer,
+      color: carData.color || '',
+      status: 0
+    };
+
+    await updateCar(carId, updateData);
     
     addActivity({
       type: 'return',
@@ -149,7 +185,7 @@ export default function CarReturnPage() {
     );
   }
 
-  if (error || !order) {
+  if (error || !order || !carData) {
     return (
       <div className="text-center py-12">
         <div className="text-red-500 mb-4">
@@ -174,15 +210,20 @@ export default function CarReturnPage() {
       <HeaderSection onNavigateBack={() => navigate('/staff/manage-cars?tab=rented')} />
       {!showQRCode ? (
         <>
-          <VehicleReturnInfo order={order} />
+          <VehicleReturnInfo
+            carData={carData}
+            order={order} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <VehicleInspectionForm 
+            <VehicleInspectionForm
+              carData={carData} 
               order={order} 
               onDataChange={handleInspectionDataChange}
             />
-            <FeeCalculationSummary 
+            <FeeCalculationSummary
+              carData={carData} 
               order={order} 
               inspectionData={inspectionData}
+              fees={calculateFees()}
             />
           </div>
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
@@ -200,7 +241,7 @@ export default function CarReturnPage() {
       ) : (
         <>
           <QRCodePayment 
-            amount={Math.abs(calculateNetAmount())}
+            amount={Math.abs(calculateFees().netAmount)}
             customerName={order.customer.name}
           />
           <div className="text-center space-y-4">

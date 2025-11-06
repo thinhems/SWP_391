@@ -111,9 +111,9 @@ export default function ApprovalReviewPage() {
         color: carData.color || '',
         status: 0
       };
-      
+
       await updateCar(carId, updateData);
-      
+
       addActivity({
         type: 'rejection',
         title: `Đã từ chối yêu cầu thuê xe ${carData.modelName}`,

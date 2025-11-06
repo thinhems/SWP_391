@@ -1,4 +1,4 @@
-export default function VehicleReturnInfo({ order }) {
+export default function VehicleReturnInfo({ carData, order }) {
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
@@ -16,19 +16,19 @@ export default function VehicleReturnInfo({ order }) {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">Model:</span>
-              <span className="font-semibold">{order.car.model}</span>
+              <span className="font-semibold">{carData.modelName}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Biển số:</span>
-              <span className="font-bold text-red-600">{order.car.licensePlate}</span>
+              <span className="font-bold text-red-600">{carData.plateNumber}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Pin ban đầu:</span>
-              <span className="font-semibold text-green-600">{order.car.initialBattery}%</span>
+              <span className="font-semibold text-green-600">{carData.batteryLevel}%</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Số km ban đầu:</span>
-              <span className="font-semibold">{order.car.initialOdometer.toLocaleString()} km</span>
+              <span className="font-semibold">{carData.odometer.toLocaleString()} km</span>
             </div>
           </div>
         </div>
@@ -38,19 +38,19 @@ export default function VehicleReturnInfo({ order }) {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">Tên:</span>
-              <span className="font-semibold">{order.customer.name}</span>
+              <span className="font-semibold">{carData.customer.fullName}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">SĐT:</span>
-              <span className="font-semibold text-blue-600">{order.customer.phone}</span>
+              <span className="font-semibold text-blue-600">{carData.customer.phone}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Thời gian thuê:</span>
-              <span className="font-semibold">{order.rental.totalDays} ngày</span>
+              <span className="font-semibold">{order?.totalDays ? order.totalDays : 'N/A'} ngày</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Tiền cọc:</span>
-              <span className="font-bold text-green-600">{order.rental.deposit.toLocaleString()} đ</span>
+              <span className="font-bold text-green-600">{order.deposit.toLocaleString()} đ</span>
             </div>
           </div>
         </div>
@@ -63,8 +63,8 @@ export default function VehicleReturnInfo({ order }) {
           </svg>
           <div>
             <p className="text-blue-800 text-sm">
-              <strong>Lưu ý:</strong> Số km tối đa được chạy: <strong>{order.rental.totalMaxKm.toLocaleString()} km</strong> 
-              ({order.rental.maxKmPerDay} km/ngày × {order.rental.totalDays} ngày)
+              <strong>Lưu ý:</strong> Số km tối đa được chạy: <strong>200 km</strong> 
+              (200 km/ngày × {order?.totalDays} ngày)
             </p>
           </div>
         </div>
