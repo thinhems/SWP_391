@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function HeaderSection( { contractData, carId, currentStep, steps, onNavigateBack }) {
+export default function HeaderSection( { carData, carId, currentStep, steps, onNavigateBack }) {
 	return (
 		<div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
 			{/* header */}
@@ -9,7 +9,7 @@ export default function HeaderSection( { contractData, carId, currentStep, steps
 					<h1 className="text-3xl font-bold text-gray-900">Thủ tục giao xe điện</h1>
 					<div className="mt-1 flex items-center space-x-4">
 						<p className="text-gray-600">
-							Xe {contractData.car.model} - Biển số <span className="font-bold text-red-600">{contractData.car.licensePlate}</span>
+							Xe {carData?.modelName} - Biển số <span className="font-bold text-red-600">{carData?.plateNumber}</span>
 						</p>
 						<span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
 							ID: {carId}

@@ -7,63 +7,68 @@ import CarImagesSection from './CarImagesSection';
 import CarInspectionContent from './CarInspectionContent';
 import CarInspectionSummary from './CarInspectionSummary';
 import PopupReport from './PopupReport';
-
+import { carService } from '../../../services/cars.api';
 export default function CarInspectionPage() {
-  const { carId } = useParams();
+  let { carId } = useParams();
+  carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { carsData, getChecklistByCarId, getFlatChecklistByCarId, updateCar, getOrderByCarId } = useCars();
+  const { updateCar } = useCars();
   const { addActivity } = useActivities();
-  
   const [carData, setCarData] = useState(null);
   const [carImages, setCarImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   // State cho report modal
   const [showPopupReport, setShowPopupReport] = useState(false);
   const [reportContent, setReportContent] = useState('');
-  
   // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
     notes: '',
     inspectionDate: new Date().toISOString()
   });
-  
-  // load dữ liệu xe
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    
-    setTimeout(() => {
-      try {
-        const car = carsData.getCarById(carId);
-        if (car) {
-          setCarData(car);
-          
-          // Load ảnh từ order nếu có
-          const order = getOrderByCarId(carId);
-          if (order && order.car && order.car.images) {
-            setCarImages(order.car.images);
-          } else if (car.images) {
-            setCarImages(car.images);
-          }
-          
-          setInspectionData(prev => ({
-            ...prev,
-            checklist: getFlatChecklistByCarId(carId)
-          }));
-        } else {
-          setError(`Không tìm thấy xe có ID: ${carId}`);
-        }
-      } catch (err) {
-        console.error('Error loading car:', err);
-        setError('Có lỗi xảy ra khi tải thông tin xe');
-      } finally {
-        setLoading(false);
+  // fetch dữ liệu xe theo carId
+  const fetchCarData = async (carId) => {
+    try {
+      const data = await carService.getCarById(carId);
+      if (!data) {
+        setError(`Không tìm thấy xe có ID: ${carId}`);
+        return;
       }
-    }, 500);
-  }, [carId, carsData, getFlatChecklistByCarId, getOrderByCarId]);
+      setCarData(data);
+      // Load ảnh nếu có
+      if (data.images) {
+        setCarImages(data.images);
+      }
+      // lọc ra thành 1 list item theo category
+      const flatChecklist = data.categories?.flatMap(category =>
+        category.items.map(item => ({
+          ...item,
+          categoryName: category.categoryName
+        }))
+      ) || [];
+      // cập nhật dữ liệu kiểm tra xe
+      setInspectionData(prev => ({
+        ...prev,
+        checklist: flatChecklist
+      }));
+    } catch (err) {
+      console.error('Error loading car:', err);
+      setError('Có lỗi xảy ra khi tải thông tin xe');
+    }
+  };
+  
+  // load dữ liệu xe từ API
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      await fetchCarData(carId);
+      setLoading(false);
+    };
+    
+    loadData();
+  }, [carId]);
   
   // xử lý cập nhật dữ liệu xe
   const handleCarDataUpdate = (updatedCarData) => {
@@ -95,14 +100,14 @@ export default function CarInspectionPage() {
     try {
       addActivity({
         type: 'inspection',
-        title: `Đã kiểm tra xe ${carData.model} (${carData.licensePlate})`,
-        customer: `${inspectionData.checklist.filter(i => i.status === 'minor_issue').length} vấn đề nhỏ`,
+        title: `Đã kiểm tra xe ${carData.modelName} (${carData.plateNumber})`,
+        customer: `${inspectionData.checklist.filter(i => i.status === 2 || i.status === 3).length} vấn đề`,
         icon: 'wrench',
         color: 'text-blue-600',
         bgColor: 'bg-blue-100'
       });
       
-      alert(`Đã lưu kết quả kiểm tra xe ${carData.licensePlate} thành công!`);
+      alert(`Đã lưu kết quả kiểm tra xe ${carData.plateNumber} thành công!`);
       navigate('/staff/manage-cars?tab=available');
     } catch (error) {
       alert('Có lỗi xảy ra khi lưu kết quả kiểm tra. Vui lòng thử lại.');
@@ -114,29 +119,29 @@ export default function CarInspectionPage() {
     try {
       addActivity({
         type: 'report',
-        title: `Báo cáo xe ${carData.model} (${carData.licensePlate})`,
+        title: `Báo cáo xe ${carData.modelName} (${carData.plateNumber})`,
         customer: reportContent.substring(0, 50) + '...',
         icon: 'bell',
         color: 'text-orange-600',
         bgColor: 'bg-orange-100'
       });
       
-      alert(`Đã gửi báo cáo cho Admin!\n\nXe: ${carData.model} (${carData.licensePlate})\nNội dung: ${reportContent}`);
+      alert(`Đã gửi báo cáo cho Admin!\n\nXe: ${carData.modelName} (${carData.plateNumber})\nNội dung: ${reportContent}`);
       setShowPopupReport(false);
       setReportContent('');
     } catch (error) {
       alert('Có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.');
     }
   };
-
-  const organizedChecklist = getChecklistByCarId(carId).map(category => ({
+  
+  // Tổ chức checklist từ dữ liệu API
+  const organizedChecklist = carData?.categories?.map(category => ({
     ...category,
-    items: category.items.map(templateItem => {
-      const currentItem = inspectionData.checklist.find(item => item.id === templateItem.id);
-      return currentItem || templateItem;
+    items: category.items.map(item => {
+      const currentItem = inspectionData.checklist.find(checkItem => checkItem.id === item.id);
+      return currentItem || item;
     })
-  }));
-
+  })) || [];
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-96">

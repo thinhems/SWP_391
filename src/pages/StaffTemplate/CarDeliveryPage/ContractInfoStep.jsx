@@ -1,5 +1,5 @@
 
-export default function ContractInfoStep({ contractData }) {
+export default function ContractInfoStep({ carData, contractData }) {
   //format theo VND
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -15,7 +15,17 @@ export default function ContractInfoStep({ contractData }) {
       year: 'numeric'
     });
   };
-
+  const checkYearCar = (nameCar) => { 
+    if (nameCar === "VinFast VF 3" || nameCar === "VinFast VF 6") {
+      return 2023;
+    } else if (nameCar === "VinFast VF 7" || nameCar === "VinFast VF 9") {
+      return 2022;
+    } else if (nameCar === "VinFast VF 8") {
+      return 2021;
+    } else {
+      return 2020;
+    }
+  };
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
       <div className="mb-6">
@@ -32,23 +42,23 @@ export default function ContractInfoStep({ contractData }) {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Họ và tên:</span>
-              <span className="text-gray-900 font-semibold">{contractData.customer.name}</span>
+              <span className="text-gray-900 font-semibold">{carData.customer.fullName ? carData.customer.fullName : "N/A"}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Số điện thoại:</span>
-              <span className="text-blue-600 font-semibold">{contractData.customer.phone}</span>
+              <span className="text-blue-600 font-semibold">{carData.customer.phone ? carData.customer.phone : "N/A"}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Số CCCD:</span>
-              <span className="text-gray-900 font-semibold">{contractData.customer.idCard}</span>
+              <span className="text-gray-900 font-semibold">{carData.customer.idCard ? carData.customer.idCard : "N/A"}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Bằng lái xe:</span>
-              <span className="text-gray-900 font-semibold">{contractData.customer.driverLicense}</span>
+              <span className="text-gray-900 font-semibold">{carData.customer.driverLicense ? carData.customer.driverLicense : "N/A"}</span>
             </div>
             <div className="flex justify-between items-start">
               <span className="text-gray-600 font-medium">Địa chỉ:</span>
-              <span className="text-gray-900 font-semibold text-right max-w-xs">{contractData.customer.address}</span>
+              <span className="text-gray-900 font-semibold text-right max-w-xs">{carData.customer.address ? carData.customer.address : "N/A"}</span>
             </div>
           </div>
         </div>
@@ -61,23 +71,23 @@ export default function ContractInfoStep({ contractData }) {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Model xe:</span>
-              <span className="text-gray-900 font-semibold">{contractData.car.model}</span>
+              <span className="text-gray-900 font-semibold">{carData.modelName}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Biển số:</span>
-              <span className="text-red-600 font-bold text-lg">{contractData.car.licensePlate}</span>
+              <span className="text-red-600 font-bold text-lg">{carData.plateNumber}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Màu xe:</span>
-              <span className="text-gray-900 font-semibold">{contractData.car.color}</span>
+              <span className="text-gray-900 font-semibold">{carData.color}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Năm sản xuất:</span>
-              <span className="text-gray-900 font-semibold">{contractData.car.year}</span>
+              <span className="text-gray-900 font-semibold">{checkYearCar(carData.modelName)}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Số km hiện tại:</span>
-              <span className="text-gray-900 font-semibold">{contractData.car.initialOdometer} km</span>
+              <span className="text-gray-900 font-semibold">{carData.odometer} km</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Mức pin hiện tại:</span>
@@ -85,10 +95,10 @@ export default function ContractInfoStep({ contractData }) {
                 <div className="w-16 h-2 bg-gray-200 rounded-full">
                   <div 
                     className="h-full bg-green-500 rounded-full"
-                    style={{ width: `${contractData.car.battery}%` }}
+                    style={{ width: `${carData.batteryLevel}%` }}
                   ></div>
                 </div>
-                <span className="text-green-600 font-semibold">{contractData.car.battery}%</span>
+                <span className="text-green-600 font-semibold">{carData.batteryLevel}%</span>
               </div>
             </div>
           </div>
@@ -103,19 +113,19 @@ export default function ContractInfoStep({ contractData }) {
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-blue-600 font-medium">Số km chạy tối đa:</span>
-                <span className="text-blue-800 font-bold">{contractData.rental.totalMaxKm} km</span>
+                <span className="text-blue-800 font-bold">200 km</span>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-blue-600 font-medium">Ngày nhận xe:</span>
-                <span className="text-blue-800 font-bold">{formatDate(contractData.rental.startDate)}</span>
+                <span className="text-blue-800 font-bold">{formatDate(contractData.startDate)}</span>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-blue-600 font-medium">Ngày trả xe:</span>
-                <span className="text-blue-800 font-bold">{formatDate(contractData.rental.endDate)}</span>
+                <span className="text-blue-800 font-bold">{formatDate(contractData.endDate)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-blue-600 font-medium">Tổng số ngày:</span>
-                <span className="text-blue-800 font-bold text-xl">{contractData.rental.totalDays} ngày</span>
+                <span className="text-blue-800 font-bold text-xl">{contractData?.totalDays} ngày</span>
               </div>
             </div>
           </div>
@@ -125,16 +135,20 @@ export default function ContractInfoStep({ contractData }) {
             <div className="bg-green-50 p-4 rounded-lg">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-green-600 font-medium">Giá thuê/ngày:</span>
-                <span className="text-green-800 font-bold">{formatCurrency(contractData.rental.pricePerDay)}</span>
+                <span className="text-green-800 font-bold">{formatCurrency(carData.pricePerDay)}</span>
+              </div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-green-600 font-medium">Tổng tiền thuê:</span>
+                <span className="text-green-800 font-bold">{formatCurrency(contractData.retalCost)}</span>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-green-600 font-medium">Tiền cọc:</span>
-                <span className="text-green-800 font-bold">{formatCurrency(contractData.rental.deposit)}</span>
+                <span className="text-green-800 font-bold">{formatCurrency(contractData.deposit)}</span>
               </div>
               <div className="border-t border-green-200 pt-2 mt-3">
                 <div className="flex justify-between items-center">
                   <span className="text-green-600 font-medium text-lg">Tổng chi phí:</span>
-                  <span className="text-green-800 font-bold text-2xl">{formatCurrency(contractData.rental.totalCost)}</span>
+                  <span className="text-green-800 font-bold text-2xl">{formatCurrency(carData?.totalCost)}</span>
                 </div>
               </div>
             </div>

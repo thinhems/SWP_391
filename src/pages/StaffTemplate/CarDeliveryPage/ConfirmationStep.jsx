@@ -1,6 +1,7 @@
 
 
-export default function ConfirmationStep({ 
+export default function ConfirmationStep({
+  carData,
   contractData, 
   inspectionData, 
   isStaffExplanationConfirmed,
@@ -17,7 +18,7 @@ export default function ConfirmationStep({
 
   // đếm số lỗi trong checklist
   const issuesCount = inspectionData.checklist ? 
-    inspectionData.checklist.filter(item => item.status !== 'good').length : 0;
+    inspectionData.checklist.filter(item => item.status !== 1).length : 0;
 
   return (
     <div className="space-y-8">
@@ -34,23 +35,23 @@ export default function ConfirmationStep({
             <div className="bg-gray-50 rounded-lg p-4 space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Khách hàng:</span>
-                <span className="font-semibold">{contractData.customer.name}</span>
+                <span className="font-semibold">{carData.customer.fullName ? carData.customer.fullName : "N/A"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Xe thuê:</span>
-                <span className="font-semibold">{contractData.car.model}</span>
+                <span className="font-semibold">{carData.modelName}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Biển số:</span>
-                <span className="font-bold text-red-600">{contractData.car.licensePlate}</span>
+                <span className="font-bold text-red-600">{carData.plateNumber}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Thời gian:</span>
-                <span className="font-semibold">{contractData.rental.totalDays} ngày</span>
+                <span className="font-semibold">{contractData?.totalDays ? contractData.totalDays : "N/A"} ngày</span>
               </div>
               <div className="flex justify-between text-lg">
                 <span className="text-gray-600">Tổng chi phí:</span>
-                <span className="font-bold text-green-600">{formatCurrency(contractData.rental.totalCost)}</span>
+                <span className="font-bold text-green-600">{formatCurrency(carData?.totalCost)}</span>
               </div>
             </div>
           </div>

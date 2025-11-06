@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { mockCars } from '../data/mockCars';
-import { mockOrders } from '../data/mockOrders'
-import { listItemCar } from '../data/mockListItem';
+import { carService } from '../services/cars.api';
 
 const CarsContext = createContext();
 
@@ -14,98 +12,66 @@ export const useCars = () => {
 };
 
 export const CarsProvider = ({ children }) => {
-  const [cars, setCars] = useState([]);
-  const [orders, setOrders] = useState([]);
+  const [listCar, setListCar] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userStation, setUserStation] = useState(null);
 
   // Fetch dữ liệu xe
-  const fetchCars = async () => {
+  const fetchListCars = async () => {
     setLoading(true);
     setError(null);
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      setCars(mockCars);
-      setOrders(mockOrders);
+      const data = await carService.getCars();
+      setListCar(data);
     } catch (err) {
-      console.error('Error fetching cars data:', err);
-      setError('Có lỗi xảy ra khi tải dữ liệu xe');
+      setError(err);
+      console.error('Error fetching cars:', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCars();
+    fetchListCars();
   }, []);
-
   // Lọc xe theo station của user
-  const filteredCars = userStation 
-    ? cars.filter(car => car.station === userStation)
-    : cars;
-
+  const filteredCars = userStation
+    ? listCar.filter(car => car.stationID === userStation)
+    : listCar;
   // Tính toán số liệu cho xe đã lọc theo station
   const carsData = {
+    // số lượng xe theo trạng thái
     total: filteredCars.length,
-    available: filteredCars.filter(car => car.status === 'available').length,
-    pending_approval: filteredCars.filter(car => car.status === 'pending_approval').length,
-    pending_contract: filteredCars.filter(car => car.status === 'pending_contract').length,
-    booked: filteredCars.filter(car => car.status === 'booked').length,
-    rented: filteredCars.filter(car => car.status === 'rented').length,
+    available: filteredCars.filter(car => car.status === 0).length,
+    pending_approval: filteredCars.filter(car => car.status === 1).length,
+    pending_contract: filteredCars.filter(car => car.status === 2).length,
+    booked: filteredCars.filter(car => car.status === 3).length,
+    rented: filteredCars.filter(car => car.status === 4).length,
     allCars: filteredCars,
-    
+    // lấy danh sách xe theo trạng thái
     getCarsByStatus: (status) => filteredCars.filter(car => car.status === status),
-    getCarById: (id) => filteredCars.find(car => car.id === id)
+    // lấy xe theo ID 
+    getCarById: (id) => filteredCars.find(car => car.id === id),
   };
 
-  // Cập nhật xe
-  const updateCar = (carId, updatedData) => {
-    setCars(prevCars => 
-      prevCars.map(car => car.id === carId ? { ...car, ...updatedData } : car)
-    );
-  };
-  // Lấy đơn hàng theo carId
-  const getOrderByCarId = (carId) => {
-    return orders.find(order => order.carId === carId);
-  };
-
-  // Lấy checklist theo carId
-  const getChecklistByCarId = (carId) => {
-    return listItemCar[carId] || [];
-  };
-
-  // Lấy flat checklist
-  const getFlatChecklistByCarId = (carId) => {
-    const checklist = listItemCar[carId] || [];
-    return checklist.flatMap(category => category.items);
-  };
-
-  // Refresh cars data
-  const refreshCars = async () => {
-    setLoading(true);
+  // Cập nhật status xe
+  const updateCar = async (carId, updateCar) => { 
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setCars([...mockCars]);
-    } catch (err) {
-      console.error('Error refreshing cars:', err);
-    } finally {
-      setLoading(false);
+      await carService.updateCar(carId, updateCar);
+      // Cập nhật lại danh sách xe sau khi update thành công
+      await fetchListCars();
+    } catch (error) {
+      console.error('Error updating car:', error);
+      throw error;
     }
   };
 
   const value = {
     carsData,
-    orders,
     loading,
     error,
-    fetchCars,
     updateCar,
-    getOrderByCarId,
-    getChecklistByCarId,
-    getFlatChecklistByCarId,
-    refreshCars,
     setUserStation // Thêm function để set station từ bên ngoài
   };
 

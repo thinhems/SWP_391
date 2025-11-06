@@ -1,5 +1,6 @@
 
-export default function CompletionStep({ 
+export default function CompletionStep({
+  carData, 
   contractData, 
   inspectionData, 
   onCompleteDelivery 
@@ -42,23 +43,23 @@ export default function CompletionStep({
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Khách hàng:</span>
-              <span className="font-medium">{contractData.customer.name}</span>
+              <span className="font-medium">{carData.customer.fullName}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Số điện thoại:</span>
-              <span className="font-medium">{contractData.customer.phone}</span>
+              <span className="font-medium">{carData.customer.phone}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Xe:</span>
-              <span className="font-medium">{contractData.car.model}</span>
+              <span className="font-medium">{carData.modelName}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Biển số:</span>
-              <span className="font-bold text-red-600">{contractData.car.licensePlate}</span>
+              <span className="font-bold text-red-600">{carData.plateNumber}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Thời gian thuê:</span>
-              <span className="font-medium">{contractData.rental.totalDays} ngày</span>
+              <span className="font-medium">{contractData?.totalDays ? contractData.totalDays : "N/A"} ngày</span>
             </div>
           </div>
         </div>
@@ -82,7 +83,7 @@ export default function CompletionStep({
               <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              <span>Pin hiện tại: {contractData.car.battery}%</span>
+              <span>Pin hiện tại: {carData.batteryLevel}%</span>
             </div>
             {inspectionData.notes && (
               <div className="mt-3 pt-3 border-t border-gray-200">
@@ -106,7 +107,7 @@ export default function CompletionStep({
             <div className="space-y-1 text-blue-700 text-sm">
               <p>• Địa điểm: Green Future - Nguyễn Huệ Quận 1</p>
               <p>• Thời gian bàn giao: {getCurrentDateTime()}</p>
-              <p>• Ngày trả xe dự kiến: {formatDate(contractData.rental.endDate)}</p>
+              <p>• Ngày trả xe dự kiến: {formatDate(contractData.endDate)}</p>
               <p>• Xe sẽ chuyển sang trạng thái "Đang cho thuê"</p>
             </div>
           </div>

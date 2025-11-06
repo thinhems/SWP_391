@@ -2,7 +2,16 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function HeaderStaff({onToggleSidebar}) {
   const { user } = useAuth();
+  const stationName = [
+    { id: 1, name:"Quận 1"},
+    { id: 2, name:"Quận 7"},
+    { id: 3, name:"Quận 9"},
+    { id: 4, name:"Bình Thạnh"}
+  ]
 
+  // Lấy tên trạm dựa theo user.station
+  const currentStation = stationName.find(station => station.id === user?.station);
+  const displayStationName = currentStation?.name || 'Chưa có trạm';
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -29,7 +38,7 @@ export default function HeaderStaff({onToggleSidebar}) {
         </div>
         <div className="flex items-center space-x-4">
           <div className="flex flex-col text-sm text-gray-600 text-right">
-            <span>Trạm: <span className="font-medium text-green-600">{user.station}</span></span>
+            <span>Trạm: <span className="font-medium text-green-600">{displayStationName}</span></span>
             <span>Email: <span className="font-medium text-gray-800">{user.email}</span></span>
           </div>
           <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
