@@ -3,8 +3,7 @@ import { useState } from 'react';
 export default function CarInspectionStep({ 
   inspectionData, 
   setInspectionData, 
-  carId, 
-  getChecklistByCarId 
+  categories
 }) {
   const [notes, setNotes] = useState(inspectionData.notes || '');
 
@@ -21,19 +20,19 @@ export default function CarInspectionStep({
   // hàm lấy thông tin label và màu sắc cho status
   const getStatusConfig = (status) => {
     const configs = {
-      good: { 
+      1: { 
         label: 'Tốt', 
         icon: '✓',
         textColor: 'text-green-700',
         bgColor: 'bg-green-50'
       },
-      minor_issue: { 
+      2: { 
         label: 'Vấn đề nhỏ', 
         icon: '!',
         textColor: 'text-orange-700',
         bgColor: 'bg-orange-50'
       },
-      major_issue: { 
+      3: { 
         label: 'Cần sửa chữa', 
         icon: '×',
         textColor: 'text-red-700',
@@ -44,7 +43,7 @@ export default function CarInspectionStep({
   };
 
   // tạo 1 mảng list category với items được cập nhật liên tục từ inspectionData.checklist
-  const organizedChecklist = getChecklistByCarId(carId).map(category => ({
+  const organizedChecklist = categories.map(category => ({
     ...category,
     items: category.items.map(templateItem => {
       // Tìm item tương ứng trong inspectionData.checklist
@@ -65,7 +64,7 @@ export default function CarInspectionStep({
         {organizedChecklist.map((category, categoryIndex) => (
           <div key={categoryIndex} className="border border-gray-200 rounded-lg p-5 bg-gray-50">
             <h3 className="text-base font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
-              {category.category}
+              {category.categoryName}
             </h3>
             {/* list ra từng items - CHỈ HIỂN THỊ */}
             <div className="space-y-2">
@@ -73,7 +72,7 @@ export default function CarInspectionStep({
                 const statusConfig = getStatusConfig(item.status);
                 return (
                   <div key={item.id} className="flex items-center justify-between py-2 px-3 bg-white rounded border border-gray-100">
-                    <span className="text-sm text-gray-700">{item.label}</span>
+                    <span className="text-sm text-gray-700">{item.name}</span>
                     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${statusConfig.bgColor} ${statusConfig.textColor}`}>
                       <span>{statusConfig.icon}</span>
                       <span>{statusConfig.label}</span>
@@ -93,21 +92,21 @@ export default function CarInspectionStep({
             <span className="text-green-700">✓</span>
             <span className="text-sm text-gray-600">Tốt:</span>
             <span className="text-sm font-semibold text-gray-900">
-              {inspectionData.checklist.filter(item => item.status === 'good').length}
+              {inspectionData.checklist.filter(item => item.status === 1).length}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-orange-700">!</span>
             <span className="text-sm text-gray-600">Vấn đề nhỏ:</span>
             <span className="text-sm font-semibold text-gray-900">
-              {inspectionData.checklist.filter(item => item.status === 'minor_issue').length}
+              {inspectionData.checklist.filter(item => item.status === 2).length}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-red-700">×</span>
             <span className="text-sm text-gray-600">Cần sửa:</span>
             <span className="text-sm font-semibold text-gray-900">
-              {inspectionData.checklist.filter(item => item.status === 'major_issue').length}
+              {inspectionData.checklist.filter(item => item.status === 3).length}
             </span>
           </div>
         </div>

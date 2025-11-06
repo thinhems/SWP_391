@@ -2,7 +2,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck, faCalendarCheck, faCarSide, faSpinner, faClock } from "@fortawesome/free-solid-svg-icons";
 
-export default function StatsSection({ cars, onRefresh }) {
+export default function StatsSection({ cars }) {
   // tính tổng số xe
   const total = cars.available.length + cars.pending_approval.length + cars.booked.length + cars.rented.length + cars.pending_contract.length;
   // mảng thống kê từng loại xe
@@ -20,14 +20,6 @@ export default function StatsSection({ cars, onRefresh }) {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Quản lý xe</h1>
           <p className="text-gray-600">Quản lý danh sách xe tại trạm</p>
-        </div>
-        <div className="mt-4 sm:mt-0 flex space-x-2">
-          <button
-            onClick={onRefresh}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Làm mới
-          </button>
         </div>
       </div>
 

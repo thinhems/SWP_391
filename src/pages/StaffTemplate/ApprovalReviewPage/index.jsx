@@ -7,55 +7,88 @@ import CustomerInfoSection from './CustomerInfoSection';
 import CarInfoSection from './CarInfoSection';
 import RentalInfoSection from './RentalInfoSection';
 import ApprovalActionsSection from './ApprovalActionsSection';
+import { bookingService } from '../../../services/booking.api';
 
 export default function ApprovalReviewPage() {
-  const { carId } = useParams();
+  let { carId } = useParams();
+  carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { getOrderByCarId, updateCar } = useCars();
+  const { updateCar, carsData } = useCars();
   const { addActivity } = useActivities();
+  const [carData, setCarData] = useState(null);
   const [requestData, setRequestData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // fetch dữ liệu booking theo carId
+  const fetchBookingData = async (carId) => {
+    try {
+      const data = await bookingService.getBookingByCarId(carId);
+      if (!data) {
+        setError(`Không tìm thấy yêu cầu duyệt cho xe có ID: ${carId}`);
+        return;
+      }
+      setRequestData(data);
+      // Lấy thông tin xe từ Context
+      const carInfo = carsData?.getCarById?.(carId);
+      if (carInfo) {
+        setCarData(carInfo);
+        // Kiểm tra trạng thái xe
+        if (carInfo.status !== 1) {
+          setError("Yêu cầu duyệt không còn hợp lệ (xe không ở trạng thái chờ duyệt)."); 
+          setRequestData(null);  
+        }
+      }
+    } catch (err) {
+      console.error('Error loading approval request:', err);
+      setError('Có lỗi xảy ra khi tải thông tin yêu cầu');
+    }
+  };
   // load dữ liệu yêu cầu duyệt
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-    
-    setTimeout(() => {
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const request = getOrderByCarId(carId);
-        if (request) {
-          setRequestData(request);
-        } else {
-          setError(`Không tìm thấy yêu cầu duyệt cho xe có ID: ${carId}`);
-        }
-      } catch (err) {
-        console.error('Error loading approval request:', err);
-        setError('Có lỗi xảy ra khi tải thông tin yêu cầu');
+        await fetchBookingData(carId);
+      } catch (error) {
+        console.error('Error loading data:', error);
       } finally {
         setLoading(false);
       }
-    }, 500);
-  }, [carId, getOrderByCarId]);
+    };
+    
+    loadData();
+  }, [carId, carsData]);
   // xử lý duyệt yêu cầu
   const handleApprove = async () => {
     setIsProcessing(true);
     try {
-      updateCar(carId, { status: 'pending_contract' });
+      const updateData = {
+        plateNumber: carData.plateNumber,
+        modelID: carData.modelID,
+        stationID: carData.stationID,
+        location: carData.location,
+        batteryLevel: carData.batteryLevel,
+        odometer: carData.odometer,
+        color: carData.color || '',
+        status: 2
+      };
+      await updateCar(carId, updateData);
       
       addActivity({
         type: 'approval',
-        title: `Đã duyệt yêu cầu thuê xe ${requestData.car.model}`,
-        customer: requestData.customer.name,
+        title: `Đã duyệt yêu cầu thuê xe ${carData.modelName}`,
+        customer: carData.customer.fullName,
         icon: 'check',
         color: 'text-green-600',
         bgColor: 'bg-green-100'
       });
       
-      alert(`Đã duyệt yêu cầu thuê xe thành công!\n\nThông báo đã được gửi tới: ${requestData.customer.name}\nEmail: ${requestData.customer.email}\nSĐT: ${requestData.customer.phone}\n\nHợp đồng điện tử sẽ được tạo và gửi cho khách hàng trong vòng 5 phút.`);
+      alert(`Đã duyệt yêu cầu thuê xe thành công!\n\nThông báo đã được gửi tới: ${carData.customer.fullName}\nEmail: ${carData.customer.email}\nSĐT: ${carData.customer.phone}\n\nHợp đồng điện tử sẽ được tạo và gửi cho khách hàng trong vòng 5 phút.`);
       
-      navigate('/staff/manage-cars?tab=pending_approval');
+      navigate('/staff/manage-cars?tab=pending_approval'); 
     } catch (error) {
       console.error('Error approving request:', error);
       alert('Có lỗi xảy ra khi duyệt yêu cầu. Vui lòng thử lại.');
@@ -67,19 +100,31 @@ export default function ApprovalReviewPage() {
   const handleReject = async (reason) => {
     setIsProcessing(true);
     try {
-      updateCar(carId, { status: 'available' });
+      // Cập nhật status xe về available (0)
+      const updateData = {
+        plateNumber: carData.plateNumber,
+        modelID: carData.modelID,
+        stationID: carData.stationID,
+        location: carData.location,
+        batteryLevel: carData.batteryLevel,
+        odometer: carData.odometer,
+        color: carData.color || '',
+        status: 0
+      };
+      
+      await updateCar(carId, updateData);
       
       addActivity({
         type: 'rejection',
-        title: `Đã từ chối yêu cầu thuê xe ${requestData.car.model}`,
-        customer: requestData.customer.name,
+        title: `Đã từ chối yêu cầu thuê xe ${carData.modelName}`,
+        customer: carData.customer.fullName,
         icon: 'clock',
         color: 'text-red-600',
         bgColor: 'bg-red-100'
       });
       
-      alert(`Đã từ chối yêu cầu thuê xe!\n\nLý do từ chối: ${reason}\n\nThông báo đã được gửi tới: ${requestData.customer.name}\nEmail: ${requestData.customer.email}\nSĐT: ${requestData.customer.phone}`);
-      
+      alert(`Đã từ chối yêu cầu thuê xe!\n\nLý do từ chối: ${reason}\n\nThông báo đã được gửi tới: ${carData.customer.fullName}\nEmail: ${carData.customer.email}\nSĐT: ${carData.customer.phone}`);
+
       navigate('/staff/manage-cars?tab=pending_approval');
     } catch (error) {
       console.error('Error rejecting request:', error);
@@ -88,11 +133,6 @@ export default function ApprovalReviewPage() {
       setIsProcessing(false);
     }
   };
-  // nếu không phải yêu cầu duyệt thì báo lỗi
-  if (requestData && requestData.type !== 'pending_approval') {
-    setError("Yêu cầu duyệt không còn hợp lệ (xe không ở trạng thái chờ duyệt)."); 
-    setRequestData(null);  
-  }
 
   if (loading) {
     return (
@@ -106,7 +146,7 @@ export default function ApprovalReviewPage() {
     );
   }
 
-  if (error || !requestData) {
+  if (error || !requestData || !carData) {
     return (
       <div className="text-center py-12">
         <div className="text-red-500 mb-4">
@@ -128,16 +168,17 @@ export default function ApprovalReviewPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <HeaderSection 
-        requestData={requestData} 
+      <HeaderSection
+        carData={carData}
         isProcessing={isProcessing}
         onNavigateBack={() => navigate('/staff/manage-cars?tab=pending_approval')}
       />
-      <CustomerInfoSection customer={requestData.customer} />
-      <CarInfoSection car={requestData.car} />
+      <CustomerInfoSection customer={carData?.customer} />
+      <CarInfoSection car={carData} />
       <RentalInfoSection 
-        rental={requestData.rental}
-        requestTime={requestData.requestTime}
+        carData={carData}
+        rental={requestData}
+        requestTime={carData.requestTime}
         notes={requestData.notes}
       />
       <ApprovalActionsSection 

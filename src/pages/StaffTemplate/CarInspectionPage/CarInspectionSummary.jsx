@@ -7,10 +7,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function CarInspectionSummary({ inspectionData, onCancel, onSave }) {
-  // tính toán thống kê
-  const goodCount = inspectionData.checklist.filter(item => item.status === 'good').length;
-  const minorIssueCount = inspectionData.checklist.filter(item => item.status === 'minor_issue').length;
-  const majorIssueCount = inspectionData.checklist.filter(item => item.status === 'major_issue').length;
+  // tính toán thống kê (status: 1 = Tốt, 2 = Vấn đề nhỏ, 3 = Cần sửa chữa)
+  const goodCount = inspectionData.checklist.filter(item => item.status === 1).length;
+  const minorIssueCount = inspectionData.checklist.filter(item => item.status === 2).length;
+  const majorIssueCount = inspectionData.checklist.filter(item => item.status === 3).length;
   const totalChecked = goodCount + minorIssueCount + majorIssueCount;
   const totalItems = inspectionData.checklist.length;
 

@@ -13,7 +13,7 @@ export default function CarInspectionHeader({
     licensePlate: carData.licensePlate,
     color: carData.color,
     year: carData.year,
-    battery: carData.battery,
+    batteryLevel: carData.batteryLevel,
     location: carData.location
   });
 
@@ -32,7 +32,7 @@ export default function CarInspectionHeader({
       licensePlate: carData.licensePlate,
       color: carData.color,
       year: carData.year,
-      battery: carData.battery,
+      batteryLevel: carData.batteryLevel,
       location: carData.location
     });
     setIsEditing(false);
@@ -44,7 +44,17 @@ export default function CarInspectionHeader({
       [field]: value
     }));
   };
-
+  const checkYearCar = (nameCar) => { 
+    if (nameCar === "VinFast VF 3" || nameCar === "VinFast VF 6") {
+      return 2023;
+    } else if (nameCar === "VinFast VF 7" || nameCar === "VinFast VF 9") {
+      return 2022;
+    } else if (nameCar === "VinFast VF 8") {
+      return 2021;
+    } else {
+      return 2020;
+    }
+  };
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
       {/* header */}
@@ -53,7 +63,7 @@ export default function CarInspectionHeader({
           <h1 className="text-3xl font-bold text-gray-900">Kiểm tra tình trạng xe</h1>
           <div className="mt-1 flex items-center space-x-4">
             <p className="text-gray-600">
-              Xe {carData.model} - Biển số <span className="font-bold text-red-600">{carData.licensePlate}</span>
+              Xe {carData.modelName} - Biển số <span className="font-bold text-red-600">{carData.plateNumber}</span>
             </p>
             <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
               ID: {carId}
@@ -111,16 +121,7 @@ export default function CarInspectionHeader({
           {/* model xe */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-2">Model xe</label>
-            {isEditing ? (
-              <input
-                type="text"
-                value={editData.model}
-                onChange={(e) => handleInputChange('model', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            ) : (
-              <p className="font-semibold text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{carData.model}</p>
-            )}
+            <p className="font-semibold text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{carData.modelName}</p>
           </div>
           {/* biển số */}
           <div>
@@ -133,7 +134,7 @@ export default function CarInspectionHeader({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             ) : (
-              <p className="font-bold text-red-600 bg-gray-50 px-3 py-2 rounded-lg">{carData.licensePlate}</p>
+              <p className="font-bold text-red-600 bg-gray-50 px-3 py-2 rounded-lg">{carData.plateNumber}</p>
             )}
           </div>
           {/* màu xe */}
@@ -162,18 +163,7 @@ export default function CarInspectionHeader({
           {/* năm sản xuất */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-2">Năm sản xuất</label>
-            {isEditing ? (
-              <input
-                type="number"
-                min="2020"
-                max="2025"
-                value={editData.year}
-                onChange={(e) => handleInputChange('year', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            ) : (
-              <p className="font-semibold text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{carData.year}</p>
-            )}
+            <p className="font-semibold text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{checkYearCar(carData.modelName)}</p>
           </div>
           {/* vị trí */}
           <div>
@@ -198,13 +188,13 @@ export default function CarInspectionHeader({
                   type="range"
                   min="0"
                   max="100"
-                  value={editData.battery}
-                  onChange={(e) => handleInputChange('battery', parseInt(e.target.value))}
+                  value={editData.batteryLevel}
+                  onChange={(e) => handleInputChange('batteryLevel', parseInt(e.target.value))}
                   className="w-full"
                 />
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <span>0%</span>
-                  <span className="font-semibold text-lg text-gray-900">{editData.battery}%</span>
+                  <span className="font-semibold text-lg text-gray-900">{editData.batteryLevelLevel}%</span>
                   <span>100%</span>
                 </div>
               </div>
@@ -215,18 +205,18 @@ export default function CarInspectionHeader({
                     <div className="w-full h-3 bg-gray-200 rounded-full">
                       <div 
                         className={`h-full rounded-full transition-all duration-300 ${
-                          carData.battery >= 80 ? 'bg-green-500' : 
-                          carData.battery >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                          carData.batteryLevel >= 80 ? 'bg-green-500' : 
+                          carData.batteryLevel >= 50 ? 'bg-yellow-500' : 'bg-red-500'
                         }`}
-                        style={{ width: `${carData.battery}%` }}
+                        style={{ width: `${carData.batteryLevel}%` }}
                       ></div>
                     </div>
                   </div>
                   <span className={`font-bold text-lg ${
-                    carData.battery >= 80 ? 'text-green-600' : 
-                    carData.battery >= 50 ? 'text-yellow-600' : 'text-red-600'
+                    carData.batteryLevel >= 80 ? 'text-green-600' : 
+                    carData.batteryLevel >= 50 ? 'text-yellow-600' : 'text-red-600'
                   }`}>
-                    {carData.battery}%
+                    {carData.batteryLevel}%
                   </span>
                 </div>
               </div>

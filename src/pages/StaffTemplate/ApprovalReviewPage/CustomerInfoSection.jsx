@@ -9,8 +9,8 @@ export default function CustomerInfoSection({ customer }) {
 
   // gom tất cả ảnh (CCCD + BLX) vào 1 mảng
   const allImages = [
-    ...(customer.idCardImages || []),
-    ...(customer.idLicenseImages || []),
+    ...(customer?.idCardImages || []),
+    ...(customer?.idLicenseImages || []),
   ].filter(Boolean); // bỏ null/undefined
 
   return (
@@ -38,10 +38,10 @@ export default function CustomerInfoSection({ customer }) {
         <div className="lg:col-span-1">
           <div className="text-center">
             <div className="w-24 h-24 rounded-full bg-gray-200 mx-auto mb-4 flex items-center justify-center overflow-hidden">
-              {customer.avatar ? (
+              {customer?.avatar ? (
                 <img
-                  src={customer.avatar}
-                  alt={customer.name}
+                  src={customer?.avatar}
+                  alt={customer?.name}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -61,9 +61,9 @@ export default function CustomerInfoSection({ customer }) {
               )}
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
-              {customer.name}
+              {customer?.name}
             </h3>
-            <p className="text-sm text-gray-600 mt-1">{customer.email}</p>
+            <p className="text-sm text-gray-600 mt-1">{customer?.email}</p>
           </div>
         </div>
 
@@ -85,7 +85,7 @@ export default function CustomerInfoSection({ customer }) {
                   d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                 />
               </svg>
-              <span className="text-sm text-gray-900">{customer.phone}</span>
+              <span className="text-sm text-gray-900">{customer?.phone}</span>
             </div>
             <div className="flex items-start">
               <svg
@@ -107,7 +107,7 @@ export default function CustomerInfoSection({ customer }) {
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              <span className="text-sm text-gray-900">{customer.address}</span>
+              <span className="text-sm text-gray-900">{customer?.address}</span>
             </div>
           </div>
         </div>
@@ -119,13 +119,13 @@ export default function CustomerInfoSection({ customer }) {
             <div>
               <p className="text-sm text-gray-600">Số CCCD/CMND:</p>
               <p className="text-sm font-medium text-gray-900">
-                {customer.idCard}
+                {customer?.idCard}
               </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Bằng lái xe:</p>
               <p className="text-sm font-medium text-gray-900">
-                {customer.driverLicense}
+                {customer?.driverLicense}
               </p>
             </div>
           </div>
@@ -135,39 +135,49 @@ export default function CustomerInfoSection({ customer }) {
       {/* ảnh giấy tờ */}
       <div className="mt-6 pt-6 border-t border-gray-200">
         <h4 className="font-semibold text-gray-800 mb-4">Ảnh CCCD/BLX</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {allImages.map((image, idx) => (
-            <div
-              key={idx}
-              className="border border-gray-200 rounded-lg overflow-hidden cursor-pointer"
-              onClick={() => {
-                setIndex(idx);
-                setOpen(true);
-              }}
-            >
-              <div className="aspect-w-16 aspect-h-10">
-                <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
-                  <img
-                    src={image}
-                    alt={`Giấy tờ ${idx + 1}`}
-                    className="w-full h-full object-cover"
-                  />
+        {allImages.length === 0 ? (
+          <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            <svg className="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p className="text-gray-600 font-medium">Không có ảnh giấy tờ</p>
+            <p className="text-gray-500 text-sm mt-1">Khách hàng chưa tải lên ảnh CCCD/BLX</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {allImages.map((image, idx) => (
+              <div
+                key={idx}
+                className="border border-gray-200 rounded-lg overflow-hidden cursor-pointer"
+                onClick={() => {
+                  setIndex(idx);
+                  setOpen(true);
+                }}
+              >
+                <div className="aspect-w-16 aspect-h-10">
+                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                    <img
+                      src={image}
+                      alt={`Giấy tờ ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                <div className="p-3 bg-gray-50">
+                  <p className="text-sm font-medium text-gray-900">
+                    {idx < (customer?.idCardImages?.length || 0)
+                      ? `CCCD - ${idx === 0 ? "Mặt trước" : "Mặt sau"}`
+                      : `BLX - ${
+                          idx - (customer?.idCardImages?.length || 0) === 0
+                            ? "Mặt trước"
+                            : "Mặt sau"
+                        }`}
+                  </p>
                 </div>
               </div>
-              <div className="p-3 bg-gray-50">
-                <p className="text-sm font-medium text-gray-900">
-                  {idx < (customer.idCardImages?.length || 0)
-                    ? `CCCD - ${idx === 0 ? "Mặt trước" : "Mặt sau"}`
-                    : `BLX - ${
-                        idx - (customer.idCardImages?.length || 0) === 0
-                          ? "Mặt trước"
-                          : "Mặt sau"
-                      }`}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* lightbox show ảnh */}

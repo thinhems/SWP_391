@@ -4,14 +4,14 @@ export default function CarInspectionContent({
   onStatusChange, 
   onNotesChange 
 }) {
-  // hàm lấy thông tin label và màu sắc cho status
+  // hàm lấy thông tin label và màu sắc cho status (1: Tốt, 2: Vấn đề nhỏ, 3: Cần sửa chữa)
   const getStatusLabel = (status) => {
     const labels = {
-      good: { label: 'Tốt', color: 'text-green-600', bg: 'bg-green-100' },
-      minor_issue: { label: 'Vấn đề nhỏ', color: 'text-yellow-600', bg: 'bg-yellow-100' },
-      major_issue: { label: 'Cần sửa chữa', color: 'text-red-600', bg: 'bg-red-100' }
+      1: { label: 'Tốt', color: 'text-green-600', bg: 'bg-green-100' },
+      2: { label: 'Vấn đề nhỏ', color: 'text-yellow-600', bg: 'bg-yellow-100' },
+      3: { label: 'Cần sửa chữa', color: 'text-red-600', bg: 'bg-red-100' }
     };
-    return labels[status] || labels.good;
+    return labels[status] || labels[1];
   };
 
   return (
@@ -28,7 +28,7 @@ export default function CarInspectionContent({
               <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold mr-3">
                 {categoryIndex + 1}
               </span>
-              {category.category}
+              {category.categoryName}
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -36,17 +36,17 @@ export default function CarInspectionContent({
                 return (
                   <div key={item.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="mb-3">
-                      <span className="text-gray-900 font-medium">{item.label}</span>
+                      <span className="text-gray-900 font-medium">{item.name}</span>
                     </div>
                     
                     <div className="flex flex-col space-y-2">
-                      {['good', 'minor_issue', 'major_issue'].map(status => {
+                      {[1, 2, 3].map(status => {
                         const statusConfig = getStatusLabel(status);
                         return (
                           <label key={status} className="flex items-center cursor-pointer">
                             <input
                               type="radio"
-                              name={item.id}
+                              name={`item-${item.id}`}
                               value={status}
                               checked={item.status === status}
                               onChange={() => onStatusChange(item.id, status)}

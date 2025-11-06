@@ -1,5 +1,5 @@
 
-export default function RentalInfoSection({ rental, requestTime, notes }) {
+export default function RentalInfoSection({ carData, rental, requestTime, notes }) {
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -49,25 +49,25 @@ export default function RentalInfoSection({ rental, requestTime, notes }) {
             <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Ngày nhận xe:</span>
-                <span className="text-sm font-semibold text-gray-900">{formatDate(rental.startDate)}</span>
+                <span className="text-sm font-semibold text-gray-900">{formatDate(rental?.startDate)}</span>
               </div>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Ngày trả xe:</span>
-                <span className="text-sm font-semibold text-gray-900">{formatDate(rental.endDate)}</span>
+                <span className="text-sm font-semibold text-gray-900">{formatDate(rental?.endDate)}</span>
               </div>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Số km tối đa (vượt qua sẽ có phụ phí):</span>
-                <span className="text-sm font-semibold text-gray-900">{rental.limitedKilometers} kilometers</span>
+                <span className="text-sm font-semibold text-gray-900">200 kilometers</span>
               </div>
             </div>
             <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div className="flex items-center justify-between">
                 <span className="text-blue-800 font-medium">Tổng thời gian thuê:</span>
-                <span className="text-xl font-bold text-blue-900">{rental.totalDays} ngày</span>
+                <span className="text-xl font-bold text-blue-900">{rental?.totalDays} ngày</span>
               </div>
             </div>
           </div>
@@ -79,15 +79,15 @@ export default function RentalInfoSection({ rental, requestTime, notes }) {
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
               <span className="text-sm text-gray-700">Giá thuê/ngày:</span>
-              <span className="text-sm font-semibold text-gray-900">{formatCurrency(rental.pricePerDay)}</span>
+              <span className="text-sm font-semibold text-gray-900">{formatCurrency(carData?.pricePerDay)}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <span className="text-sm text-gray-700">{rental.totalDays} ngày × {formatCurrency(rental.pricePerDay)}:</span>
-              <span className="text-sm font-semibold text-gray-900">{formatCurrency(rental.totalCost)}</span>
+              <span className="text-sm text-gray-700">Tổng tiền thuê:</span>
+              <span className="text-sm font-semibold text-gray-900">{formatCurrency(rental?.retalCost)}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
               <span className="text-sm text-gray-700">Tiền cọc:</span>
-              <span className="text-sm font-semibold text-gray-900">{formatCurrency(rental.deposit)}</span>
+              <span className="text-sm font-semibold text-gray-900">{formatCurrency(rental?.deposit)}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
               <span className="text-sm text-gray-700">Chi phí phát sinh:</span>
@@ -95,7 +95,7 @@ export default function RentalInfoSection({ rental, requestTime, notes }) {
             </div>
             <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
               <span className="text-sm text-green-800 font-bold text-lg">Tổng chi phí:</span>
-              <span className="text-sm font-bold text-green-900 text-xl">{formatCurrency(rental.grandTotal)}</span>
+              <span className="text-sm font-bold text-green-900 text-xl">{formatCurrency(carData?.totalCost)}</span>
             </div>
           </div>
         </div>

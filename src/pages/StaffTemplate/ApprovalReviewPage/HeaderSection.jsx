@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function HeaderSection({requestData, isProcessing, onNavigateBack}) {
+export default function HeaderSection({carData, isProcessing, onNavigateBack}) {
 	return (
 		<div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
 			<div className="flex items-center justify-between">
@@ -13,7 +13,7 @@ export default function HeaderSection({requestData, isProcessing, onNavigateBack
 					</h1>
 					<div className="mt-2 flex items-center space-x-4">
 						<p className="text-gray-600">
-							Xe {requestData.car.model} - Biển số <span className="font-bold text-red-600">{requestData.car.licensePlate}</span>
+							Xe {carData?.modelName} - Biển số <span className="font-bold text-red-600">{carData?.plateNumber}</span>
 						</p>
 						<span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
 							Chờ duyệt

@@ -4,10 +4,43 @@ export const carService = {
   // Lấy danh sách xe
   getCars: async () => {
     try {
-      const response = await api.get("/api/Vehicle");
+      const response = await api.get("/Vehicle");
       return response.data;
     } catch (error) {
       throw error;
     }
-  }
+  },
+
+  getCarById: async (id) => {
+    try {
+      const response = await api.get(`/Vehicle/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  updateCar: async (id, carData) => {
+    try {
+      const formData = new FormData();
+      formData.append('PlateNumber', carData.plateNumber || '');
+      formData.append('ModelID', carData.modelID || '');
+      formData.append('StationID', carData.stationID || '');
+      formData.append('Location', carData.location || '');
+      formData.append('BatteryLevel', carData.batteryLevel || '');
+      formData.append('Odometer', carData.odometer || '');
+      formData.append('Color', carData.color || '');
+      formData.append('Status', carData.status !== undefined ? carData.status : '');
+      // call api dùng kiểu dữ liệu multipart/form-data
+      const response = await api.put(`/Vehicle/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error in updateCar:', error.response?.data || error.message);
+      throw error;
+    }
+  } 
 };

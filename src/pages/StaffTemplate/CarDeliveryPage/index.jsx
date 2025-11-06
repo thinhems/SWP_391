@@ -7,48 +7,87 @@ import ContractInfoStep from './ContractInfoStep';
 import CarInspectionStep from './CarInspectionStep';
 import ConfirmationStep from './ConfirmationStep';
 import CompletionStep from './CompletionStep';
+import { bookingService } from '../../../services/booking.api';
+import { carService } from '../../../services/cars.api';
 
 export default function CarDeliveryPage() {
-  const { carId } = useParams();
+  let { carId } = useParams();
+  carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { getOrderByCarId, getChecklistByCarId, getFlatChecklistByCarId, updateCar } = useCars();
+  const { carsData, updateCar } = useCars();
   const { addActivity } = useActivities();
   const [currentStep, setCurrentStep] = useState(1);
+  const [carDataFromAPI, setCarDataFromAPI] = useState(null); // Dữ liệu xe từ API (có categories)
+  const [carDataFromContext, setCarDataFromContext] = useState(null); // Dữ liệu xe từ Context
   const [contractData, setContractData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]); // categories từ API
   // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
     notes: ''
   });
-
+  // state kiểm tra đã xác nhận giải thích với khách hàng chưa
   const [isStaffExplanationConfirmed, setIsStaffExplanationConfirmed] = useState(false);
-  // load dữ liệu hợp đồng
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    
-    setTimeout(() => {
-      try {
-        const contract = getOrderByCarId(carId);
-        if (contract) {
-          setContractData(contract);
-          setInspectionData({
-            checklist: getFlatChecklistByCarId(carId),
-            notes: ''
-          });
-        } else {
-          setError(`Không tìm thấy hợp đồng cho xe có ID: ${carId}`);
-        }
-      } catch (err) {
-        console.error('Error loading contract:', err);
-        setError('Có lỗi xảy ra khi tải thông tin hợp đồng');
-      } finally {
-        setLoading(false);
+  // fetach dữ liệu xe theo carId
+  const fetchCarData = async (carId) => {
+    try {
+      const data = await carService.getCarById(carId);
+      if (!data) {
+        setError(`Không tìm thấy xe có ID: ${carId}`);
+        return;
       }
-    }, 500);
-  }, [carId, getOrderByCarId, getFlatChecklistByCarId]);
+      setCarDataFromAPI(data);
+      setCategories(data.categories || []);
+      
+      // lọc ra thành 1 list item theo category
+      const flatChecklist = data.categories?.flatMap(category =>
+        category.items.map(item => ({
+          ...item,
+          categoryName: category.categoryName
+        }))
+      ) || [];
+      
+      // cập nhật dữ liệu kiểm tra xe
+      setInspectionData(prev => ({
+        ...prev,
+        checklist: flatChecklist
+      }));
+    } catch (error) {
+      console.error('Error fetching car data:', error);
+      setError(`Không tìm thấy xe có ID: ${carId}`);
+    }
+  };
+  // fetach dữ liệu booking theo carId
+  const fetchBookingData = async (carId) => {
+    try {
+      const data = await bookingService.getBookingByCarId(carId);
+      setContractData(data);
+    } catch (error) {
+      console.error('Error fetching booking data:', error);
+      setError(`Không tìm thấy yêu cầu duyệt cho xe có ID: ${carId}`);
+    }
+  };
+  // load dữ liệu xe và booking từ API
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      // 1. Load dữ liệu xe từ API
+      await fetchCarData(carId);
+      // 2. Load dữ liệu xe từ Context
+      const carContext = carsData?.getCarById?.(carId);
+      if (carContext) {
+        setCarDataFromContext(carContext);
+      }
+      // 3. Load dữ liệu booking
+      await fetchBookingData(carId);
+      setLoading(false);
+    };
+    
+    loadData();
+  }, [carId, carsData]);
   // các bước giao xe
   const steps = [
     { id: 1, title: 'Thông tin hợp đồng', desc: 'Xem thông tin chi tiết' },
@@ -84,29 +123,34 @@ export default function CarDeliveryPage() {
   // hoàn tất bàn giao xe
   const handleCompleteDelivery = async () => {
     try {
-      updateCar(carId, { status: 'rented' });
+      const updateData = {
+        plateNumber: carDataFromContext.plateNumber,
+        modelID: carDataFromContext.modelID,
+        stationID: carDataFromContext.stationID,
+        location: carDataFromContext.location,
+        batteryLevel: carDataFromContext.batteryLevel,
+        odometer: carDataFromContext.odometer,
+        color: carDataFromContext.color || '',
+        status: 4
+      };
+      updateCar(carId, updateData);
       
       addActivity({
         type: 'delivery',
-        title: `Đã giao xe ${contractData.car.model} (${contractData.car.licensePlate})`,
-        customer: contractData.customer.name,
+        title: `Đã giao xe ${carDataFromContext.modelName} (${carDataFromContext.plateNumber})`,
+        customer: carDataFromContext.customer.fullName,
         icon: 'car',
         color: 'text-green-600',
         bgColor: 'bg-green-100'
       });
       
-      alert(`Bàn giao xe ${contractData.car.licensePlate} thành công! Xe đã chuyển sang trạng thái cho thuê.`);
+      alert(`Bàn giao xe ${carDataFromContext.plateNumber} thành công! Xe đã chuyển sang trạng thái cho thuê.`);
       navigate('/staff/manage-cars?tab=booked');
     } catch (error) {
       console.error('Error completing delivery:', error);
       alert('Có lỗi xảy ra khi hoàn tất bàn giao. Vui lòng thử lại.');
     }
   };
-  // nếu không phải yêu cầu duyệt thì báo lỗi
-  if (contractData && contractData.type !== 'booked') {
-    setError("Yêu cầu bàn giao không hợp lệ (xe không ở trạng thái đã đặt).");
-    setContractData(null);
-  }
 
   if (loading) {
     return (
@@ -120,7 +164,7 @@ export default function CarDeliveryPage() {
     );
   }
 
-  if (error || !contractData) {
+  if (error || !contractData || !carDataFromAPI || !carDataFromContext) {
     return (
       <div className="text-center py-12">
         <div className="text-red-500 mb-4">
@@ -144,7 +188,7 @@ export default function CarDeliveryPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <HeaderSection 
-        contractData={contractData} 
+        carData={carDataFromContext}
         carId={carId}
         currentStep={currentStep}
         steps={steps}
@@ -153,18 +197,21 @@ export default function CarDeliveryPage() {
       {/* Step content */}
       <div className="min-h-96">
         {currentStep === 1 && (
-          <ContractInfoStep contractData={contractData} />
+          <ContractInfoStep 
+            carData={carDataFromContext}
+            contractData={contractData} />
         )}
         {currentStep === 2 && (
           <CarInspectionStep 
             inspectionData={inspectionData}
             setInspectionData={setInspectionData}
             carId={carId}
-            getChecklistByCarId={getChecklistByCarId}
+            categories={categories}
           />
         )}
         {currentStep === 3 && (
           <ConfirmationStep 
+            carData={carDataFromContext}
             contractData={contractData}
             inspectionData={inspectionData}
             isStaffExplanationConfirmed={isStaffExplanationConfirmed}
@@ -173,6 +220,7 @@ export default function CarDeliveryPage() {
         )}
         {currentStep === 4 && (
           <CompletionStep 
+            carData={carDataFromContext}
             contractData={contractData}
             inspectionData={inspectionData}
             onCompleteDelivery={handleCompleteDelivery}
