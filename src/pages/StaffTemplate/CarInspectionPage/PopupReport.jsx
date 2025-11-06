@@ -51,8 +51,8 @@ export default function PopupReport({
           <div className="bg-gray-50 rounded-lg p-4">
             <h4 className="font-medium text-gray-900 mb-2">Thông tin xe</h4>
             <div className="text-sm text-gray-600 space-y-1">
-              <p><span className="font-medium">Xe:</span> {carData?.model}</p>
-              <p><span className="font-medium">Biển số:</span> {carData?.licensePlate}</p>
+              <p><span className="font-medium">Xe:</span> {carData?.modelName}</p>
+              <p><span className="font-medium">Biển số:</span> {carData?.plateNumber}</p>
               <p><span className="font-medium">Vị trí:</span> {carData?.location}</p>
             </div>
           </div>
