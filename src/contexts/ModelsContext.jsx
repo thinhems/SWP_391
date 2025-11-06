@@ -65,7 +65,7 @@ export const ModelsProvider = ({ children }) => {
 			});
 
 			setModels(transformedModels);
-			setSelectedLocation('Quận 1');
+			// Không set selectedLocation mặc định nữa, để user tự chọn
 		} catch (err) {
 			console.error('Error fetching models data:', err);
 			setError('Có lỗi xảy ra khi tải dữ liệu models');

@@ -13,6 +13,7 @@ export const authService = {
       
       const response = await api.post('/Auth/login', requestBody);
       console.log('AuthService - Response:', response.data);
+      console.log('AuthService - Full response data:', JSON.stringify(response.data, null, 2));
 
       // Kiểm tra nếu response là error response
       if (response.data?.error || !response.data) {
@@ -43,13 +44,21 @@ export const authService = {
 
       // Tạo user object
       const user = {
+        id: userData.userId || userData.id || userData.renterId || null,
         name: userData.fullName || '',
         email: userData.email || '',
-        phone: userData.phoneNumber || '',
+        phone: userData.phone || userData.phoneNumber || '',
         role: mappedRole,
         station: userData.stationId || null,
-        isVerified: userData.isVerified || false
+        isVerified: userData.verified === 'Verified' || userData.isVerified || false
       };
+
+      console.log('AuthService - Mapped user object:', user);
+      
+      // Nếu không có ID, log warning
+      if (!user.id) {
+        console.warn('⚠️ User ID not found in API response. Available fields:', Object.keys(userData));
+      }
 
       // Lưu thông tin user
       localStorage.setItem('user', JSON.stringify(user));
