@@ -1,32 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { vnpayService } from '../../../services/vnpayService';
+import { bookingService } from '../../../services/bookingService';
+import { useStations } from '../../../contexts/StationsContext';
 
 export default function BookingPopup({ isOpen, onClose, carModel, selectedLocation }) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { stations } = useStations();
   const activeTab = searchParams.get('tab') || 'daily';
   const [isProcessing, setIsProcessing] = useState(false);
-  // Mock data voucher
-  const mockVouchers = [
-    { code: 'VINFAST10', discount: 10, description: 'Giảm 10% cho lần thuê đầu tiên' },
-    { code: 'SUMMER2025', discount: 15, description: 'Giảm 15% cho thuê xe mùa hè' },
-    { code: 'WEEKEND20', discount: 20, description: 'Giảm 20% thuê xe cuối tuần' },
-    { code: 'LONGTERM25', discount: 25, description: 'Giảm 25% thuê xe dài hạn từ 7 ngày' },
-    { code: 'STUDENT5', discount: 5, description: 'Giảm 5% cho sinh viên' }
-  ];
-  // Form data state
+  
+  // Form data state - chỉ giữ những field cần thiết
   const [formData, setFormData] = useState({
-    customerName: '',
-    phone: '',
-    email: '',
     rentDate: '',
     returnDate: '',
-    duration: 1,
-    notes: '',
-    voucherCode: '',
-    agreeTerms: false,
-    agreePolicy: false
+    duration: 1
   });
   // Tính toán mặc định cho ngày thuê/trả xe (UTC+7)
   const getDefaultDates = () => {
@@ -60,27 +49,17 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
   // Khởi tạo form data khi popup mở
   useEffect(() => {
     if (isOpen) {
-      // Lấy thông tin user từ localStorage
-      const userString = localStorage.getItem('user');
       const defaultDates = getDefaultDates();
-      const user = JSON.parse(userString);
       setFormData({
-        customerName: user.name || '',
-        phone: user.phone || '',
-        email: user.email || '',
         rentDate: defaultDates.rentDate,
         returnDate: activeTab === 'daily' ? defaultDates.returnDate : '',
-        duration: 1,
-        notes: '',
-        voucherCode: '',
-        agreeTerms: false,
-        agreePolicy: false
+        duration: 1
       });
     }
   }, [isOpen, activeTab]);
   // Tính toán giá
   const calculatePrice = () => {
-    if (!carModel) return { basePrice: 0, duration: 0, totalPrice: 0, deposit: 0, totalAmount: 0, discount: 0, finalPrice: 0 };
+    if (!carModel) return { basePrice: 0, duration: 0, totalPrice: 0, deposit: 0, totalAmount: 0 };
     const basePrice = carModel.price[activeTab];
     const deposit = carModel.deposit[activeTab];
     let duration = 1;
@@ -95,23 +74,13 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
       duration = formData.duration || 1;
     }
     const totalPrice = basePrice * duration;
-    // Áp dụng voucher
-    let discount = 0;
-    const appliedVoucher = mockVouchers.find(v => v.code === formData.voucherCode);
-    if (appliedVoucher) {
-      discount = (totalPrice * appliedVoucher.discount) / 100;
-    }
-    const finalPrice = totalPrice - discount;
-    const totalAmount = finalPrice + deposit;
+    const totalAmount = totalPrice + deposit;
     return {
       basePrice,
       duration,
       totalPrice,
       deposit,
-      discount,
-      finalPrice,
-      totalAmount,
-      appliedVoucher
+      totalAmount
     };
   };
   // Xử lý thay đổi form
@@ -124,16 +93,8 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
   // Xử lý submit
   const handleSubmit = async () => {
     // Validation
-    if (!formData.customerName || !formData.phone || !formData.email) {
-      alert('Vui lòng điền đầy đủ thông tin!');
-      return;
-    }
     if (!formData.rentDate) {
       alert('Vui lòng chọn ngày nhận xe!');
-      return;
-    }
-    if (!formData.agreeTerms) {
-      alert('Vui lòng đồng ý với điều khoản dịch vụ!');
       return;
     }
     if (activeTab === 'daily' && !formData.returnDate) {
@@ -152,18 +113,79 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
     setIsProcessing(true);
     
     try {
-      const pricing = calculatePrice();
+      // Lấy thông tin user từ localStorage
+      const userString = localStorage.getItem('user');
+      if (!userString) {
+        alert('Vui lòng đăng nhập để tiếp tục!');
+        setIsProcessing(false);
+        return;
+      }
+      const user = JSON.parse(userString);
+      
+      // Tìm stationId từ selectedLocation
+      const station = stations.find(s => s.name === selectedLocation);
+      if (!station) {
+        alert('Không tìm thấy thông tin điểm thuê xe!');
+        setIsProcessing(false);
+        return;
+      }
+
+      // Tính toán ngày kết thúc dựa trên activeTab
+      let endDate;
+      if (activeTab === 'daily') {
+        endDate = new Date(formData.returnDate).toISOString();
+      } else if (activeTab === 'weekly') {
+        const start = new Date(formData.rentDate);
+        endDate = new Date(start);
+        endDate.setDate(endDate.getDate() + (formData.duration * 7));
+        endDate = endDate.toISOString();
+      } else { // monthly
+        const start = new Date(formData.rentDate);
+        endDate = new Date(start);
+        endDate.setMonth(endDate.getMonth() + formData.duration);
+        endDate = endDate.toISOString();
+      }
+
+      // Tạo booking qua API
       const bookingData = {
+        modelId: carModel.id,
+        renterId: user.id,
+        stationId: station.id,
+        startDate: new Date(formData.rentDate).toISOString(),
+        endDate: endDate
+      };
+
+      console.log('User data:', user);
+      console.log('Station data:', station);
+      console.log('Car model ID:', carModel.id);
+      console.log('Booking data to send:', bookingData);
+
+      const bookingResult = await bookingService.createBooking(bookingData);
+      
+      if (!bookingResult.success) {
+        alert(`Lỗi khi tạo đơn thuê: ${bookingResult.error}`);
+        setIsProcessing(false);
+        return;
+      }
+
+      // Tạo booking thành công
+      alert('Đặt xe thành công! Đơn thuê của bạn đang chờ xét duyệt.');
+      onClose();
+      // Chuyển đến trang danh sách đơn thuê hoặc trang chủ
+      navigate('/my-contracts');
+      
+      /* TEMPORARY: Tắt thanh toán VNPay
+      // Nếu tạo booking thành công, tiếp tục với thanh toán VNPay
+      const pricing = calculatePrice();
+      const paymentData = vnpayService.createPaymentData({
         ...formData,
         carModel: carModel.name,
         carModelId: carModel.id,
         station: selectedLocation,
         rentalType: activeTab,
-        pricing
-      };
-
-      // Tạo dữ liệu thanh toán VNPay
-      const paymentData = vnpayService.createPaymentData(bookingData);
+        pricing,
+        bookingId: bookingResult.data.id // Lưu ID của booking vừa tạo
+      });
       
       // Gọi API tạo URL thanh toán VNPay
       const result = await vnpayService.createPaymentUrl(paymentData);
@@ -172,12 +194,13 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
         // Chuyển hướng đến VNPay
         vnpayService.redirectToVNPay(result.data.paymentUrl);
       } else {
-        alert(`Lỗi: ${result.error}`);
+        alert(`Lỗi thanh toán: ${result.error}`);
         setIsProcessing(false);
       }
+      */
     } catch (error) {
-      console.error('Error processing payment:', error);
-      alert('Có lỗi xảy ra khi xử lý thanh toán. Vui lòng thử lại!');
+      console.error('Error processing booking:', error);
+      alert('Có lỗi xảy ra khi xử lý đơn thuê. Vui lòng thử lại!');
       setIsProcessing(false);
     }
   };
@@ -208,156 +231,55 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
           <div className="flex flex-col lg:flex-row gap-6 pb-6">
             {/* content left */}
             <div className="flex-1 lg:w-6/10 space-y-6">
-              {/* Thông tin khách hàng */}
-              <div className="pt-3 px-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Tên người thuê</label>
-                    <input
-                      type="text"
-                      value={formData.customerName}
-                      onChange={(e) => handleInputChange('customerName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="Nhập họ tên"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
-                    <input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="Nhập số điện thoại"
-                    />
-                  </div>
-                  <div className='max-w-2xl'>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      disabled
-                      className="w-full px-4 py-3 border border-gray-300 bg-gray-200"
-                      placeholder="Nhập email"
-                    />
-                  </div>
-                </div>
-              </div>
               {/* Thời gian thuê xe */}
-              <div className="pt-2 px-6">
+              <div className="pt-6 px-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Thời gian thuê xe</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Ngày nhận xe</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Ngày nhận xe *</label>
                     <input
                       type="datetime-local"
                       value={formData.rentDate}
                       onChange={(e) => handleInputChange('rentDate', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
                   {activeTab === 'daily' ? (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Ngày trả xe</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Ngày trả xe *</label>
                       <input
                         type="datetime-local"
                         value={formData.returnDate}
                         onChange={(e) => handleInputChange('returnDate', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                   ) : (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Số {activeTab === 'weekly' ? 'tuần' : 'tháng'} thuê
+                        Số {activeTab === 'weekly' ? 'tuần' : 'tháng'} thuê *
                       </label>
                       <input
                         type="number"
                         min="1"
                         value={formData.duration}
                         onChange={(e) => handleInputChange('duration', parseInt(e.target.value) || 1)}
-                        className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                         placeholder={`Nhập số ${activeTab === 'weekly' ? 'tuần' : 'tháng'}`}
                       />
                     </div>
                   )}
                 </div>
               </div>
-              {/* Ghi chú + voucher*/}
-              <div className='pt-2 px-6'>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Ghi chú</label>
-                    <textarea
-                      value={formData.notes}
-                      onChange={(e) => handleInputChange('notes', e.target.value)}
-                      rows={3}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="Nhập ghi chú (tùy chọn)..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Mã voucher</label>
-                    <input
-                      type="text"
-                      value={formData.voucherCode}
-                      onChange={(e) => handleInputChange('voucherCode', e.target.value.toUpperCase())}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="Nhập mã voucher"
-                    />
-                    <div className="mt-2">
-                      <p className="text-xs text-gray-500">Mã voucher có sẵn:</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {mockVouchers.slice(0, 3).map((voucher) => (
-                          <button
-                            key={voucher.code}
-                            type="button"
-                            onClick={() => handleInputChange('voucherCode', voucher.code)}
-                            className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200"
-                          >
-                            {voucher.code}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Điều khoản */}
-              <div className="pt-2 px-6 space-y-3">
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    id="agreeTerms"
-                    checked={formData.agreeTerms}
-                    onChange={(e) => handleInputChange('agreeTerms', e.target.checked)}
-                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2 mt-1"
-                  />
-                  <label htmlFor="agreeTerms" className="text-sm text-gray-700">
-                    Tôi đồng ý với <span className="text-green-600 cursor-pointer hover:underline">Điều khoản dịch vụ</span> và 
-                    <span className="text-green-600 cursor-pointer hover:underline"> Chính sách bảo mật</span> của VinFast
-                  </label>
-                </div>
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    id="agreePolicy"
-                    checked={formData.agreePolicy}
-                    onChange={(e) => handleInputChange('agreePolicy', e.target.checked)}
-                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2 mt-1"
-                  />
-                  <label htmlFor="agreePolicy" className="text-sm text-gray-700">
-                    Tôi đồng ý nhận thông tin khuyến mãi và cập nhật từ VinFast
-                  </label>
-                </div>
-              </div>
-              {/* nút thuê xe */}
+              
+              {/* nút đặt xe */}
               <div className="pt-4 px-6">
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={!formData.agreeTerms || isProcessing}
+                  disabled={isProcessing}
                   className={`w-full py-4 px-6 text-lg font-bold rounded-lg shadow-lg transition-all duration-200 ${
-                    !formData.agreeTerms || isProcessing
+                    isProcessing
                       ? 'bg-gray-400 text-gray-500 cursor-not-allowed'
                       : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white transform hover:scale-105 cursor-pointer'
                   }`}
@@ -365,10 +287,10 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
                   {isProcessing ? (
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Đang xử lý thanh toán...
+                      Đang xử lý đơn thuê...
                     </div>
                   ) : (
-                    'Thanh toán VNPay'
+                    'Xác nhận đặt xe'
                   )}
                 </button>
               </div>
@@ -474,14 +396,6 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
                             {pricing.totalPrice.toLocaleString('vi-VN')}đ
                           </span>
                         </div>
-                        {pricing.discount > 0 && (
-                          <div className="flex justify-between items-center text-lg text-green-600">
-                            <span className="font-bold">Giảm giá ({pricing.appliedVoucher?.code})</span>
-                            <span className="font-bold">
-                              -{pricing.discount.toLocaleString('vi-VN')}đ
-                            </span>
-                          </div>
-                        )}
                         <div className="flex justify-between items-center text-lg">
                           <span className="font-bold text-gray-900">Tiền đặt cọc</span>
                           <span className="font-bold text-gray-900">
@@ -490,12 +404,12 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
                         </div>
                         <hr className="border-gray-400 border-dashed" />
                         <div className="flex justify-between items-center text-lg">
-                          <span className="font-bold text-gray-900">Thanh toán*</span>
+                          <span className="font-bold text-gray-900">Tổng tiền dự kiến</span>
                           <span className="font-bold text-green-600 text-xl">
                             {pricing.totalAmount.toLocaleString('vi-VN')}đ
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">*Giá thuê xe đã bao gồm VAT.</p>
+                        <p className="text-xs text-gray-500 mt-2">*Giá thuê xe đã bao gồm VAT. Thanh toán khi nhận xe.</p>
                       </div>
                     </div>
                   );

@@ -1,12 +1,7 @@
+import { useStations } from '../../../contexts/StationsContext';
 
 export default function LocationFormSection({ carModel, selectedLocation, onStationChange, availableCount }) {
-  // Danh sách các trạm
-  const stations = [
-    'Quận 1',
-    'Quận 7', 
-    'Quận 9',
-    'Quận Bình Thạnh'
-  ];
+  const { stations, loading: stationsLoading } = useStations();
   const isOutOfStock = availableCount === 0;
 
   return (
@@ -22,12 +17,20 @@ export default function LocationFormSection({ carModel, selectedLocation, onStat
             value={selectedLocation || ''}
             onChange={(e) => onStationChange(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 cursor-pointer"
+            disabled={stationsLoading}
           >
-            {stations.map((station) => (
-              <option key={station} value={station}>
-                {station}
-              </option>
-            ))}
+            {stationsLoading ? (
+              <option value="">Đang tải danh sách điểm thuê...</option>
+            ) : (
+              <>
+                <option value="">Chọn điểm thuê xe</option>
+                {stations.map((station) => (
+                  <option key={station.id} value={station.name}>
+                    {station.name}
+                  </option>
+                ))}
+              </>
+            )}
           </select>
         </div>
         {/* Trạng thái có sẵn */}
