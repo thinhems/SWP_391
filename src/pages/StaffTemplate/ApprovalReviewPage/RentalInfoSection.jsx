@@ -1,5 +1,7 @@
 
-export default function RentalInfoSection({ carData, rental, requestTime, notes }) {
+export default function bookingInfoSection({ carData }) {
+  const booking = carData?.booking || {};
+  const caculateKiloMax = 200 * (booking.rentalType === 1 ? booking.rentalTime : booking.rentalType === 2 ? booking.rentalTime * 7 : booking.rentalTime * 30);
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -43,31 +45,32 @@ export default function RentalInfoSection({ carData, rental, requestTime, notes 
             <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Thời gian yêu cầu:</span>
-                <span className="text-sm font-medium text-gray-900">{formatDateTime(requestTime)}</span>
+                <span className="text-sm font-medium text-gray-900">{formatDateTime(booking?.requestTime)}</span>
               </div>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Ngày nhận xe:</span>
-                <span className="text-sm font-semibold text-gray-900">{formatDate(rental?.startDate)}</span>
+                <span className="text-sm font-semibold text-gray-900">{formatDate(booking?.startDate)}</span>
               </div>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Ngày trả xe:</span>
-                <span className="text-sm font-semibold text-gray-900">{formatDate(rental?.endDate)}</span>
+                <span className="text-sm font-semibold text-gray-900">{formatDate(booking?.endDate)}</span>
               </div>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Số km tối đa (vượt qua sẽ có phụ phí):</span>
-                <span className="text-sm font-semibold text-gray-900">200 kilometers</span>
+                <span className="text-sm text-gray-600">Số km tối đa (vượt qua sẽ có phụ phí): </span>
+                <span className="text-sm font-semibold text-gray-900">{caculateKiloMax} kilometers</span>
               </div>
             </div>
             <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div className="flex items-center justify-between">
                 <span className="text-blue-800 font-medium">Tổng thời gian thuê:</span>
-                <span className="text-xl font-bold text-blue-900">{rental?.totalDays} ngày</span>
+                <span className="text-xl font-bold text-blue-900">
+                  {booking?.rentalTime} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}</span>
               </div>
             </div>
           </div>
@@ -78,16 +81,16 @@ export default function RentalInfoSection({ carData, rental, requestTime, notes 
           <h4 className="font-semibold text-gray-800 mb-4">Chi phí thuê xe</h4>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <span className="text-sm text-gray-700">Giá thuê/ngày:</span>
-              <span className="text-sm font-semibold text-gray-900">{formatCurrency(carData?.pricePerDay)}</span>
+              <span className="text-sm text-gray-700">Giá thuê/{booking?.rentalType === 1 ? "ngày" : booking?.rentalType === 2 ? "tuần" : "tháng"}:</span>
+              <span className="text-sm font-semibold text-gray-900">{formatCurrency(booking?.retalCost / booking?.rentalTime)}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
               <span className="text-sm text-gray-700">Tổng tiền thuê:</span>
-              <span className="text-sm font-semibold text-gray-900">{formatCurrency(rental?.retalCost)}</span>
+              <span className="text-sm font-semibold text-gray-900">{formatCurrency(booking?.retalCost)}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
               <span className="text-sm text-gray-700">Tiền cọc:</span>
-              <span className="text-sm font-semibold text-gray-900">{formatCurrency(rental?.deposit)}</span>
+              <span className="text-sm font-semibold text-gray-900">{formatCurrency(booking?.deposit)}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
               <span className="text-sm text-gray-700">Chi phí phát sinh:</span>
@@ -95,20 +98,18 @@ export default function RentalInfoSection({ carData, rental, requestTime, notes 
             </div>
             <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
               <span className="text-sm text-green-800 font-bold text-lg">Tổng chi phí:</span>
-              <span className="text-sm font-bold text-green-900 text-xl">{formatCurrency(carData?.totalCost)}</span>
+              <span className="text-sm font-bold text-green-900 text-xl">{formatCurrency(booking?.baseCost)}</span>
             </div>
           </div>
         </div>
       </div>
       {/* ghi chú */}
-      {notes && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <h4 className="font-semibold text-gray-800 mb-3">Ghi chú từ khách hàng</h4>
-          <div className="bg-gray-50 rounded-lg p-4">
-            <p className="text-gray-800 italic">{notes}</p>
-          </div>
+      <div className="mt-6 pt-6 border-t border-gray-200">
+        <h4 className="font-semibold text-gray-800 mb-3">Ghi chú từ khách hàng</h4>
+        <div className="bg-gray-50 rounded-lg p-4">
+          <p className="text-gray-800 italic">{booking?.notes ? booking.notes : 'Không có ghi chú'}</p>
         </div>
-      )}
+      </div>
       {/* lưu ý quan trọng */}
       <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
         <div className="flex items-start space-x-3">

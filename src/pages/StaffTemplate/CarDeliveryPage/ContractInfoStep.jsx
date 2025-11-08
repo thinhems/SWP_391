@@ -1,5 +1,6 @@
 
-export default function ContractInfoStep({ carData, contractData }) {
+export default function ContractInfoStep({ carData }) {
+  const booking = carData.booking || {};
   //format theo VND
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -117,15 +118,17 @@ export default function ContractInfoStep({ carData, contractData }) {
               </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-blue-600 font-medium">Ngày nhận xe:</span>
-                <span className="text-blue-800 font-bold">{formatDate(contractData.startDate)}</span>
+                <span className="text-blue-800 font-bold">{formatDate(booking.startDate)}</span>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-blue-600 font-medium">Ngày trả xe:</span>
-                <span className="text-blue-800 font-bold">{formatDate(contractData.endDate)}</span>
+                <span className="text-blue-800 font-bold">{formatDate(booking.endDate)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-blue-600 font-medium">Tổng số ngày:</span>
-                <span className="text-blue-800 font-bold text-xl">{contractData?.totalDays} ngày</span>
+                <span className="text-blue-600 font-medium">Tổng thời gian thuê:</span>
+                <span className="text-blue-800 font-bold text-xl">
+                  {booking?.rentalTime} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}
+                </span>
               </div>
             </div>
           </div>
@@ -134,21 +137,21 @@ export default function ContractInfoStep({ carData, contractData }) {
             <h3 className="text-lg font-semibold text-gray-800">Chi phí</h3>
             <div className="bg-green-50 p-4 rounded-lg">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-green-600 font-medium">Giá thuê/ngày:</span>
-                <span className="text-green-800 font-bold">{formatCurrency(carData.pricePerDay)}</span>
+                <span className="text-green-600 font-medium">Giá thuê/{booking?.rentalType === 1 ? "ngày" : booking?.rentalType === 2 ? "tuần" : "tháng"}:</span>
+                <span className="text-green-800 font-bold">{formatCurrency(booking.retalCost / booking.rentalTime)}</span>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-green-600 font-medium">Tổng tiền thuê:</span>
-                <span className="text-green-800 font-bold">{formatCurrency(contractData.retalCost)}</span>
+                <span className="text-green-800 font-bold">{formatCurrency(booking.retalCost)}</span>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-green-600 font-medium">Tiền cọc:</span>
-                <span className="text-green-800 font-bold">{formatCurrency(contractData.deposit)}</span>
+                <span className="text-green-800 font-bold">{formatCurrency(booking.deposit)}</span>
               </div>
               <div className="border-t border-green-200 pt-2 mt-3">
                 <div className="flex justify-between items-center">
                   <span className="text-green-600 font-medium text-lg">Tổng chi phí:</span>
-                  <span className="text-green-800 font-bold text-2xl">{formatCurrency(carData?.totalCost)}</span>
+                  <span className="text-green-800 font-bold text-2xl">{formatCurrency(booking?.baseCost)}</span>
                 </div>
               </div>
             </div>

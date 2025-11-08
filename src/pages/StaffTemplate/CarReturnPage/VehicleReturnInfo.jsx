@@ -1,5 +1,7 @@
-export default function VehicleReturnInfo({ carData, order }) {
-
+export default function VehicleReturnInfo({ carData }) {
+  const booking = carData?.booking || {};
+  // tính số km tối đa được chạy
+  const caculateKiloMax = 200 * (booking.rentalType === 1 ? booking.rentalTime : booking.rentalType === 2 ? booking.rentalTime * 7 : booking.rentalTime * 30);
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
       <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
@@ -46,11 +48,13 @@ export default function VehicleReturnInfo({ carData, order }) {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Thời gian thuê:</span>
-              <span className="font-semibold">{order?.totalDays ? order.totalDays : 'N/A'} ngày</span>
+              <span className="font-semibold">
+                {booking?.rentalTime} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Tiền cọc:</span>
-              <span className="font-bold text-green-600">{order.deposit.toLocaleString()} đ</span>
+              <span className="font-bold text-green-600">{booking.deposit.toLocaleString()} đ</span>
             </div>
           </div>
         </div>
@@ -63,8 +67,8 @@ export default function VehicleReturnInfo({ carData, order }) {
           </svg>
           <div>
             <p className="text-blue-800 text-sm">
-              <strong>Lưu ý:</strong> Số km tối đa được chạy: <strong>200 km</strong> 
-              (200 km/ngày × {order?.totalDays} ngày)
+              <strong>Lưu ý:</strong> Số km tối đa được chạy: <strong>{caculateKiloMax} km </strong> 
+              (200 km/ngày × {booking.rentalType === 1 ? booking.rentalTime : booking.rentalType === 2 ? booking.rentalTime * 7 : booking.rentalTime * 30} ngày)
             </p>
           </div>
         </div>
