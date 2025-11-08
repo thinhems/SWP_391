@@ -1,10 +1,10 @@
 
 export default function CompletionStep({
   carData, 
-  contractData, 
   inspectionData, 
   onCompleteDelivery 
 }) {
+  const booking = carData.booking || {};
   //format theo VND
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('vi-VN', {
@@ -59,7 +59,9 @@ export default function CompletionStep({
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Thời gian thuê:</span>
-              <span className="font-medium">{contractData?.totalDays ? contractData.totalDays : "N/A"} ngày</span>
+              <span className="font-medium">
+                {booking?.rentalTime ? booking.rentalTime : "N/A"} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}
+              </span>
             </div>
           </div>
         </div>
@@ -107,7 +109,7 @@ export default function CompletionStep({
             <div className="space-y-1 text-blue-700 text-sm">
               <p>• Địa điểm: Green Future - Nguyễn Huệ Quận 1</p>
               <p>• Thời gian bàn giao: {getCurrentDateTime()}</p>
-              <p>• Ngày trả xe dự kiến: {formatDate(contractData.endDate)}</p>
+              <p>• Ngày trả xe dự kiến: {formatDate(booking.endDate)}</p>
               <p>• Xe sẽ chuyển sang trạng thái "Đang cho thuê"</p>
             </div>
           </div>

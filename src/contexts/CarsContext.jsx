@@ -66,12 +66,23 @@ export const CarsProvider = ({ children }) => {
       throw error;
     }
   };
+  // Tự động cập nhật trạng thái xe
+  const autoUpdateStatusCar = async (carId) => { 
+    try {
+      await carService.updateStatusCar(carId);
+      await fetchListCars();
+    } catch (error) {
+      console.error('Error updating car status:', error);
+      throw error;
+    }
+  };
 
   const value = {
     carsData,
     loading,
     error,
     updateCar,
+    autoUpdateStatusCar,
     setUserStation // Thêm function để set station từ bên ngoài
   };
 

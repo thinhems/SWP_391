@@ -12,11 +12,10 @@ export default function CarInspectionPage() {
   let { carId } = useParams();
   carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { updateCar } = useCars();
+  const { updateCar, carsData, loading } = useCars();
   const { addActivity } = useActivities();
   const [carData, setCarData] = useState(null);
   const [carImages, setCarImages] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   // State cho report modal
   const [showPopupReport, setShowPopupReport] = useState(false);
@@ -27,14 +26,18 @@ export default function CarInspectionPage() {
     notes: '',
     inspectionDate: new Date().toISOString()
   });
-  // fetch dữ liệu xe theo carId
-  const fetchCarData = async (carId) => {
-    try {
-      const data = await carService.getCarById(carId);
+  // load dữ liệu xe filter context
+  useEffect(() => {
+    const loadData = async () => {
+      setError(null);
+      const data = carsData.getCarById(carId);
       if (!data) {
         setError(`Không tìm thấy xe có ID: ${carId}`);
         return;
       }
+      if (data.status !== 0) {
+          setError("Yêu cầu duyệt không còn hợp lệ (xe không ở trạng thái có sẵn)."); 
+        }
       setCarData(data);
       // Load ảnh nếu có
       if (data.images) {
@@ -52,23 +55,10 @@ export default function CarInspectionPage() {
         ...prev,
         checklist: flatChecklist
       }));
-    } catch (err) {
-      console.error('Error loading car:', err);
-      setError('Có lỗi xảy ra khi tải thông tin xe');
-    }
-  };
-  
-  // load dữ liệu xe từ API
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      setError(null);
-      await fetchCarData(carId);
-      setLoading(false);
     };
     
     loadData();
-  }, [carId]);
+  }, [carId, carsData]);
   
   // xử lý cập nhật dữ liệu xe
   const handleCarDataUpdate = (updatedCarData) => {

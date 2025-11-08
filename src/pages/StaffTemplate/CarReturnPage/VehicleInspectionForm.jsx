@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function VehicleInspectionForm({ carData, order, onDataChange }) {
+export default function VehicleInspectionForm({ carData, onDataChange }) {
   const [currentBattery, setCurrentBattery] = useState(carData.batteryLevel);
   const [currentOdometer, setCurrentOdometer] = useState(carData.odometer);
   const [additionalFees, setAdditionalFees] = useState([]);

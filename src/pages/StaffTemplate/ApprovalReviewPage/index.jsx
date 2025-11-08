@@ -7,55 +7,34 @@ import CustomerInfoSection from './CustomerInfoSection';
 import CarInfoSection from './CarInfoSection';
 import RentalInfoSection from './RentalInfoSection';
 import ApprovalActionsSection from './ApprovalActionsSection';
-import { bookingService } from '../../../services/booking.api';
 
 export default function ApprovalReviewPage() {
   let { carId } = useParams();
   carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { updateCar, carsData } = useCars();
+  const { autoUpdateStatusCar, updateCar, carsData, loading } = useCars();
   const { addActivity } = useActivities();
   const [carData, setCarData] = useState(null);
-  const [requestData, setRequestData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // fetch dữ liệu booking theo carId
-  const fetchBookingData = async (carId) => {
-    try {
-      const data = await bookingService.getBookingByCarId(carId);
-      if (!data) {
-        setError(`Không tìm thấy yêu cầu duyệt cho xe có ID: ${carId}`);
-        return;
-      }
-      setRequestData(data);
-      // Lấy thông tin xe từ Context
-      const carInfo = carsData?.getCarById?.(carId);
-      if (carInfo) {
-        setCarData(carInfo);
-        // Kiểm tra trạng thái xe
-        if (carInfo.status !== 1) {
-          setError("Yêu cầu duyệt không còn hợp lệ (xe không ở trạng thái chờ duyệt)."); 
-          setRequestData(null);  
-        }
-      }
-    } catch (err) {
-      console.error('Error loading approval request:', err);
-      setError('Có lỗi xảy ra khi tải thông tin yêu cầu');
-    }
-  };
-  // load dữ liệu yêu cầu duyệt
+  // load dữ liệu yêu cầu duyệt từ filter car context
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true);
       setError(null);
       try {
-        await fetchBookingData(carId);
-      } catch (error) {
-        console.error('Error loading data:', error);
-      } finally {
-        setLoading(false);
+        const data = carsData.getCarById(carId);
+        if (!data) {
+          setError(`Không tìm thấy yêu cầu duyệt cho xe có ID: ${carId}`);
+          return;
+        }
+        if (data.status !== 1) {
+          setError("Yêu cầu duyệt không còn hợp lệ (xe không ở trạng thái chờ duyệt)."); 
+        }
+        setCarData(data);
+      } catch (err) {
+        console.error('Error loading approval request:', err);
+        setError('Có lỗi xảy ra khi tải thông tin yêu cầu');
       }
     };
     
@@ -65,17 +44,7 @@ export default function ApprovalReviewPage() {
   const handleApprove = async () => {
     setIsProcessing(true);
     try {
-      const updateData = {
-        plateNumber: carData.plateNumber,
-        modelID: carData.modelID,
-        stationID: carData.stationID,
-        location: carData.location,
-        batteryLevel: carData.batteryLevel,
-        odometer: carData.odometer,
-        color: carData.color || '',
-        status: 2
-      };
-      await updateCar(carId, updateData);
+      await autoUpdateStatusCar(carId); // Cập nhật trạng thái xe về pending_contract (2)
       
       addActivity({
         type: 'approval',
@@ -146,7 +115,7 @@ export default function ApprovalReviewPage() {
     );
   }
 
-  if (error || !requestData || !carData) {
+  if (error || !carData ) {
     return (
       <div className="text-center py-12">
         <div className="text-red-500 mb-4">
@@ -177,9 +146,6 @@ export default function ApprovalReviewPage() {
       <CarInfoSection car={carData} />
       <RentalInfoSection 
         carData={carData}
-        rental={requestData}
-        requestTime={carData.requestTime}
-        notes={requestData.notes}
       />
       <ApprovalActionsSection 
         onApprove={handleApprove}

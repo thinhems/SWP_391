@@ -3,16 +3,18 @@ import { useNavigate } from 'react-router-dom';
 
 export default function ListCarsSection({ cars, activeTab }) {
   const navigate = useNavigate();
-  // hàm đổi màu pin  
+
+  // Hàm đổi màu pin
   const getBatteryColor = (battery) => {
     if (battery >= 80) return 'text-green-600';
     if (battery >= 50) return 'text-yellow-600';
     return 'text-red-600';
   };
-  // hàm hiển thị trạng thái xe (status là số từ 0-4)
+
+  // Hàm hiển thị trạng thái xe (status là số từ 0-4)
   const getStatusBadge = (status) => {
     const statusConfig = [
-      { bg: 'bg-green-100', text: 'text-green-800', label: 'Có sẵn' },           // 0 avlailable
+      { bg: 'bg-green-100', text: 'text-green-800', label: 'Có sẵn' },           // 0 available
       { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Chờ xác nhận' },   // 1 pending_approval
       { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Chờ ký hợp đồng' },    // 2 pending_contract
       { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Đã đặt' },         // 3 booked
@@ -25,33 +27,43 @@ export default function ListCarsSection({ cars, activeTab }) {
       </span>
     );
   };
-  // hàm chuyển trang nhận xe trả
+
+  // Hàm chuyển trang nhận xe trả
   const handleCarReturn = (car) => {
     navigate(`/staff/manage-cars/car-return/${car.id}`);
   };
-  // hàm chuyển trang giao xe
+
+  // Hàm chuyển trang giao xe
   const handleCarDelivery = (car) => {
     navigate(`/staff/manage-cars/car-delivery/${car.id}`);
   };
-  // hàm chuyển trang duyệt xe
+
+  // Hàm chuyển trang duyệt xe
   const handleApprovalReview = (car) => {
     navigate(`/staff/manage-cars/approval-review/${car.id}`);
   };
-  // hàm chuyển trang kiểm tra xe
-  const handleInspectionlCar = (car) => {
+
+  // Hàm chuyển trang kiểm tra xe
+  const handleInspectionCar = (car) => {
     navigate(`/staff/manage-cars/inspection/${car.id}`);
   };
-  // hàm định dạng tiền
+
+  // Hàm định dạng tiền
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    return new Intl.NumberFormat('vi-VN', { 
+      style: 'currency', 
+      currency: 'VND' 
+    }).format(amount);
   };
-  // hàm kiểm tra thời gian hợp lệ
+
+  // Hàm kiểm tra thời gian hợp lệ
   const isValidTime = (time) => {
     if (!time) return false;
     const invalidTimes = ['0001-01-01T00:00:00', '00:00:00'];
     return !invalidTimes.some(invalid => time.includes(invalid));
   };
-  // hàm format datetime
+
+  // Hàm format datetime
   const formatDateTime = (dateTimeString) => {
     if (!dateTimeString || !isValidTime(dateTimeString)) return '';
     const date = new Date(dateTimeString);
@@ -93,67 +105,71 @@ export default function ListCarsSection({ cars, activeTab }) {
                 </span>
               </div>
             </div>
+
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Vị trí:</span>
               <span className="text-sm font-medium text-gray-900">{car.location}</span>
             </div>
-            {/* thông tin theo từng trạng thái */}
-            {car?.customer && (
+            {/* Thông tin theo từng trạng thái */}
+            {car?.status !== 0 && (
               <>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Khách hàng:</span>
-                  <span className="text-sm font-medium text-gray-900">{car.customer.fullName}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">SĐT:</span>
-                  <span className="text-sm font-medium text-blue-600">{car.customer.phone}</span>
-                </div>
+                {car?.customer && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Khách hàng:</span>
+                      <span className="text-sm font-medium text-gray-900">{car.customer.fullName}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">SĐT:</span>
+                      <span className="text-sm font-medium text-blue-600">{car.customer.phone}</span>
+                    </div>
+                  </>
+                )}
+
+                {isValidTime(car?.booking?.requestTime) && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Yêu cầu lúc:</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {formatDateTime(car.booking.requestTime)}
+                    </span>
+                  </div>
+                )}
+                {car?.booking?.baseCost != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Tổng tiền:</span>
+                    <span className="text-sm font-bold text-green-600">
+                      {formatCurrency(car.booking.baseCost)}
+                    </span>
+                  </div>
+                )}
+                {car?.booking?.startDate && isValidTime(car?.booking?.startDate) && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Ngày nhận xe:</span>
+                    <span className="text-sm font-medium text-orange-600">
+                      {formatDateTime(car?.booking?.startDate)}
+                    </span>
+                  </div>
+                )}
+                {car?.booking?.endDate && isValidTime(car?.booking?.endDate) && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Ngày trả xe:</span>
+                    <span className="text-sm font-medium text-purple-600">
+                      {formatDateTime(car?.booking?.endDate)}
+                    </span>
+                  </div>
+                )}
               </>
             )}
-            {car.requestTime && isValidTime(car.requestTime) && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Yêu cầu lúc:</span>
-                <span className="text-sm font-medium text-gray-900">{formatDateTime(car.requestTime)}</span>
-              </div>
-            )}
-            {car.approvalTime && isValidTime(car.approvalTime) && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Duyệt lúc:</span>
-                <span className="text-sm font-medium text-gray-900">{car.approvalTime}</span>
-              </div>
-            )}
-            {car.totalCost != null && car.totalCost > 0 && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Tổng tiền:</span>
-                <span className="text-sm font-bold text-green-600">{formatCurrency(car.totalCost)}</span>
-              </div>
-            )}
-            {car.bookingTime && isValidTime(car.bookingTime) && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Thời gian đặt:</span>
-                <span className="text-sm font-medium text-gray-900">{formatDateTime(car.bookingTime)}</span>
-              </div>
-            )}
-            {car.pickupTime && isValidTime(car.pickupTime) && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Ngày nhận xe:</span>
-                <span className="text-sm font-medium text-orange-600">{formatDateTime(car.pickupTime)}</span>
-              </div>
-            )}
-            {car.expectedReturn && isValidTime(car.expectedReturn) && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Ngày trả xe:</span>
-                <span className="text-sm font-medium text-purple-600">{formatDateTime(car.expectedReturn) }</span>
-              </div>
-            )}
           </div>
-          {/* nút theo từng tab */}
+
+          {/* Nút theo từng tab */}
           <div className="flex space-x-2 pt-4 border-t border-gray-100">
             {activeTab === 'available' && (
               <>
                 <button 
-                onClick={() => handleInspectionlCar(car)} 
-                className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer">
+                  onClick={() => handleInspectionCar(car)} 
+                  className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer"
+                >
                   Kiểm tra xe
                 </button>
                 <button className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors cursor-pointer">
@@ -161,6 +177,7 @@ export default function ListCarsSection({ cars, activeTab }) {
                 </button>
               </>
             )}
+
             {activeTab === 'pending_approval' && (
               <>
                 {car.status === 1 && (
@@ -176,6 +193,7 @@ export default function ListCarsSection({ cars, activeTab }) {
                 </button>
               </>
             )}
+
             {activeTab === 'booked' && (
               <>
                 <button 
@@ -208,4 +226,4 @@ export default function ListCarsSection({ cars, activeTab }) {
       ))}
     </div>
   );
-};
+}

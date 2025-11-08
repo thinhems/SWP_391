@@ -10,7 +10,7 @@ export const carService = {
       throw error;
     }
   },
-
+  // Lấy thông tin xe theo ID
   getCarById: async (id) => {
     try {
       const response = await api.get(`/Vehicle/${id}`);
@@ -19,7 +19,7 @@ export const carService = {
       throw error;
     }
   },
-
+  // Cập nhật thông tin xe
   updateCar: async (id, carData) => {
     try {
       const formData = new FormData();
@@ -42,5 +42,14 @@ export const carService = {
       console.error('Error in updateCar:', error.response?.data || error.message);
       throw error;
     }
-  } 
+  },
+  // Tự động cập nhật trạng thái xe
+  updateStatusCar: async (idCar) => {
+    try {
+      const response = await api.put(`/Vehicle/AutpUpdateStatus/${idCar}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };

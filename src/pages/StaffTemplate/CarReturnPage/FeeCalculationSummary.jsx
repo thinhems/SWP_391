@@ -1,4 +1,5 @@
-export default function FeeCalculationSummary({ carData, order, inspectionData, fees }) {
+export default function FeeCalculationSummary({ carData, inspectionData, fees }) {
+  const booking = carData?.booking || {};
   // Tính thêm các giá trị cần thiết cho hiển thị
   const kmDriven = inspectionData.currentOdometer - carData.odometer;
   const kmOverage = Math.max(0, kmDriven - 200);
@@ -22,11 +23,11 @@ export default function FeeCalculationSummary({ carData, order, inspectionData, 
         <div className="bg-gray-50 rounded-lg p-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-gray-700">Phí thuê xe</span>
-            <span className="font-semibold text-gray-900">{formatCurrency(order.retalCost)}</span>
+            <span className="font-semibold text-gray-900">{formatCurrency(booking.retalCost)}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-700">Tiền cọc</span>
-            <span className="font-semibold text-green-600">{formatCurrency(order.deposit)}</span>
+            <span className="font-semibold text-green-600">{formatCurrency(booking.deposit)}</span>
           </div>
         </div>
         {/* chi tiết phụ phí */}
@@ -83,7 +84,7 @@ export default function FeeCalculationSummary({ carData, order, inspectionData, 
           </div>
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-700 font-medium">Tiền cọc</span>
-            <span className="font-bold text-gray-900 text-lg">-{formatCurrency(order.deposit)}</span>
+            <span className="font-bold text-gray-900 text-lg">-{formatCurrency(booking.deposit)}</span>
           </div>
           <div className={`p-4 rounded-lg ${needsPayment ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
             <div className="flex justify-between items-center">
