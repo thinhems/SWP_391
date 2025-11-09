@@ -18,6 +18,7 @@ export default function CarModelCard({
           : 'scale-100 opacity-95 hover:opacity-100 hover:scale-105 hover:shadow-xl border-gray-200/60 hover:border-green-200/50 p-6 hover:shadow-green-50/40'
         }
       `}
+      data-model-id={model.id}
       onClick={() => onModelSelect(model.id)}
       style={{
         width: isCenter ? '520px' : '460px',

@@ -147,18 +147,28 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
         endDate = endDate.toISOString();
       }
 
+      // Map activeTab to rentalType: daily=1, weekly=2, monthly=3
+      let rentalType = 1;
+      if (activeTab === 'weekly') {
+        rentalType = 2;
+      } else if (activeTab === 'monthly') {
+        rentalType = 3;
+      }
+
       // Tạo booking qua API
       const bookingData = {
         modelId: carModel.id,
         renterId: user.id,
         stationId: station.id,
         startDate: new Date(formData.rentDate).toISOString(),
-        endDate: endDate
+        endDate: endDate,
+        rentalType: rentalType
       };
 
       console.log('User data:', user);
       console.log('Station data:', station);
       console.log('Car model ID:', carModel.id);
+      console.log('Active tab:', activeTab, '-> Rental Type:', rentalType);
       console.log('Booking data to send:', bookingData);
 
       const bookingResult = await bookingService.createBooking(bookingData);
