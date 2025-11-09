@@ -11,9 +11,9 @@ const Home = () => {
   const { modelsData, loading } = useModels();
   const [activeTab] = useState('daily');
 
-  // Xử lý chọn model
+  // Xử lý chọn model: chuyển sang trang model-rental
   const handleModelSelect = (modelId) => {
-    navigate(`/booking/${modelId}?tab=${activeTab}`);
+    navigate(`/model-rental?tab=${activeTab}&selected=${modelId}`);
   };
 
   // Carousel logic
@@ -105,7 +105,7 @@ const Home = () => {
           </div>
           <div className="hero-image">
             <div className="electric-car-illustration">
-            <img src="https://vinfastautodongnai.com/wp-content/uploads/2023/10/img-CE1H.png" alt="Xe điện minh họa" className="w-full max-w-lg object-contain drop-shadow-xl" />
+              <img src="https://vinfastautodongnai.com/wp-content/uploads/2023/10/img-CE1H.png" alt="Xe điện minh họa" className="w-full max-w-lg object-contain drop-shadow-xl" />
             </div>
           </div>
         </div>

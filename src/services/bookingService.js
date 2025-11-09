@@ -9,6 +9,7 @@ export const bookingService = {
    * @param {number} bookingData.stationId - ID của station
    * @param {string} bookingData.startDate - Ngày bắt đầu (ISO string)
    * @param {string} bookingData.endDate - Ngày kết thúc (ISO string)
+   * @param {number} bookingData.rentalType - Loại thuê (1: daily, 2: weekly, 3: monthly)
    * @returns {Promise<Object>} Response từ API
    */
   async createBooking(bookingData) {
@@ -20,6 +21,7 @@ export const bookingService = {
       formData.append('StationID', bookingData.stationId);
       formData.append('StartDate', bookingData.startDate);
       formData.append('EndDate', bookingData.endDate);
+      formData.append('RentalType', bookingData.rentalType || 1); // Default to daily if not provided
       
       console.log('Booking form data:');
       for (let [key, value] of formData.entries()) {
