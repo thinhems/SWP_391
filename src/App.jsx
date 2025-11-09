@@ -81,6 +81,7 @@ function App() {
               <Route path="my-contracts" element={<MyContractsPage />} />
               <Route path="contract-detail/:id" element={<ContractDetailPage />} />
               <Route path="payment/result" element={<PaymentResultPage />} />
+              <Route path="payment-result" element={<PaymentResultPage />} />
               <Route path="dashboard" element={<Dashboard />} />
             </Route>
           </Routes>
