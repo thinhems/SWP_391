@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { vnpayService } from '../../../services/vnpayService';
 import { bookingService } from '../../../services/bookingService';
+import { paymentService } from '../../../services/paymentService';
 import { useStations } from '../../../contexts/StationsContext';
 
 export default function BookingPopup({ isOpen, onClose, carModel, selectedLocation }) {
@@ -168,36 +169,55 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
         return;
       }
 
-      // Tạo booking thành công
-      alert('Đặt xe thành công! Đơn thuê của bạn đang chờ xét duyệt.');
-      onClose();
-      // Chuyển đến trang danh sách đơn thuê hoặc trang chủ
-      navigate('/my-contracts');
+      console.log('Booking created successfully:', bookingResult.data);
+
+      // Sau khi tạo booking thành công, tiếp tục tạo payment
+      const bookingId = bookingResult.data?.id || bookingResult.data?.bookingId;
+      const baseCost = bookingResult.data?.baseCost;
       
-      /* TEMPORARY: Tắt thanh toán VNPay
-      // Nếu tạo booking thành công, tiếp tục với thanh toán VNPay
-      const pricing = calculatePrice();
-      const paymentData = vnpayService.createPaymentData({
-        ...formData,
-        carModel: carModel.name,
-        carModelId: carModel.id,
-        station: selectedLocation,
-        rentalType: activeTab,
-        pricing,
-        bookingId: bookingResult.data.id // Lưu ID của booking vừa tạo
-      });
-      
-      // Gọi API tạo URL thanh toán VNPay
-      const result = await vnpayService.createPaymentUrl(paymentData);
-      
-      if (result.success) {
-        // Chuyển hướng đến VNPay
-        vnpayService.redirectToVNPay(result.data.paymentUrl);
-      } else {
-        alert(`Lỗi thanh toán: ${result.error}`);
+      if (!bookingId) {
+        alert('Tạo booking thành công nhưng không nhận được Booking ID. Vui lòng liên hệ hỗ trợ.');
         setIsProcessing(false);
+        return;
       }
-      */
+
+      if (!baseCost) {
+        alert('Tạo booking thành công nhưng không nhận được thông tin giá. Vui lòng liên hệ hỗ trợ.');
+        setIsProcessing(false);
+        return;
+      }
+
+      // Tạo payment request - sử dụng baseCost từ booking response
+      const paymentData = {
+        bookingId: bookingId,
+        userId: user.id,
+        amount: baseCost, // Sử dụng baseCost từ booking API response
+        paymentMethod: "VNPay",
+        note: `Thanh toán thuê xe ${carModel.name} - ${activeTab === 'daily' ? 'Theo ngày' : activeTab === 'weekly' ? 'Theo tuần' : 'Theo tháng'}`
+      };
+
+      console.log('Payment data to send:', paymentData);
+
+      const paymentResult = await paymentService.createPayment(paymentData);
+      
+      if (!paymentResult.success) {
+        alert(`Lỗi khi tạo thanh toán: ${paymentResult.error}`);
+        setIsProcessing(false);
+        return;
+      }
+
+      // Nếu API trả về URL thanh toán, chuyển hướng đến VNPay
+      const paymentUrl = paymentResult.data?.paymentUrl || paymentResult.data?.url;
+      
+      if (paymentUrl) {
+        console.log('Redirecting to VNPay:', paymentUrl);
+        paymentService.redirectToVNPay(paymentUrl);
+      } else {
+        alert('Đặt xe thành công! Đơn thuê của bạn đang chờ xét duyệt.');
+        onClose();
+        navigate('/my-contracts');
+      }
+      
     } catch (error) {
       console.error('Error processing booking:', error);
       alert('Có lỗi xảy ra khi xử lý đơn thuê. Vui lòng thử lại!');
