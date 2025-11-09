@@ -13,7 +13,7 @@ export const bookingService = {
    */
   async createBooking(bookingData) {
     try {
-      // Tạo FormData thay vì JSON object
+      // API Booking sử dụng FormData
       const formData = new FormData();
       formData.append('ModelID', bookingData.modelId);
       formData.append('RenterID', bookingData.renterId);
@@ -26,11 +26,15 @@ export const bookingService = {
         console.log(`${key}: ${value}`);
       }
       
+      // Phải xóa Content-Type header để browser tự set với boundary
       const response = await api.post('/Booking', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
-        }
+        },
+        transformRequest: [(data) => data] // Không transform FormData
       });
+
+      console.log('Booking response:', response.data);
 
       return {
         success: true,
@@ -38,10 +42,25 @@ export const bookingService = {
       };
     } catch (error) {
       console.error('Error creating booking:', error);
-      console.error('Error response:', error.response?.data);
+      console.error('Error response status:', error.response?.status);
+      console.error('Error response data:', error.response?.data);
+      console.error('Error response headers:', error.response?.headers);
+      
+      // Try to get detailed error message
+      let errorMessage = 'Không thể tạo đơn thuê xe';
+      if (error.response?.data) {
+        if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.data.errors) {
+          errorMessage = JSON.stringify(error.response.data.errors);
+        }
+      }
+      
       return {
         success: false,
-        error: error.response?.data?.message || error.message || 'Không thể tạo đơn thuê xe'
+        error: errorMessage
       };
     }
   },
