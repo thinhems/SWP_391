@@ -1,39 +1,10 @@
-export default function FeeCalculationSummary({ order, inspectionData }) {
-  const calculateFees = () => {
-    // Tính phí vượt km
-    const kmDriven = inspectionData.currentOdometer - order.car.initialOdometer;
-    const kmOverage = Math.max(0, kmDriven - order.rental.totalMaxKm);
-    const kmOverageFee = kmOverage * order.rental.kmOverageFee;
-
-    // Tính phí thiếu pin
-    const batteryDeficit = Math.max(0, order.car.initialBattery - inspectionData.currentBattery);
-    const batteryDeficitFee = batteryDeficit * order.rental.batteryDeficitFee;
-
-    // Tính tổng phụ phí bổ sung
-    const additionalFeesTotal = inspectionData.additionalFees.reduce((sum, fee) => {
-      if (fee.isCustom) {
-        return sum + inspectionData.customFeeAmount;
-      }
-      return sum + fee.amount;
-    }, 0);
-
-    const totalFees = kmOverageFee + batteryDeficitFee + additionalFeesTotal;
-    const netAmount = order.rental.deposit - totalFees;
-
-    return {
-      kmDriven,
-      kmOverage,
-      kmOverageFee,
-      batteryDeficit,
-      batteryDeficitFee,
-      additionalFeesTotal,
-      totalFees,
-      netAmount,
-      needsPayment: netAmount < 0
-    };
-  };
-
-  const fees = calculateFees();
+export default function FeeCalculationSummary({ carData, inspectionData, fees }) {
+  const booking = carData?.booking || {};
+  // Tính thêm các giá trị cần thiết cho hiển thị
+  const kmDriven = inspectionData.currentOdometer - carData.odometer;
+  const kmOverage = Math.max(0, kmDriven - 200);
+  const batteryDeficit = Math.max(0, carData.batteryLevel - inspectionData.currentBattery);
+  const needsPayment = fees.netAmount < 0;
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -52,11 +23,11 @@ export default function FeeCalculationSummary({ order, inspectionData }) {
         <div className="bg-gray-50 rounded-lg p-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-gray-700">Phí thuê xe</span>
-            <span className="font-semibold text-gray-900">{formatCurrency(order.rental.totalCost)}</span>
+            <span className="font-semibold text-gray-900">{formatCurrency(booking.retalCost)}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-700">Tiền cọc</span>
-            <span className="font-semibold text-green-600">{formatCurrency(order.rental.deposit)}</span>
+            <span className="font-semibold text-green-600">{formatCurrency(booking.deposit)}</span>
           </div>
         </div>
         {/* chi tiết phụ phí */}
@@ -66,9 +37,9 @@ export default function FeeCalculationSummary({ order, inspectionData }) {
           <div className="flex justify-between items-center text-sm">
             <div className="flex-1">
               <span className="text-gray-600">Phí vượt km</span>
-              {fees.kmOverage > 0 && (
+              {kmOverage > 0 && (
                 <div className="text-xs text-gray-500 mt-1">
-                  {fees.kmOverage.toLocaleString()} km × {order.rental.kmOverageFee.toLocaleString()} đ/km
+                  {kmOverage.toLocaleString()} km × 10.000đ/km
                 </div>
               )}
             </div>
@@ -80,9 +51,9 @@ export default function FeeCalculationSummary({ order, inspectionData }) {
           <div className="flex justify-between items-center text-sm">
             <div className="flex-1">
               <span className="text-gray-600">Phí thiếu pin</span>
-              {fees.batteryDeficit > 0 && (
+              {batteryDeficit > 0 && (
                 <div className="text-xs text-gray-500 mt-1">
-                  {fees.batteryDeficit}% × {order.rental.batteryDeficitFee.toLocaleString()} đ/%
+                  {batteryDeficit}% × 5.000đ/%
                 </div>
               )}
             </div>
@@ -113,14 +84,14 @@ export default function FeeCalculationSummary({ order, inspectionData }) {
           </div>
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-700 font-medium">Tiền cọc</span>
-            <span className="font-bold text-gray-900 text-lg">-{formatCurrency(order.rental.deposit)}</span>
+            <span className="font-bold text-gray-900 text-lg">-{formatCurrency(booking.deposit)}</span>
           </div>
-          <div className={`p-4 rounded-lg ${fees.needsPayment ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
+          <div className={`p-4 rounded-lg ${needsPayment ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
             <div className="flex justify-between items-center">
-              <span className={`font-bold text-lg ${fees.needsPayment ? 'text-red-800' : 'text-green-800'}`}>
-                {fees.needsPayment ? 'Khách hàng cần thanh toán thêm' : 'Hoàn trả khách hàng'}
+              <span className={`font-bold text-lg ${needsPayment ? 'text-red-800' : 'text-green-800'}`}>
+                {needsPayment ? 'Khách hàng cần thanh toán thêm' : 'Hoàn trả khách hàng'}
               </span>
-              <span className={`font-bold text-2xl ${fees.needsPayment ? 'text-red-600' : 'text-green-600'}`}>
+              <span className={`font-bold text-2xl ${needsPayment ? 'text-red-600' : 'text-green-600'}`}>
                 {formatCurrency(Math.abs(fees.netAmount))}
               </span>
             </div>

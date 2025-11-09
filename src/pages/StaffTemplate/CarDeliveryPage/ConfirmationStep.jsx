@@ -2,12 +2,11 @@
 
 export default function ConfirmationStep({
   carData,
-  contractData, 
   inspectionData, 
   isStaffExplanationConfirmed,
   setIsStaffExplanationConfirmed 
 }) {
-
+  const booking = carData.booking || {};
   // định dạng tiền theo VND
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -47,11 +46,13 @@ export default function ConfirmationStep({
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Thời gian:</span>
-                <span className="font-semibold">{contractData?.totalDays ? contractData.totalDays : "N/A"} ngày</span>
+                <span className="font-semibold">
+                  {booking?.rentalTime ? booking.rentalTime : "N/A"} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}
+                </span>
               </div>
               <div className="flex justify-between text-lg">
                 <span className="text-gray-600">Tổng chi phí:</span>
-                <span className="font-bold text-green-600">{formatCurrency(carData?.totalCost)}</span>
+                <span className="font-bold text-green-600">{formatCurrency(booking?.baseCost)}</span>
               </div>
             </div>
           </div>

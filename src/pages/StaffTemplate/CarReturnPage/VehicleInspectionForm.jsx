@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
-export default function VehicleInspectionForm({ order, onDataChange }) {
-  const [currentBattery, setCurrentBattery] = useState(order.car.initialBattery);
-  const [currentOdometer, setCurrentOdometer] = useState(order.car.initialOdometer);
+export default function VehicleInspectionForm({ carData, onDataChange }) {
+  const [currentBattery, setCurrentBattery] = useState(carData.batteryLevel);
+  const [currentOdometer, setCurrentOdometer] = useState(carData.odometer);
   const [additionalFees, setAdditionalFees] = useState([]);
 
   const additionalFeeOptions = [
@@ -68,9 +68,9 @@ export default function VehicleInspectionForm({ order, onDataChange }) {
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                 />
             </div>
-            {currentBattery < order.car.initialBattery && (
+            {currentBattery < carData.batteryLevel && (
               <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                ⚠️ Pin thấp hơn {order.car.initialBattery - currentBattery}% so với ban đầu
+                ⚠️ Pin thấp hơn {carData.batteryLevel - currentBattery}% so với ban đầu
               </div>
             )}
           </div>
@@ -83,29 +83,29 @@ export default function VehicleInspectionForm({ order, onDataChange }) {
           <div className="relative">
             <input
               type="number"
-              min={order.car.initialOdometer}
+              min={carData.odometer}
               value={currentOdometer}
-              onChange={(e) => setCurrentOdometer(parseInt(e.target.value) || order.car.initialOdometer)}
+              onChange={(e) => setCurrentOdometer(parseInt(e.target.value) || carData.odometer)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent font-semibold text-lg"
               placeholder="Nhập số km hiện tại"
             />
             <span className="absolute right-4 top-3 text-gray-500 font-medium">km</span>
           </div>
-          {currentOdometer > order.car.initialOdometer && (
+          {currentOdometer > carData.odometer && (
             <div className="mt-2 flex items-center justify-between text-sm">
               <span className="text-gray-600">Số km đã chạy:</span>
               <span className={`font-bold ${
-                (currentOdometer - order.car.initialOdometer) > order.rental.totalMaxKm 
+                (currentOdometer - carData.odometer) > 200 
                   ? 'text-red-600' 
                   : 'text-green-600'
               }`}>
-                {(currentOdometer - order.car.initialOdometer).toLocaleString()} km
+                {(currentOdometer - carData.odometer).toLocaleString()} km
               </span>
             </div>
           )}
-          {(currentOdometer - order.car.initialOdometer) > order.rental.totalMaxKm && (
+          {(currentOdometer - carData.odometer) > 200 && (
             <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-800">
-              ⚠️ Vượt quá {(currentOdometer - order.car.initialOdometer - order.rental.totalMaxKm).toLocaleString()} km so với giới hạn
+              ⚠️ Vượt quá {(currentOdometer - carData.odometer - 200).toLocaleString()} km so với giới hạn
             </div>
           )}
         </div>

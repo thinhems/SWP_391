@@ -7,22 +7,16 @@ import ContractInfoStep from './ContractInfoStep';
 import CarInspectionStep from './CarInspectionStep';
 import ConfirmationStep from './ConfirmationStep';
 import CompletionStep from './CompletionStep';
-import { bookingService } from '../../../services/booking.api';
-import { carService } from '../../../services/cars.api';
 
 export default function CarDeliveryPage() {
   let { carId } = useParams();
   carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { carsData, updateCar } = useCars();
+  const { carsData, loading, autoUpdateStatusCar } = useCars();
   const { addActivity } = useActivities();
   const [currentStep, setCurrentStep] = useState(1);
-  const [carDataFromAPI, setCarDataFromAPI] = useState(null); // Dữ liệu xe từ API (có categories)
-  const [carDataFromContext, setCarDataFromContext] = useState(null); // Dữ liệu xe từ Context
-  const [contractData, setContractData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [carData, setCarData] = useState(null);
   const [error, setError] = useState(null);
-  const [categories, setCategories] = useState([]); // categories từ API
   // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
@@ -30,60 +24,37 @@ export default function CarDeliveryPage() {
   });
   // state kiểm tra đã xác nhận giải thích với khách hàng chưa
   const [isStaffExplanationConfirmed, setIsStaffExplanationConfirmed] = useState(false);
-  // fetach dữ liệu xe theo carId
-  const fetchCarData = async (carId) => {
-    try {
-      const data = await carService.getCarById(carId);
-      if (!data) {
-        setError(`Không tìm thấy xe có ID: ${carId}`);
-        return;
-      }
-      setCarDataFromAPI(data);
-      setCategories(data.categories || []);
-      
-      // lọc ra thành 1 list item theo category
-      const flatChecklist = data.categories?.flatMap(category =>
-        category.items.map(item => ({
-          ...item,
-          categoryName: category.categoryName
-        }))
-      ) || [];
-      
-      // cập nhật dữ liệu kiểm tra xe
-      setInspectionData(prev => ({
-        ...prev,
-        checklist: flatChecklist
-      }));
-    } catch (error) {
-      console.error('Error fetching car data:', error);
-      setError(`Không tìm thấy xe có ID: ${carId}`);
-    }
-  };
-  // fetach dữ liệu booking theo carId
-  const fetchBookingData = async (carId) => {
-    try {
-      const data = await bookingService.getBookingByCarId(carId);
-      setContractData(data);
-    } catch (error) {
-      console.error('Error fetching booking data:', error);
-      setError(`Không tìm thấy yêu cầu duyệt cho xe có ID: ${carId}`);
-    }
-  };
+
   // load dữ liệu xe và booking từ API
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true);
       setError(null);
-      // 1. Load dữ liệu xe từ API
-      await fetchCarData(carId);
-      // 2. Load dữ liệu xe từ Context
-      const carContext = carsData?.getCarById?.(carId);
-      if (carContext) {
-        setCarDataFromContext(carContext);
+      try {
+        const data = carsData.getCarById(carId);
+        if (!data) {
+          setError(`Không tìm thấy xe có ID: ${carId}`);
+          return;
+        }
+        if (data.status !== 3) {
+          setError("Yêu cầu duyệt không còn hợp lệ (xe không ở trạng thái chờ bàn giao).");
+        }
+        setCarData(data);
+        // lọc ra thành 1 list item theo category
+        const flatChecklist = data.categories?.flatMap(category =>
+          category.items.map(item => ({
+            ...item,
+            categoryName: category.categoryName
+          }))
+        ) || [];
+        // cập nhật dữ liệu kiểm tra xe
+        setInspectionData(prev => ({
+          ...prev,
+          checklist: flatChecklist
+        }));
+      } catch (error) {
+        console.error('Error fetching car data:', error);
+        setError(`Không tìm thấy xe có ID: ${carId}`);
       }
-      // 3. Load dữ liệu booking
-      await fetchBookingData(carId);
-      setLoading(false);
     };
     
     loadData();
@@ -123,28 +94,18 @@ export default function CarDeliveryPage() {
   // hoàn tất bàn giao xe
   const handleCompleteDelivery = async () => {
     try {
-      const updateData = {
-        plateNumber: carDataFromContext.plateNumber,
-        modelID: carDataFromContext.modelID,
-        stationID: carDataFromContext.stationID,
-        location: carDataFromContext.location,
-        batteryLevel: carDataFromContext.batteryLevel,
-        odometer: carDataFromContext.odometer,
-        color: carDataFromContext.color || '',
-        status: 4
-      };
-      updateCar(carId, updateData);
+      await autoUpdateStatusCar(carId); // Cập nhật trạng thái xe về rented (4)
       
       addActivity({
         type: 'delivery',
-        title: `Đã giao xe ${carDataFromContext.modelName} (${carDataFromContext.plateNumber})`,
-        customer: carDataFromContext.customer.fullName,
+        title: `Đã giao xe ${carData.modelName} (${carData.plateNumber})`,
+        customer: carData.customer.fullName,
         icon: 'car',
         color: 'text-green-600',
         bgColor: 'bg-green-100'
       });
       
-      alert(`Bàn giao xe ${carDataFromContext.plateNumber} thành công! Xe đã chuyển sang trạng thái cho thuê.`);
+      alert(`Bàn giao xe ${carData.plateNumber} thành công! Xe đã chuyển sang trạng thái cho thuê.`);
       navigate('/staff/manage-cars?tab=booked');
     } catch (error) {
       console.error('Error completing delivery:', error);
@@ -164,7 +125,7 @@ export default function CarDeliveryPage() {
     );
   }
 
-  if (error || !contractData || !carDataFromAPI || !carDataFromContext) {
+  if (error || !carData) {
     return (
       <div className="text-center py-12">
         <div className="text-red-500 mb-4">
@@ -188,7 +149,7 @@ export default function CarDeliveryPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <HeaderSection 
-        carData={carDataFromContext}
+        carData={carData}
         carId={carId}
         currentStep={currentStep}
         steps={steps}
@@ -197,22 +158,21 @@ export default function CarDeliveryPage() {
       {/* Step content */}
       <div className="min-h-96">
         {currentStep === 1 && (
-          <ContractInfoStep 
-            carData={carDataFromContext}
-            contractData={contractData} />
+          <ContractInfoStep
+            carData={carData}
+          />
         )}
         {currentStep === 2 && (
           <CarInspectionStep 
             inspectionData={inspectionData}
             setInspectionData={setInspectionData}
             carId={carId}
-            categories={categories}
+            categories={carData.categories || []}
           />
         )}
         {currentStep === 3 && (
           <ConfirmationStep 
-            carData={carDataFromContext}
-            contractData={contractData}
+            carData={carData}
             inspectionData={inspectionData}
             isStaffExplanationConfirmed={isStaffExplanationConfirmed}
             setIsStaffExplanationConfirmed={setIsStaffExplanationConfirmed}
@@ -220,8 +180,7 @@ export default function CarDeliveryPage() {
         )}
         {currentStep === 4 && (
           <CompletionStep 
-            carData={carDataFromContext}
-            contractData={contractData}
+            carData={carData}
             inspectionData={inspectionData}
             onCompleteDelivery={handleCompleteDelivery}
           />
