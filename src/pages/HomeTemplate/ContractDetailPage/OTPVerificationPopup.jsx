@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { bookingService } from '../../../services/bookingService';
 
 export default function OTPVerificationPopup({ contract, isOpen, onClose }) {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -68,17 +69,23 @@ export default function OTPVerificationPopup({ contract, isOpen, onClose }) {
   // handle send otp
   const handleSendOtp = async () => {
     setIsSending(true);
+    setErrorMessage('');
     try {
-      // Simulate API call to send OTP
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setOtpSent(true);
-      setCountdown(300); // 5 phút
-      setCanResend(false);
-      setOtp(['', '', '', '', '', '']);
-      setErrorMessage('');
-      setSuccessMessage('Mã OTP đã được gửi đến email của bạn.');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      // Gọi API gửi email OTP
+      const result = await bookingService.sendSignatureEmail(contract.id);
+      
+      if (result.success) {
+        setOtpSent(true);
+        setCountdown(300); // 5 phút
+        setCanResend(false);
+        setOtp(['', '', '', '', '', '']);
+        setSuccessMessage('Mã OTP đã được gửi đến email của bạn.');
+        setTimeout(() => setSuccessMessage(''), 3000);
+      } else {
+        setErrorMessage(result.error || 'Không thể gửi mã OTP. Vui lòng thử lại.');
+      }
     } catch (error) {
+      console.error('Error sending OTP:', error);
       setErrorMessage('Không thể gửi mã OTP. Vui lòng thử lại.');
     } finally {
       setIsSending(false);
@@ -87,16 +94,22 @@ export default function OTPVerificationPopup({ contract, isOpen, onClose }) {
   // handle resend otp
   const handleResendOtp = async () => {
     setIsSending(true);
+    setErrorMessage('');
     try {
-      // Simulate API call to resend OTP
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setCountdown(300);
-      setCanResend(false);
-      setOtp(['', '', '', '', '', '']);
-      setErrorMessage('');
-      setSuccessMessage('Mã OTP mới đã được gửi đến email của bạn.');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      // Gọi lại API gửi email OTP
+      const result = await bookingService.sendSignatureEmail(contract.id);
+      
+      if (result.success) {
+        setCountdown(300);
+        setCanResend(false);
+        setOtp(['', '', '', '', '', '']);
+        setSuccessMessage('Mã OTP mới đã được gửi đến email của bạn.');
+        setTimeout(() => setSuccessMessage(''), 3000);
+      } else {
+        setErrorMessage(result.error || 'Không thể gửi lại mã OTP. Vui lòng thử lại.');
+      }
     } catch (error) {
+      console.error('Error resending OTP:', error);
       setErrorMessage('Không thể gửi lại mã OTP. Vui lòng thử lại.');
     } finally {
       setIsSending(false);
