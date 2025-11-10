@@ -60,7 +60,11 @@ export default function CompletionStep({
             <div className="flex justify-between">
               <span className="text-gray-600">Thời gian thuê:</span>
               <span className="font-medium">
-                {booking?.rentalTime ? booking.rentalTime : "N/A"} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}
+                {booking?.rentalType === 1 
+                  ? booking?.rentalTime 
+                  : booking?.rentalType === 2 
+                  ? booking?.rentalTime / 7 
+                  : booking?.rentalTime / 30} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}
               </span>
             </div>
           </div>

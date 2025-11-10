@@ -9,8 +9,8 @@ export default function StatsSection({ cars }) {
   const stats = [
     { label: 'Xe có sẵn', count: cars.available.length, color: 'green', icon: faCircleCheck },
     { label: 'Chờ xác nhận', count: cars.pending_approval.length + cars.pending_contract.length, color: 'yellow', icon: faClock },
-    { label: 'Xe đã đặt', count: cars.booked.length, color: 'orange', icon: faCalendarCheck },
-    { label: 'Đang cho thuê', count: cars.rented.length, color: 'purple', icon: faSpinner },
+    { label: 'Chờ bàn giao', count: cars.booked.length, color: 'orange', icon: faSpinner },
+    { label: 'Đang cho thuê', count: cars.rented.length, color: 'purple', icon: faCalendarCheck },
     { label: 'Tổng số xe', count: total, color: 'blue', icon: faCarSide }
   ];
 

@@ -27,6 +27,12 @@ export default function ContractInfoStep({ carData }) {
       return 2020;
     }
   };
+
+  const calculateRentalPrice = (rentalCost) => {
+    if (booking?.rentalType === 1) return rentalCost / booking?.rentalTime;
+    else if (booking?.rentalType === 2) return rentalCost / (booking?.rentalTime / 7);
+    else if (booking?.rentalType === 3) return rentalCost / (booking?.rentalTime / 30);
+  };
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
       <div className="mb-6">
@@ -138,7 +144,7 @@ export default function ContractInfoStep({ carData }) {
             <div className="bg-green-50 p-4 rounded-lg">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-green-600 font-medium">Giá thuê/{booking?.rentalType === 1 ? "ngày" : booking?.rentalType === 2 ? "tuần" : "tháng"}:</span>
-                <span className="text-green-800 font-bold">{formatCurrency(booking.retalCost / booking.rentalTime)}</span>
+                <span className="text-green-800 font-bold">{formatCurrency(calculateRentalPrice(booking.retalCost))}</span>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-green-600 font-medium">Tổng tiền thuê:</span>
