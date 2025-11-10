@@ -12,6 +12,33 @@ export default function ContractDetailPage() {
   const [contract, setContract] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showOtpModal, setShowOtpModal] = useState(false);
+  const [vehicleId, setVehicleId] = useState(null);
+  
+  // Handler cho button "Ký hợp đồng" - gọi API cập nhật vehicle status
+  const handleSignContractDirect = async () => {
+    if (!vehicleId) {
+      alert('Không tìm thấy thông tin xe');
+      return;
+    }
+
+    const confirmSign = window.confirm('Bạn có chắc chắn muốn ký hợp đồng? Trạng thái xe sẽ được cập nhật.');
+    if (!confirmSign) return;
+
+    try {
+      const result = await bookingService.updateVehicleStatus(vehicleId);
+      
+      if (result.success) {
+        alert('Ký hợp đồng thành công! Trạng thái xe đã được cập nhật.');
+        // Reload contract data
+        window.location.reload();
+      } else {
+        alert(result.error || 'Không thể ký hợp đồng. Vui lòng thử lại.');
+      }
+    } catch (error) {
+      console.error('Error signing contract:', error);
+      alert('Có lỗi xảy ra khi ký hợp đồng.');
+    }
+  };
   
   // Fetch booking detail từ API
   useEffect(() => {
@@ -27,6 +54,9 @@ export default function ContractDetailPage() {
         }
 
         const booking = result.data;
+        
+        // Lưu vehicleId để dùng cho API update status
+        setVehicleId(booking.vehicleID);
         
         // Map status giống MyContractsPage
         const statusNum = booking.status ?? 0;
@@ -188,6 +218,7 @@ export default function ContractDetailPage() {
         <ContractHeader 
           contract={contract} 
           onSignContract={() => setShowOtpModal(true)}
+          onSignContractDirect={handleSignContractDirect}
         />
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* left content - thông tin xe & khách hàng */}
