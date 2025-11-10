@@ -28,18 +28,52 @@ export default function ContractDetailPage() {
 
         const booking = result.data;
         
+        // Map status giống MyContractsPage
+        const statusNum = booking.status ?? 0;
+        const statusMap = {
+          0: 'pending_approval',        // Chờ duyệt
+          1: 'pending_contract',        // Chờ ký hợp đồng
+          2: 'booked',                  // Đã đặt
+          3: 'booked',                  // Đã đặt (fallback)
+          4: 'rented',                  // Đang thuê
+          5: 'completed',               // Hoàn thành
+          6: 'cancelled'                // Đã hủy
+        };
+        const status = statusMap[statusNum] || 'pending_approval';
+        
+        const statusTextMap = {
+          0: 'Chờ duyệt',
+          1: 'Chờ ký hợp đồng',
+          2: 'Đã đặt',
+          3: 'Đã đặt',
+          4: 'Đang thuê',
+          5: 'Hoàn thành',
+          6: 'Đã hủy'
+        };
+        const statusText = statusTextMap[statusNum] || 'Chờ duyệt';
+        
         // Transform API data sang format contract hiện tại
         const transformedContract = {
           id: booking.id,
           orderCode: `BK-${(booking.id || 0).toString().padStart(6, '0')}`,
-          status: booking.status ?? 0,
+          contractNumber: `HD-${(booking.id || 0).toString().padStart(6, '0')}`,
+          status: status,
+          statusText: statusText,
+          signDate: booking.signDate || null,
+          otpRequired: statusNum === 1, // Chỉ yêu cầu OTP khi status = 1 (chờ ký hợp đồng)
+          notes: booking.note || null,
           
           // Customer info
           customer: {
             name: booking.renterName || 'N/A',
             phone: booking.renterPhone || 'N/A',
             email: booking.renterEmail || 'N/A',
-            avatar: '/images/default-avatar.png'
+            avatar: '/images/default-avatar.png',
+            idCard: booking.renterIDCard || 'N/A',
+            driverLicense: booking.renterDriverLicense || 'N/A',
+            address: booking.renterAddress || 'N/A',
+            idCardImages: booking.renterIDCardImages || ['/images/id-card-front.jpg', '/images/id-card-back.jpg'],
+            licenseImages: booking.renterLicenseImages || ['/images/license-front.jpg', '/images/license-back.jpg']
           },
           
           // Car info
@@ -47,17 +81,51 @@ export default function ContractDetailPage() {
             model: booking.modelName || `Vehicle #${booking.vehicleID || 'N/A'}`,
             licensePlate: booking.licensePlate || 'N/A',
             image: booking.imageUrl || '/images/default-car.jpg',
+            images: booking.vehicleImages || [booking.imageUrl || '/images/default-car.jpg'],
             color: booking.color || 'N/A',
-            year: booking.year || 'N/A'
+            year: booking.year || 'N/A',
+            location: booking.stationName || 'N/A',
+            specifications: {
+              seats: booking.seats || '4 chỗ',
+              power: booking.power || '150 HP',
+              transmission: booking.transmission || 'Tự động',
+              chargingTime: booking.chargingTime || '8 giờ'
+            }
           },
+          
+          // Pickup location
+          pickupLocation: booking.stationName || 'N/A',
           
           // Rental info
           rental: {
-            pickupDate: booking.startDate,
-            returnDate: booking.endDate,
+            startDate: booking.startDate,
+            endDate: booking.endDate,
             pickupLocation: booking.stationName || 'N/A',
-            rentalType: booking.rentalType === 2 ? 'weekly' : booking.rentalType === 3 ? 'monthly' : 'daily',
-            rentTime: booking.rentTime || null
+            rentalType: booking.rentalType === 2 ? 'weeks' : booking.rentalType === 3 ? 'months' : 'days',
+            rentTime: booking.rentTime || null,
+            totalDays: Math.max(1, Math.ceil((new Date(booking.endDate) - new Date(booking.startDate)) / (1000*60*60*24))),
+            maxKmPerDay: 300, // Default value
+            totalMaxKm: Math.max(1, Math.ceil((new Date(booking.endDate) - new Date(booking.startDate)) / (1000*60*60*24))) * 300,
+            pricePerDay: (booking.retalCost || booking.baseCost || 0) / Math.max(1, Math.ceil((new Date(booking.endDate) - new Date(booking.startDate)) / (1000*60*60*24))),
+            totalCost: booking.retalCost || booking.baseCost || 0,
+            deposit: booking.deposit || 0,
+            grandTotal: booking.baseCost || (booking.retalCost + booking.deposit) || 0,
+            kmOverageFee: 5000, // Default value
+            batteryDeficitFee: 50000 // Default value
+          },
+          
+          // Mileage info (default values for now)
+          mileage: {
+            initial: booking.initialMileage || null,
+            overageFee: 0,
+            overage: 0
+          },
+          
+          // Battery info (default values for now)
+          battery: {
+            initial: booking.initialBattery || null,
+            deficitFee: 0,
+            deficit: 0
           },
           
           // Payment info
@@ -66,6 +134,7 @@ export default function ContractDetailPage() {
             deposit: booking.deposit || 0,
             totalCost: booking.baseCost || (booking.retalCost + booking.deposit) || 0,
             finalCost: booking.finalCost || null,
+            finalAmount: booking.finalCost || booking.baseCost || 0,
             voucher: booking.voucherID ? { 
               code: `VOUCHER-${booking.voucherID}`,
               discount: 0 
