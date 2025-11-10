@@ -51,13 +51,16 @@ export default function MyContractsPage() {
           const endDate = new Date(end);
           const totalDays = Math.max(1, Math.ceil((endDate - startDate) / (1000*60*60*24)));
           const statusNum = b.status ?? b.Status;
-          // Map numeric status to UI keys
+          // Map numeric status to UI keys (Booking table status)
+          // 0: Chờ duyệt, 1: Chờ ký hợp đồng, 2: Đã đặt, 3+: các trạng thái khác
           const statusMap = {
-            0: 'pending_approval',
-            1: 'booked',
-            2: 'rented',
-            3: 'completed',
-            4: 'cancelled'
+            0: 'pending_approval',        // Chờ duyệt
+            1: 'pending_contract',        // Chờ ký hợp đồng
+            2: 'booked',                  // Đã đặt
+            3: 'booked',                  // Đã đặt (fallback)
+            4: 'rented',                  // Đang thuê
+            5: 'completed',               // Hoàn thành
+            6: 'cancelled'                // Đã hủy
           };
           const status = statusMap[statusNum] || 'pending_approval';
 

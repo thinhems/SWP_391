@@ -111,8 +111,8 @@ export const bookingService = {
         error: error.response?.data?.message || error.message || 'Không thể tải chi tiết đơn thuê'
       };
     }
-  }
-,
+  },
+
   /**
    * Lấy danh sách booking theo renterID (userID)
    * @param {number} renterId
