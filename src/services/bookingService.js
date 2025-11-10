@@ -131,5 +131,47 @@ export const bookingService = {
         error: error.response?.data?.message || error.message || 'Không thể tải danh sách hợp đồng'
       };
     }
+  },
+
+  /**
+   * Gửi email OTP để xác nhận ký hợp đồng
+   * @param {number} bookingId - ID của booking cần ký
+   * @returns {Promise<Object>}
+   */
+  async sendSignatureEmail(bookingId) {
+    try {
+      const response = await api.post(`/Email/${bookingId}/send-signature-email`);
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Error sending signature email:', error);
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Không thể gửi email xác nhận'
+      };
+    }
+  },
+
+  /**
+   * Cập nhật status xe tự động
+   * @param {number} vehicleId - ID của xe cần cập nhật status
+   * @returns {Promise<Object>}
+   */
+  async updateVehicleStatus(vehicleId) {
+    try {
+      const response = await api.put(`/Vehicle/AutpUpdateStatus/${vehicleId}`);
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Error updating vehicle status:', error);
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Không thể cập nhật trạng thái xe'
+      };
+    }
   }
 };
