@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getContractById } from '../../../data/mockContractDetails';
+import { bookingService } from '../../../services/bookingService';
 import ContractHeader from './ContractHeader';
 import CustomerCarInfo from './CustomerCarInfo';
 import RentalPaymentInfo from './RentalPaymentInfo';
@@ -12,17 +12,74 @@ export default function ContractDetailPage() {
   const [contract, setContract] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showOtpModal, setShowOtpModal] = useState(false);
-  // call api lấy hợp đồng theo id
+  
+  // Fetch booking detail từ API
   useEffect(() => {
-    const fetchContract = () => {
+    const fetchContract = async () => {
       setLoading(true);
-      const contractData = getContractById(id);
-      if (contractData) {
-        setContract(contractData);
-      } else {
+      try {
+        const result = await bookingService.getBookingDetail(id);
+        
+        if (!result.success) {
+          console.error('Error:', result.error);
+          navigate('/my-contracts');
+          return;
+        }
+
+        const booking = result.data;
+        
+        // Transform API data sang format contract hiện tại
+        const transformedContract = {
+          id: booking.id,
+          orderCode: `BK-${(booking.id || 0).toString().padStart(6, '0')}`,
+          status: booking.status ?? 0,
+          
+          // Customer info
+          customer: {
+            name: booking.renterName || 'N/A',
+            phone: booking.renterPhone || 'N/A',
+            email: booking.renterEmail || 'N/A',
+            avatar: '/images/default-avatar.png'
+          },
+          
+          // Car info
+          car: {
+            model: booking.modelName || `Vehicle #${booking.vehicleID || 'N/A'}`,
+            licensePlate: booking.licensePlate || 'N/A',
+            image: booking.imageUrl || '/images/default-car.jpg',
+            color: booking.color || 'N/A',
+            year: booking.year || 'N/A'
+          },
+          
+          // Rental info
+          rental: {
+            pickupDate: booking.startDate,
+            returnDate: booking.endDate,
+            pickupLocation: booking.stationName || 'N/A',
+            rentalType: booking.rentalType === 2 ? 'weekly' : booking.rentalType === 3 ? 'monthly' : 'daily',
+            rentTime: booking.rentTime || null
+          },
+          
+          // Payment info
+          payment: {
+            rentalCost: booking.retalCost || booking.baseCost || 0,
+            deposit: booking.deposit || 0,
+            totalCost: booking.baseCost || (booking.retalCost + booking.deposit) || 0,
+            finalCost: booking.finalCost || null,
+            voucher: booking.voucherID ? { 
+              code: `VOUCHER-${booking.voucherID}`,
+              discount: 0 
+            } : null
+          }
+        };
+        
+        setContract(transformedContract);
+      } catch (error) {
+        console.error('Error fetching contract:', error);
         navigate('/my-contracts');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchContract();
