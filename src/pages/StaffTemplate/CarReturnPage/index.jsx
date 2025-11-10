@@ -222,6 +222,7 @@ export default function CarReturnPage() {
           <QRCodePayment 
             amount={Math.abs(calculateFees().netAmount)}
             customerName={carData.customer.fullName}
+            bookingId={carData.booking.id}
           />
           <div className="text-center space-y-4">
             <button
