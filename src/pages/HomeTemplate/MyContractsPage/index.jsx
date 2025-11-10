@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import FilterSection from "./FilterSection";
 import OrderRow from './OrderRow';
 
-import { mockMyOrders } from "../../../data/mockMyOrder";
+import { bookingService } from '../../../services/bookingService';
 
 export default function MyContractsPage() {
   const navigate = useNavigate();
@@ -30,23 +30,68 @@ export default function MyContractsPage() {
       }
     }, [isAuthenticated, loading, navigate]);
 
-  // Giả lập fetch data từ API
+  // Fetch contracts from API by renterID (user.id)
   useEffect(() => {
     const fetchOrders = async () => {
+      if (!user?.id) return;
       try {
         setIsLoading(true);
-        // Giả lập API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setAllOrders(mockMyOrders);
+        const res = await bookingService.getBookingsByRenter(user.id);
+        if (!res.success) throw new Error(res.error);
+
+        const apiOrders = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+
+        // Transform API data to UI order shape used by OrderRow/filters
+        const transformed = apiOrders.map((b) => {
+          const start = b.startDate || b.StartDate;
+          const end = b.endDate || b.EndDate;
+          const rentalTypeNum = b.rentalType || b.RentalType;
+          const rentalType = rentalTypeNum === 2 ? 'weeks' : rentalTypeNum === 3 ? 'months' : 'days';
+          const startDate = new Date(start);
+          const endDate = new Date(end);
+          const totalDays = Math.max(1, Math.ceil((endDate - startDate) / (1000*60*60*24)));
+          const statusNum = b.status ?? b.Status;
+          // Map numeric status to UI keys
+          const statusMap = {
+            0: 'pending_approval',
+            1: 'booked',
+            2: 'rented',
+            3: 'completed',
+            4: 'cancelled'
+          };
+          const status = statusMap[statusNum] || 'pending_approval';
+
+          const baseCost = b.baseCost ?? b.BaseCost ?? b.retalCost ?? 0;
+          const deposit = b.deposit ?? b.Deposit ?? 0;
+
+          return {
+            id: b.id ?? b.bookingId ?? Math.random().toString(36).slice(2),
+            orderCode: `BK-${(b.id ?? 0).toString().padStart(6,'0')}`,
+            carModel: b.modelName || `Model #${b.vehicleID ?? b.ModelID ?? 'N/A'}`,
+            carImage: b.imageUrl || '/images/default-car.jpg',
+            licensePlate: b.licensePlate || '—',
+            pickupDate: startDate.toISOString(),
+            returnDate: endDate.toISOString(),
+            totalDays,
+            rentalType,
+            pickupLocation: b.stationName || '—',
+            totalAmount: baseCost,
+            deposit,
+            status
+          };
+        });
+
+        setAllOrders(transformed);
       } catch (error) {
         console.error('Error fetching orders:', error);
+        setAllOrders([]);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchOrders();
-  }, []); 
+  }, [user?.id]); 
 
   // tự động lọc khi filters hoặc allOrders thay đổi
   useEffect(() => {

@@ -162,14 +162,16 @@ export default function BookingPopup({ isOpen, onClose, carModel, selectedLocati
         stationId: station.id,
         startDate: new Date(formData.rentDate).toISOString(),
         endDate: endDate,
-        rentalType: rentalType
+        rentalType: rentalType,
+        // Với weekly/monthly, backend yêu cầu thêm RentTime = số tuần/tháng
+        rentTime: rentalType === 1 ? undefined : (parseInt(formData.duration, 10) || 1)
       };
 
       console.log('User data:', user);
       console.log('Station data:', station);
       console.log('Car model ID:', carModel.id);
       console.log('Active tab:', activeTab, '-> Rental Type:', rentalType);
-      console.log('Booking data to send:', bookingData);
+  console.log('Booking data to send:', bookingData);
 
       const bookingResult = await bookingService.createBooking(bookingData);
       

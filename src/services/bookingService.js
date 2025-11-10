@@ -10,6 +10,7 @@ export const bookingService = {
    * @param {string} bookingData.startDate - Ngày bắt đầu (ISO string)
    * @param {string} bookingData.endDate - Ngày kết thúc (ISO string)
    * @param {number} bookingData.rentalType - Loại thuê (1: daily, 2: weekly, 3: monthly)
+   * @param {number} [bookingData.rentTime] - Số tuần/tháng thuê (áp dụng khi RentalType = 2 hoặc 3)
    * @returns {Promise<Object>} Response từ API
    */
   async createBooking(bookingData) {
@@ -22,6 +23,9 @@ export const bookingService = {
       formData.append('StartDate', bookingData.startDate);
       formData.append('EndDate', bookingData.endDate);
       formData.append('RentalType', bookingData.rentalType || 1); // Default to daily if not provided
+      if (bookingData.rentTime !== undefined && bookingData.rentTime !== null) {
+        formData.append('RentTime', bookingData.rentTime);
+      }
       
       console.log('Booking form data:');
       for (let [key, value] of formData.entries()) {
@@ -105,6 +109,26 @@ export const bookingService = {
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Không thể tải chi tiết đơn thuê'
+      };
+    }
+  }
+,
+  /**
+   * Lấy danh sách booking theo renterID (userID)
+   * @param {number} renterId
+   */
+  async getBookingsByRenter(renterId) {
+    if (!renterId) {
+      return { success: false, error: 'Thiếu renterId' };
+    }
+    try {
+      const response = await api.get(`/Booking/GetBookingsByRenter/${renterId}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Error fetching bookings by renter:', error);
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Không thể tải danh sách hợp đồng'
       };
     }
   }
