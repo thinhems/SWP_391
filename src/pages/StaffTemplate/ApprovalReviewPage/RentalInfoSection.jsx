@@ -28,6 +28,12 @@ export default function bookingInfoSection({ carData }) {
     });
   };
 
+  const calculateRentalPrice = (rentalCost) => {
+    if (booking?.rentalType === 1) return rentalCost / booking?.rentalTime;
+    else if (booking?.rentalType === 2) return rentalCost / (booking?.rentalTime / 7);
+    else if (booking?.rentalType === 3) return rentalCost / (booking?.rentalTime / 30);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
       <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
@@ -70,7 +76,12 @@ export default function bookingInfoSection({ carData }) {
               <div className="flex items-center justify-between">
                 <span className="text-blue-800 font-medium">Tổng thời gian thuê:</span>
                 <span className="text-xl font-bold text-blue-900">
-                  {booking?.rentalTime} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}</span>
+                  {booking?.rentalType === 1 
+                    ? booking?.rentalTime 
+                    : booking?.rentalType === 2 
+                    ? booking?.rentalTime / 7 
+                    : booking?.rentalTime / 30} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}
+                </span>
               </div>
             </div>
           </div>
@@ -82,7 +93,7 @@ export default function bookingInfoSection({ carData }) {
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
               <span className="text-sm text-gray-700">Giá thuê/{booking?.rentalType === 1 ? "ngày" : booking?.rentalType === 2 ? "tuần" : "tháng"}:</span>
-              <span className="text-sm font-semibold text-gray-900">{formatCurrency(booking?.retalCost / booking?.rentalTime)}</span>
+              <span className="text-sm font-semibold text-gray-900">{formatCurrency(calculateRentalPrice(booking?.retalCost))}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
               <span className="text-sm text-gray-700">Tổng tiền thuê:</span>

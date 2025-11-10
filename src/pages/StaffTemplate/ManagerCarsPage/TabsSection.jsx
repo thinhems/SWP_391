@@ -12,7 +12,7 @@ export default function TabsSection({ activeTab, setActiveTab, cars }) {
   const tabs = [
     { id: 'available', label: 'Xe có sẵn', count: cars.available.length },
     { id: 'pending_approval', label: 'Chờ xác nhận', count: cars.pending_approval.length + cars.pending_contract.length },
-    { id: 'booked', label: 'Xe đã đặt', count: cars.booked.length },
+    { id: 'booked', label: 'Chờ bàn giao', count: cars.booked.length },
     { id: 'rented', label: 'Đang cho thuê', count: cars.rented.length }
   ];
 

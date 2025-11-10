@@ -1,7 +1,7 @@
 export default function VehicleReturnInfo({ carData }) {
   const booking = carData?.booking || {};
   // tính số km tối đa được chạy
-  const caculateKiloMax = 200 * (booking.rentalType === 1 ? booking.rentalTime : booking.rentalType === 2 ? booking.rentalTime * 7 : booking.rentalTime * 30);
+  const caculateKiloMax = 200 * booking.rentalTime;
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
       <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
@@ -49,7 +49,11 @@ export default function VehicleReturnInfo({ carData }) {
             <div className="flex justify-between">
               <span className="text-gray-600">Thời gian thuê:</span>
               <span className="font-semibold">
-                {booking?.rentalTime} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}
+                {booking?.rentalType === 1 
+                  ? booking?.rentalTime 
+                  : booking?.rentalType === 2 
+                  ? booking?.rentalTime / 7 
+                  : booking?.rentalTime / 30} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}
               </span>
             </div>
             <div className="flex justify-between">
@@ -68,7 +72,7 @@ export default function VehicleReturnInfo({ carData }) {
           <div>
             <p className="text-blue-800 text-sm">
               <strong>Lưu ý:</strong> Số km tối đa được chạy: <strong>{caculateKiloMax} km </strong> 
-              (200 km/ngày × {booking.rentalType === 1 ? booking.rentalTime : booking.rentalType === 2 ? booking.rentalTime * 7 : booking.rentalTime * 30} ngày)
+              (200 km/ngày × {booking.rentalTime} ngày)
             </p>
           </div>
         </div>

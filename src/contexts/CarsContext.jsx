@@ -44,10 +44,10 @@ export const CarsProvider = ({ children }) => {
     // số lượng xe theo trạng thái
     total: filteredCars.length,
     available: filteredCars.filter(car => car.status === 0).length,
-    pending_approval: filteredCars.filter(car => car.status === 1).length,
-    pending_contract: filteredCars.filter(car => car.status === 2).length,
-    booked: filteredCars.filter(car => car.status === 3).length,
-    rented: filteredCars.filter(car => car.status === 4).length,
+    pending_approval: filteredCars.filter(car => car.status === 1 && car.booking.status === 0).length,
+    pending_contract: filteredCars.filter(car => car.status === 2 && car.booking.status === 1).length,
+    booked: filteredCars.filter(car => car.status === 3 && car.booking.status === 2).length,
+    rented: filteredCars.filter(car => car.status === 4 && car.booking.status === 2).length,
     allCars: filteredCars,
     // lấy danh sách xe theo trạng thái
     getCarsByStatus: (status) => filteredCars.filter(car => car.status === status),
