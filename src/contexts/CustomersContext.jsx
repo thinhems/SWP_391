@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mockCustomers } from '../data/mockCustomers';
+import { customersService } from '../services/customers.api';
 
 const CustomersContext = createContext();
 
@@ -21,8 +22,8 @@ export const CustomersProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setCustomers(mockCustomers);
+      const data = await customersService.getCustomers();
+      setCustomers(data);
     } catch (err) {
       console.error('Error fetching customers data:', err);
       setError('Có lỗi xảy ra khi tải dữ liệu khách hàng');

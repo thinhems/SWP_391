@@ -17,7 +17,7 @@ export default function ListCarsSection({ cars, activeTab }) {
       { bg: 'bg-green-100', text: 'text-green-800', label: 'Có sẵn' },           // 0 available
       { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Chờ xác nhận' },   // 1 pending_approval
       { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Chờ ký hợp đồng' },    // 2 pending_contract
-      { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Đã đặt' },         // 3 booked
+      { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Chờ bàn giao' },         // 3 pending_handover
       { bg: 'bg-purple-100', text: 'text-purple-800', label: 'Đang cho thuê' }   // 4 rented
     ];
     const config = statusConfig[status] || statusConfig[0];
@@ -125,12 +125,19 @@ export default function ListCarsSection({ cars, activeTab }) {
                     </div>
                   </>
                 )}
-
                 {isValidTime(car?.booking?.requestTime) && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Yêu cầu lúc:</span>
                     <span className="text-sm font-medium text-gray-900">
                       {formatDateTime(car.booking.requestTime)}
+                    </span>
+                  </div>
+                )}
+                {car?.booking?.rentalType != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Hình thức thuê:</span>
+                    <span className="text-sm font-bold text-red-600">
+                      {car.booking.rentalType === 1 ? 'Theo ngày' : car.booking.rentalType === 2 ? 'Theo tuần' : 'Theo tháng'}
                     </span>
                   </div>
                 )}
@@ -194,7 +201,7 @@ export default function ListCarsSection({ cars, activeTab }) {
               </>
             )}
 
-            {activeTab === 'booked' && (
+            {activeTab === 'pending_handover' && (
               <>
                 <button 
                   onClick={() => handleCarDelivery(car)}

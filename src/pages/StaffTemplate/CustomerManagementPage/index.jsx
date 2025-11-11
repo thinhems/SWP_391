@@ -17,7 +17,7 @@ export default function CustomerManagementPage() {
   // Filter khách hàng
   const filteredCustomers = customers.filter((customer) => {
     const searchMatch = 
-      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.phone.includes(searchTerm);
 

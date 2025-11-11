@@ -32,7 +32,7 @@ export default function ManagerCarsPage() {
     available: carsData.getCarsByStatus(0),
     pending_approval: carsData.getCarsByStatus(1),
     pending_contract: carsData.getCarsByStatus(2),
-    booked: carsData.getCarsByStatus(3),
+    pending_handover: carsData.getCarsByStatus(3),
     rented: carsData.getCarsByStatus(4)
   };
   

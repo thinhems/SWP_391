@@ -4,12 +4,12 @@ import { faCircleCheck, faCalendarCheck, faCarSide, faSpinner, faClock } from "@
 
 export default function StatsSection({ cars }) {
   // tính tổng số xe
-  const total = cars.available.length + cars.pending_approval.length + cars.booked.length + cars.rented.length + cars.pending_contract.length;
+  const total = cars.available.length + cars.pending_approval.length + cars.pending_handover.length + cars.rented.length + cars.pending_contract.length;
   // mảng thống kê từng loại xe
   const stats = [
     { label: 'Xe có sẵn', count: cars.available.length, color: 'green', icon: faCircleCheck },
     { label: 'Chờ xác nhận', count: cars.pending_approval.length + cars.pending_contract.length, color: 'yellow', icon: faClock },
-    { label: 'Chờ bàn giao', count: cars.booked.length, color: 'orange', icon: faSpinner },
+    { label: 'Chờ bàn giao', count: cars.pending_handover.length, color: 'orange', icon: faSpinner },
     { label: 'Đang cho thuê', count: cars.rented.length, color: 'purple', icon: faCalendarCheck },
     { label: 'Tổng số xe', count: total, color: 'blue', icon: faCarSide }
   ];
