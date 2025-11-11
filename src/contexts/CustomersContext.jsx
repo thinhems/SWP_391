@@ -14,7 +14,7 @@ export const useCustomers = () => {
 
 export const CustomersProvider = ({ children }) => {
   const [customers, setCustomers] = useState([]);
-  const [loading, setLoading] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Fetch dữ liệu khách hàng

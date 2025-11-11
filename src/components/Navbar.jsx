@@ -112,15 +112,15 @@ export default function Navbar() {
                           </span>
                         )}
                         <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
-                          user?.isVerified === "verified"
+                          user?.isVerified === true
                             ? 'bg-green-100 text-green-700'
-                            : user?.isVerified === "pending" || user?.isVerified == "not_started"
+                            : user?.isVerified === "pending" || user?.isVerified == false
                             ? 'bg-yellow-100 text-yellow-700'
                             : 'bg-red-100 text-red-700'
                         }`}>
-                          {user?.isVerified === "verified" && 'Đã xác thực'}
+                          {user?.isVerified === true && 'Đã xác thực'}
                           {user?.isVerified === "pending" && user?.verificationSubmitted && 'Đang xác thực'}
-                          {user?.isVerified === "not_started" && !user?.verificationSubmitted && 'Chưa xác thực'}
+                          {user?.isVerified === false && !user?.verificationSubmitted && 'Chưa xác thực'}
                         </span>
                       </div>
                     </div>

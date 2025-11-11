@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { carService } from '../services/cars.api';
 
 const CarsContext = createContext();
@@ -13,15 +13,17 @@ export const useCars = () => {
 
 export const CarsProvider = ({ children }) => {
   const [listCar, setListCar] = useState([]);
-  const [loading, setLoading] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userStation, setUserStation] = useState(null);
+  const isFirstLoadRef = useRef(true); // ← Thêm ref
 
   // Fetch dữ liệu xe
   const fetchListCars = async () => {
-    if (listCar.length == 0) {
+    if (isFirstLoadRef.current) {
       setLoading(true);
     }
+    
     setError(null);
     try {
       const data = await carService.getCars();
@@ -30,8 +32,9 @@ export const CarsProvider = ({ children }) => {
       setError(err);
       console.error('Error fetching cars:', err);
     } finally {
-      if (listCar.length == 0) {
+      if (isFirstLoadRef.current) {
         setLoading(false);
+        isFirstLoadRef.current = false; // ← Đánh dấu đã load xong
       }
     }
   };
@@ -58,7 +61,7 @@ export const CarsProvider = ({ children }) => {
     available: filteredCars.filter(car => car.status === 0).length,
     pending_approval: filteredCars.filter(car => car.status === 1 && car.booking?.status === 0).length,
     pending_contract: filteredCars.filter(car => car.status === 2 && car.booking?.status === 1).length,
-    booked: filteredCars.filter(car => car.status === 3 && car.booking?.status === 2).length,
+    pending_handover: filteredCars.filter(car => car.status === 3 && car.booking?.status === 2).length,
     rented: filteredCars.filter(car => car.status === 4 && car.booking?.status === 2).length,
     allCars: filteredCars,
     // lấy danh sách xe theo trạng thái

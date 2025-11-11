@@ -24,6 +24,8 @@ export default function CarDeliveryPage() {
   });
   // state kiểm tra đã xác nhận giải thích với khách hàng chưa
   const [isStaffExplanationConfirmed, setIsStaffExplanationConfirmed] = useState(false);
+  // state kiểm tra khách hàng đã xác nhận hợp đồng chưa
+  const [isCustomerConfirmed, setIsCustomerConfirmed] = useState(false);
 
   // load dữ liệu xe và booking từ API
   useEffect(() => {
@@ -86,7 +88,7 @@ export default function CarDeliveryPage() {
       case 2:
         return true;
       case 3:
-        return isStaffExplanationConfirmed;
+        return isStaffExplanationConfirmed && isCustomerConfirmed;
       default:
         return false;
     }
@@ -106,7 +108,7 @@ export default function CarDeliveryPage() {
       });
       
       alert(`Bàn giao xe ${carData.plateNumber} thành công! Xe đã chuyển sang trạng thái cho thuê.`);
-      navigate('/staff/manage-cars?tab=booked');
+      navigate('/staff/manage-cars?tab=pending_handover');
     } catch (error) {
       console.error('Error completing delivery:', error);
       alert('Có lỗi xảy ra khi hoàn tất bàn giao. Vui lòng thử lại.');
@@ -136,7 +138,7 @@ export default function CarDeliveryPage() {
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy thông tin hợp đồng</h2>
         <p className="text-gray-600 mb-4">{error || `Hợp đồng với xe ID "${carId}" không tồn tại hoặc đã bị xóa.`}</p>
         <button
-          onClick={() => navigate('/staff/manage-cars?tab=booked')}
+          onClick={() => navigate('/staff/manage-cars?tab=pending_handover')}
           className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
         >
           Quay lại danh sách xe
@@ -153,7 +155,7 @@ export default function CarDeliveryPage() {
         carId={carId}
         currentStep={currentStep}
         steps={steps}
-        onNavigateBack={() => navigate('/staff/manage-cars?tab=booked')}
+        onNavigateBack={() => navigate('/staff/manage-cars?tab=pending_handover')}
       />  
       {/* Step content */}
       <div className="min-h-96">
@@ -176,6 +178,8 @@ export default function CarDeliveryPage() {
             inspectionData={inspectionData}
             isStaffExplanationConfirmed={isStaffExplanationConfirmed}
             setIsStaffExplanationConfirmed={setIsStaffExplanationConfirmed}
+            isCustomerConfirmed={isCustomerConfirmed}
+            setIsCustomerConfirmed={setIsCustomerConfirmed}
           />
         )}
         {currentStep === 4 && (
@@ -233,7 +237,7 @@ export default function CarDeliveryPage() {
             <p className="text-sm text-gray-600">
               {currentStep === 1 && "Kiểm tra kỹ thông tin hợp đồng trước khi tiếp tục"}
               {currentStep === 2 && "Thực hiện kiểm tra chi tiết tình trạng xe và chụp ảnh làm bằng chứng"}
-              {currentStep === 3 && "Cần xác nhận đã giải thích để tiếp tục"}
+              {currentStep === 3 && "Cần xác nhận từ cả nhân viên và khách hàng để tiếp tục"}
             </p>
           </div>
         </div>
