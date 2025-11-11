@@ -74,7 +74,7 @@ export default function CustomerList({
   };
   // hàm xử lý chọn loại khách hàng
   const handleClassifySelect = (customer, type) => {
-    alert(`Phân loại khách hàng: ${customer.name}\n(Chức năng sẽ được phát triển)`);
+    alert(`Phân loại khách hàng: ${customer.fullName}\n(Chức năng sẽ được phát triển)`);
     setOpenDropdown(null); // Đóng dropdown sau khi chọn
   };
   // hàm render phân trang
@@ -218,13 +218,13 @@ export default function CustomerList({
                       <div className="flex-shrink-0 h-10 w-10">
                         <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                           <span className="text-blue-600 font-semibold">
-                            {customer.name.charAt(0)}
+                            {customer.fullName.charAt(0)}
                           </span>
                         </div>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {customer.name}
+                          {customer.fullName}
                         </div>
                         <div className="text-xs text-gray-500">{customer.id}</div>
                       </div>

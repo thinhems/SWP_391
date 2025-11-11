@@ -125,12 +125,19 @@ export default function ListCarsSection({ cars, activeTab }) {
                     </div>
                   </>
                 )}
-
                 {isValidTime(car?.booking?.requestTime) && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Yêu cầu lúc:</span>
                     <span className="text-sm font-medium text-gray-900">
                       {formatDateTime(car.booking.requestTime)}
+                    </span>
+                  </div>
+                )}
+                {car?.booking?.rentalType != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Hình thức thuê:</span>
+                    <span className="text-sm font-bold text-red-600">
+                      {car.booking.rentalType === 1 ? 'Theo ngày' : car.booking.rentalType === 2 ? 'Theo tuần' : 'Theo tháng'}
                     </span>
                   </div>
                 )}

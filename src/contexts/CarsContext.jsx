@@ -13,13 +13,15 @@ export const useCars = () => {
 
 export const CarsProvider = ({ children }) => {
   const [listCar, setListCar] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(null);
   const [error, setError] = useState(null);
   const [userStation, setUserStation] = useState(null);
 
   // Fetch dữ liệu xe
   const fetchListCars = async () => {
-    setLoading(true);
+    if (listCar.length == 0) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const data = await carService.getCars();
@@ -28,12 +30,22 @@ export const CarsProvider = ({ children }) => {
       setError(err);
       console.error('Error fetching cars:', err);
     } finally {
-      setLoading(false);
+      if (listCar.length == 0) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
     fetchListCars();
+    // tự động làm mới danh sách xe mỗi 20 giây
+    const intervalId = setInterval(() => {
+      fetchListCars();
+    }, 20000);
+    // cleanup interval khi unmount
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
   // Lọc xe theo station của user
   const filteredCars = userStation
