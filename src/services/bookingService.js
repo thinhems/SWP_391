@@ -140,21 +140,49 @@ export const bookingService = {
    */
   async sendSignatureEmail(bookingId) {
     try {
-      // Thử nhiều format khác nhau
-      const response = await api.post(`/Email/send-signature-email`, {
-        bookingId: bookingId
-      });
+      console.log('Sending signature email for bookingId:', bookingId);
+      const response = await api.post(`/Email/${bookingId}/send-signature-email`);
       return {
         success: true,
-        data: response.data
+        data: response.data,
+        verificationLink: response.data // Link xác thực sẽ ở đây
       };
     } catch (error) {
       console.error('Error sending signature email:', error);
       // Log chi tiết để debug
+      console.error('BookingId:', bookingId);
       console.error('Error details:', error.response?.data);
+      console.error('Error status:', error.response?.status);
       return {
         success: false,
         error: error.response?.data?.message || error.response?.data || error.message || 'Không thể gửi email xác nhận'
+      };
+    }
+  },
+
+  /**
+   * Xác thực chữ ký điện tử qua token
+   * @param {string} token - Token từ email
+   * @returns {Promise<Object>}
+   */
+  async confirmSignature(token) {
+    try {
+      console.log('Confirming signature with token:', token);
+      const response = await api.get(`/Email/confirm-signature`, {
+        params: { token }
+      });
+      return {
+        success: true,
+        data: response.data,
+        message: 'Xác thực chữ ký thành công'
+      };
+    } catch (error) {
+      console.error('Error confirming signature:', error);
+      console.error('Token:', token);
+      console.error('Error details:', error.response?.data);
+      return {
+        success: false,
+        error: error.response?.data?.message || error.response?.data || error.message || 'Không thể xác thực chữ ký'
       };
     }
   },

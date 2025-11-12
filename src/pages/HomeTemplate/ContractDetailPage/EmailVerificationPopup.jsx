@@ -18,10 +18,11 @@ export default function EmailVerificationPopup({ contract, isOpen, onClose }) {
       
       if (result.success) {
         setEmailSent(true);
+        console.log('Verification link:', result.verificationLink);
         setTimeout(() => {
           onClose();
           setEmailSent(false);
-        }, 3000);
+        }, 5000); // Tăng lên 5 giây để user có thời gian đọc
       } else {
         setErrorMessage(result.error || 'Không thể gửi email xác thực. Vui lòng thử lại.');
       }
@@ -63,9 +64,14 @@ export default function EmailVerificationPopup({ contract, isOpen, onClose }) {
             {emailSent ? (
               <>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Email đã được gửi!</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 mb-3">
                   Vui lòng kiểm tra hộp thư <span className="font-semibold text-gray-900">{contract.customer.email}</span> để xác thực và ký hợp đồng điện tử.
                 </p>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+                  <p className="text-sm text-green-700 font-medium">
+                    ✓ Nhấn vào link trong email để hoàn tất ký hợp đồng
+                  </p>
+                </div>
               </>
             ) : (
               <>
