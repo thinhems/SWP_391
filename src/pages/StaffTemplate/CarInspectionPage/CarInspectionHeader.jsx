@@ -29,7 +29,7 @@ export default function CarInspectionHeader({
   const handleCancel = () => {
     setEditData({
       model: carData.model,
-      licensePlate: carData.licensePlate,
+      licensePlate: carData.plateNumber,
       color: carData.color,
       year: carData.year,
       batteryLevel: carData.batteryLevel,
@@ -194,7 +194,7 @@ export default function CarInspectionHeader({
                 />
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <span>0%</span>
-                  <span className="font-semibold text-lg text-gray-900">{editData.batteryLevelLevel}%</span>
+                  <span className="font-semibold text-lg text-gray-900">{editData.batteryLevel}%</span>
                   <span>100%</span>
                 </div>
               </div>
