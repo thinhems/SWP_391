@@ -226,7 +226,7 @@ export default function CustomerList({
                         <div className="text-sm font-medium text-gray-900">
                           {customer.fullName}
                         </div>
-                        <div className="text-xs text-gray-500">{customer.id}</div>
+                        <div className="text-xs text-gray-500">ID: {customer.id}</div>
                       </div>
                     </div>
                   </td>

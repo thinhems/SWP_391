@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 
 export default function ListCarsSection({ cars, activeTab }) {
   const navigate = useNavigate();
-
+  if (activeTab == 'pending_approval') {
+    cars = cars.sort((a, b) => a.booking.requestTime + b.booking.requestTime);
+  }
   // Hàm đổi màu pin
   const getBatteryColor = (battery) => {
     if (battery >= 80) return 'text-green-600';
@@ -55,7 +57,10 @@ export default function ListCarsSection({ cars, activeTab }) {
       currency: 'VND' 
     }).format(amount);
   };
-
+  // mờ trang zalo khách hàng
+  const handleClick = (sdt) => {
+    window.open(`https://zalo.me/${sdt}`, "_blank");
+  };
   // Hàm kiểm tra thời gian hợp lệ
   const isValidTime = (time) => {
     if (!time) return false;
@@ -80,7 +85,7 @@ export default function ListCarsSection({ cars, activeTab }) {
   return (
     <div className="flex flex-wrap gap-6">
       {cars.map((car) => (
-        <div key={car.id} className="w-full sm:w-80 md:w-96 lg:w-[450px] bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+        <div key={car.id} className="w-full sm:w-80 md:w-96 lg:w-[510px] bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow">
           <div className="flex justify-between items-start mb-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">{car.modelName}</h3>
@@ -179,9 +184,6 @@ export default function ListCarsSection({ cars, activeTab }) {
                 >
                   Kiểm tra xe
                 </button>
-                <button className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors cursor-pointer">
-                  Bảo trì
-                </button>
               </>
             )}
 
@@ -195,7 +197,9 @@ export default function ListCarsSection({ cars, activeTab }) {
                     Duyệt xe
                   </button>
                 )}
-                <button className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors cursor-pointer">
+                <button 
+                  onClick={() => handleClick(car?.booking?.customer?.phoneNumber)}
+                  className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors cursor-pointer">
                   Liên hệ KH
                 </button>
               </>
@@ -209,7 +213,9 @@ export default function ListCarsSection({ cars, activeTab }) {
                 >
                   Giao xe
                 </button>
-                <button className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors cursor-pointer">
+                <button 
+                  onClick={() => handleClick(car?.booking?.customer?.phoneNumber)}
+                  className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors cursor-pointer">
                   Liên hệ KH
                 </button>
               </>
@@ -223,7 +229,9 @@ export default function ListCarsSection({ cars, activeTab }) {
                 >
                   Nhận xe trả
                 </button>
-                <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer">
+                <button 
+                  onClick={() => handleClick(car?.booking?.customer?.phoneNumber)}
+                  className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer">
                   Liên hệ KH
                 </button>
               </>

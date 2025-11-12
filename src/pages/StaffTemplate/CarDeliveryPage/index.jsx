@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
 import { useCars } from '../../../contexts/CarsContext';
 import { useActivities } from '../../../contexts/ActivitiesContext';
 import HeaderSection from './HeaderSection';  
@@ -12,7 +13,8 @@ export default function CarDeliveryPage() {
   let { carId } = useParams();
   carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { carsData, loading, autoUpdateStatusCar } = useCars();
+  const { user } = useAuth();
+  const { carsData, loading, createHandover } = useCars();
   const { addActivity } = useActivities();
   const [currentStep, setCurrentStep] = useState(1);
   const [carData, setCarData] = useState(null);
@@ -69,7 +71,7 @@ export default function CarDeliveryPage() {
     { id: 4, title: 'Hoàn tất', desc: 'Bàn giao xe' }
   ];
   // chuyển đến bước tiếp theo
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep < 4) {
       setCurrentStep(prev => prev + 1);
     }
@@ -96,7 +98,13 @@ export default function CarDeliveryPage() {
   // hoàn tất bàn giao xe
   const handleCompleteDelivery = async () => {
     try {
-      await autoUpdateStatusCar(carId); // Cập nhật trạng thái xe về rented (4)
+      const handoverData = {
+        bookingID: carData?.booking.id || 0,
+        staffID: user?.id || 0,
+        description: inspectionData.notes || "Không có ghi chú"
+      };
+      
+      await createHandover(handoverData);
       
       addActivity({
         type: 'delivery',
