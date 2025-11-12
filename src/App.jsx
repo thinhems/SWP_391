@@ -13,6 +13,7 @@ import ModelListPage from './pages/HomeTemplate/ModelListPage';
 import BookingPage from './pages/HomeTemplate/BookingPage';
 import MyContractsPage from './pages/HomeTemplate/MyContractsPage';
 import ContractDetailPage from './pages/HomeTemplate/ContractDetailPage';
+import ConfirmSignaturePage from './pages/HomeTemplate/ConfirmSignaturePage';
 import PaymentResultPage from './pages/HomeTemplate/PaymentResultPage';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminTemplate/Dashboard';
@@ -80,6 +81,7 @@ function App() {
               <Route path="booking/:modelId" element={<BookingPage />} />
               <Route path="my-contracts" element={<MyContractsPage />} />
               <Route path="contract-detail/:id" element={<ContractDetailPage />} />
+              <Route path="confirm-signature" element={<ConfirmSignaturePage />} />
               <Route path="payment/result" element={<PaymentResultPage />} />
               <Route path="payment-result" element={<PaymentResultPage />} />
               <Route path="dashboard" element={<Dashboard />} />
