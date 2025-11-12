@@ -1,9 +1,10 @@
 
 export default function OrderRow({ order, index, handleClickOrder }) {
   const statusMap = {
-    pending_approval: { text: "Chờ duyệt", bg: "bg-yellow-100", color: "text-yellow-800" },
+    pending_payment: { text: "Chờ thanh toán", bg: "bg-gray-100", color: "text-gray-800" },
+    pending_approval: { text: "Chờ phê duyệt", bg: "bg-yellow-100", color: "text-yellow-800" },
     pending_contract: { text: "Chờ ký hợp đồng", bg: "bg-purple-100", color: "text-purple-800" },
-    booked: { text: "Đã đặt", bg: "bg-blue-100", color: "text-blue-800" },
+    pending_handover: { text: "Chờ bàn giao", bg: "bg-blue-100", color: "text-blue-800" },
     rented: { text: "Đang thuê", bg: "bg-orange-100", color: "text-orange-800" },
     completed: { text: "Hoàn thành", bg: "bg-green-100", color: "text-green-800" },
     cancelled: { text: "Đã hủy", bg: "bg-red-100", color: "text-red-800" }
@@ -23,8 +24,8 @@ export default function OrderRow({ order, index, handleClickOrder }) {
       currency: 'VND'
     }).format(amount);
   };
-  // Lấy thông tin trạng thái
-  const status = statusMap[order.status] || statusMap.pending;
+  // Lấy thông tin trạng thái với fallback
+  const status = statusMap[order.status] || statusMap.pending_payment;
 
   return (
     <div 

@@ -28,9 +28,10 @@ export default function FilterSection({ filters, setFilters }) {
   ];
   // các trạng thái đơn hàng
   const statusOptions = [
-    { value: "pending_approval", label: "Chờ duyệt", color: "text-yellow-600" },
+    { value: "pending_payment", label: "Chờ thanh toán", color: "text-gray-600" },
+    { value: "pending_approval", label: "Chờ phê duyệt", color: "text-yellow-600" },
     { value: "pending_contract", label: "Chờ ký hợp đồng", color: "text-purple-600" },
-    { value: "booked", label: "Đã đặt", color: "text-blue-600" },
+    { value: "pending_handover", label: "Chờ bàn giao", color: "text-blue-600" },
     { value: "rented", label: "Đang thuê", color: "text-orange-600" },
     { value: "completed", label: "Hoàn thành", color: "text-green-600" },
     { value: "cancelled", label: "Đã hủy", color: "text-red-600" }
