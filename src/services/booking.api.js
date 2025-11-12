@@ -9,5 +9,15 @@ export const bookingService = {
     } catch (error) {
       throw error;
     }
-  }
+  },
+  // khởi tạo biên bản bàn giao và tự động duyệt status xe + booking, dành cho bàn giao xe
+  createHandover: async (handoverData) => {
+    try {
+      const response = await api.post('/Handover/create', handoverData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
 };

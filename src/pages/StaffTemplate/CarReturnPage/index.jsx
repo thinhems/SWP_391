@@ -12,7 +12,7 @@ export default function CarReturnPage() {
   let { carId } = useParams();
   carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { updateCar, carsData, loading } = useCars();
+  const { autoUpdateStatusCar, carsData, loading } = useCars();
   const { addActivity } = useActivities();
   const [carData, setCarData] = useState(null);
   const [error, setError] = useState(null);
@@ -59,10 +59,10 @@ export default function CarReturnPage() {
     
     const kmDriven = inspectionData.currentOdometer - carData.odometer;
     const kmOverage = Math.max(0, kmDriven - 200);
-    const kmOverageFee = kmOverage * 10000;
+    const kmOverageFee = kmOverage * 5000; // 5.000 vnd cho mỗi km vượt quá 200km
 
     const batteryDeficit = Math.max(0, carData.batteryLevel - inspectionData.currentBattery);
-    const batteryDeficitFee = batteryDeficit * 5000;
+    const batteryDeficitFee = batteryDeficit * 50000; // 50.000 vnd cho mỗi 1% pin thiếu
 
     const additionalFeesTotal = inspectionData.additionalFees.reduce((sum, fee) => {
       if (fee.isCustom) {
@@ -84,19 +84,7 @@ export default function CarReturnPage() {
       setShowQRCode(true);
     } else {
       // Hoàn trả tiền cho khách hàng
-      // Cập nhật status xe về available (0)
-      const updateData = {
-        plateNumber: carData.plateNumber,
-        modelID: carData.modelID,
-        stationID: carData.stationID,
-        location: carData.location,
-        batteryLevel: carData.batteryLevel,
-        odometer: carData.odometer,
-        color: carData.color || '',
-        status: 0
-      };
-
-      await updateCar(carId, updateData);
+      await autoUpdateStatusCar(carId);
       
       addActivity({
         type: 'return',
@@ -120,25 +108,12 @@ export default function CarReturnPage() {
   // xử lý xác nhận đã nhận thanh toán từ khách
   const handleConfirmPayment = async () => {
     const { netAmount } = calculateFees();
-    
-    // Cập nhật status xe về available (0)
-    const updateData = {
-      plateNumber: carData.plateNumber,
-      modelID: carData.modelID,
-      stationID: carData.stationID,
-      location: carData.location,
-      batteryLevel: carData.batteryLevel,
-      odometer: carData.odometer,
-      color: carData.color || '',
-      status: 0
-    };
-
-    await updateCar(carId, updateData);
+    await autoUpdateStatusCar(carId);
     
     addActivity({
       type: 'return',
       title: `Đã nhận xe trả ${carData.modelName} (${carData.plateNumber})`,
-      customer: `Thu thêm ${Math.abs(netAmount).toLocaleString()}đ từ ${carData.booking.customer.name}`,
+      customer: `Thu thêm ${Math.abs(netAmount).toLocaleString()}đ từ ${carData.customer.fullName}`,
       icon: 'check',
       color: 'text-green-600',
       bgColor: 'bg-green-100'

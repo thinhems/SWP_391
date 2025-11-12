@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { carService } from '../services/cars.api';
-
+import { bookingService } from '../services/booking.api';
 const CarsContext = createContext();
 
 export const useCars = () => {
@@ -59,10 +59,10 @@ export const CarsProvider = ({ children }) => {
     // số lượng xe theo trạng thái
     total: filteredCars.length,
     available: filteredCars.filter(car => car.status === 0).length,
-    pending_approval: filteredCars.filter(car => car.status === 1 && car.booking?.status === 0).length,
-    pending_contract: filteredCars.filter(car => car.status === 2 && car.booking?.status === 1).length,
-    pending_handover: filteredCars.filter(car => car.status === 3 && car.booking?.status === 2).length,
-    rented: filteredCars.filter(car => car.status === 4 && car.booking?.status === 2).length,
+    pending_approval: filteredCars.filter(car => car.status === 1 && car.booking?.status === 1).length,
+    pending_contract: filteredCars.filter(car => car.status === 2 && car.booking?.status === 2).length,
+    pending_handover: filteredCars.filter(car => car.status === 3 && car.booking?.status === 3).length,
+    rented: filteredCars.filter(car => car.status === 4 && car.booking?.status === 4).length,
     allCars: filteredCars,
     // lấy danh sách xe theo trạng thái
     getCarsByStatus: (status) => filteredCars.filter(car => car.status === status),
@@ -70,7 +70,7 @@ export const CarsProvider = ({ children }) => {
     getCarById: (id) => filteredCars.find(car => car.id === id),
   };
 
-  // Cập nhật status xe
+  // Cập nhật xe
   const updateCar = async (carId, updateCar) => { 
     try {
       await carService.updateCar(carId, updateCar);
@@ -81,7 +81,7 @@ export const CarsProvider = ({ children }) => {
       throw error;
     }
   };
-  // Tự động cập nhật trạng thái xe
+  // Tự động cập nhật status xe + booking
   const autoUpdateStatusCar = async (carId) => { 
     try {
       await carService.updateStatusCar(carId);
@@ -91,13 +91,32 @@ export const CarsProvider = ({ children }) => {
       throw error;
     }
   };
-
+  // khởi tạo biên bản
+  const createHandover = async (handoverData) => {
+    try {
+      await bookingService.createHandover(handoverData);
+      await fetchListCars();
+    } catch (error) {
+      throw error;
+    }
+  };
+  // từ chối yêu cầu thuê xe
+  const rejectCarApproval = async (carId) => { 
+    try {
+      await carService.rejectCarApproval(carId);
+      await fetchListCars();
+    } catch (error) {
+      throw error;
+    }
+  };
   const value = {
     carsData,
     loading,
     error,
     updateCar,
     autoUpdateStatusCar,
+    createHandover,
+    rejectCarApproval,
     setUserStation // Thêm function để set station từ bên ngoài
   };
 
