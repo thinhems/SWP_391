@@ -140,16 +140,21 @@ export const bookingService = {
    */
   async sendSignatureEmail(bookingId) {
     try {
-      const response = await api.post(`/Email/${bookingId}/send-signature-email`);
+      // Thử nhiều format khác nhau
+      const response = await api.post(`/Email/send-signature-email`, {
+        bookingId: bookingId
+      });
       return {
         success: true,
         data: response.data
       };
     } catch (error) {
       console.error('Error sending signature email:', error);
+      // Log chi tiết để debug
+      console.error('Error details:', error.response?.data);
       return {
         success: false,
-        error: error.response?.data?.message || error.message || 'Không thể gửi email xác nhận'
+        error: error.response?.data?.message || error.response?.data || error.message || 'Không thể gửi email xác nhận'
       };
     }
   },

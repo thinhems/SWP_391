@@ -4,14 +4,14 @@ import { bookingService } from '../../../services/bookingService';
 import ContractHeader from './ContractHeader';
 import CustomerCarInfo from './CustomerCarInfo';
 import RentalPaymentInfo from './RentalPaymentInfo';
-import OTPVerificationPopup from './OTPVerificationPopup';
+import EmailVerificationPopup from './EmailVerificationPopup';
 
 export default function ContractDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [contract, setContract] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const [vehicleId, setVehicleId] = useState(null);
   
   // Handler cho button "Ký hợp đồng" - gọi API cập nhật vehicle status
@@ -54,33 +54,34 @@ export default function ContractDetailPage() {
         }
 
         const booking = result.data;
+        console.log('Booking API Response:', booking); // Debug log
         
         // Lưu vehicleId để dùng cho API update status
-        setVehicleId(booking.vehicleID);
+        setVehicleId(booking.vehicleID || booking.VehicleID);
         
         // Map status giống MyContractsPage
         const statusNum = booking.status ?? 0;
         const statusMap = {
-          0: 'pending_approval',        // Chờ duyệt
-          1: 'pending_contract',        // Chờ ký hợp đồng
-          2: 'booked',                  // Đã đặt
-          3: 'booked',                  // Đã đặt (fallback)
-          4: 'rented',                  // Đang thuê
-          5: 'completed',               // Hoàn thành
+          0: 'pending_payment',         // Chờ thanh toán (new create)
+          1: 'pending_approval',        // Chờ phê duyệt (paid)
+          2: 'pending_contract',        // Chờ ký hợp đồng (Approval)
+          3: 'pending_handover',        // Chờ bàn giao (Pending Handover)
+          4: 'rented',                  // Đang thuê xe (Rented)
+          5: 'completed',               // Hoàn thành (Complete)
           6: 'cancelled'                // Đã hủy
         };
-        const status = statusMap[statusNum] || 'pending_approval';
+        const status = statusMap[statusNum] || 'pending_payment';
         
         const statusTextMap = {
-          0: 'Chờ duyệt',
-          1: 'Chờ ký hợp đồng',
-          2: 'Đã đặt',
-          3: 'Đã đặt',
+          0: 'Chờ thanh toán',
+          1: 'Chờ phê duyệt',
+          2: 'Chờ ký hợp đồng',
+          3: 'Chờ bàn giao',
           4: 'Đang thuê',
           5: 'Hoàn thành',
           6: 'Đã hủy'
         };
-        const statusText = statusTextMap[statusNum] || 'Chờ duyệt';
+        const statusText = statusTextMap[statusNum] || 'Chờ thanh toán';
         
         // Transform API data sang format contract hiện tại
         const transformedContract = {
@@ -90,36 +91,36 @@ export default function ContractDetailPage() {
           status: status,
           statusText: statusText,
           signDate: booking.signDate || null,
-          otpRequired: statusNum === 1, // Chỉ yêu cầu OTP khi status = 1 (chờ ký hợp đồng)
+          otpRequired: statusNum === 2, // Chỉ yêu cầu OTP khi status = 2 (chờ ký hợp đồng)
           notes: booking.note || null,
           
-          // Customer info
+          // Customer info - Map từ nhiều nguồn có thể
           customer: {
-            name: booking.renterName || 'N/A',
-            phone: booking.renterPhone || 'N/A',
-            email: booking.renterEmail || 'N/A',
-            avatar: '/images/default-avatar.png',
-            idCard: booking.renterIDCard || 'N/A',
-            driverLicense: booking.renterDriverLicense || 'N/A',
-            address: booking.renterAddress || 'N/A',
-            idCardImages: booking.renterIDCardImages || ['/images/id-card-front.jpg', '/images/id-card-back.jpg'],
-            licenseImages: booking.renterLicenseImages || ['/images/license-front.jpg', '/images/license-back.jpg']
+            name: booking.renterName || booking.RenterName || booking.renter?.name || 'N/A',
+            phone: booking.renterPhone || booking.RenterPhone || booking.renter?.phone || 'N/A',
+            email: booking.renterEmail || booking.RenterEmail || booking.renter?.email || 'N/A',
+            avatar: booking.renterAvatar || booking.renter?.avatar || '/images/default-avatar.png',
+            idCard: booking.renterIDCard || booking.RenterIDCard || booking.renter?.idCard || 'N/A',
+            driverLicense: booking.renterDriverLicense || booking.RenterDriverLicense || booking.renter?.driverLicense || 'N/A',
+            address: booking.renterAddress || booking.RenterAddress || booking.renter?.address || 'N/A',
+            idCardImages: booking.renterIDCardImages || booking.RenterIDCardImages || booking.renter?.idCardImages || ['/images/id-card-front.jpg', '/images/id-card-back.jpg'],
+            licenseImages: booking.renterLicenseImages || booking.RenterLicenseImages || booking.renter?.licenseImages || ['/images/license-front.jpg', '/images/license-back.jpg']
           },
           
-          // Car info
+          // Car info - Map từ nhiều nguồn có thể
           car: {
-            model: booking.modelName || `Vehicle #${booking.vehicleID || 'N/A'}`,
-            licensePlate: booking.licensePlate || 'N/A',
-            image: booking.imageUrl || '/images/default-car.jpg',
-            images: booking.vehicleImages || [booking.imageUrl || '/images/default-car.jpg'],
-            color: booking.color || 'N/A',
-            year: booking.year || 'N/A',
-            location: booking.stationName || 'N/A',
+            model: booking.modelName || booking.ModelName || booking.vehicle?.modelName || `Vehicle #${booking.vehicleID || booking.VehicleID || 'N/A'}`,
+            licensePlate: booking.licensePlate || booking.LicensePlate || booking.vehicle?.licensePlate || 'N/A',
+            image: booking.imageUrl || booking.ImageUrl || booking.vehicle?.imageUrl || '/images/default-car.jpg',
+            images: booking.vehicleImages || booking.VehicleImages || booking.vehicle?.images || [booking.imageUrl || booking.ImageUrl] || ['/images/default-car.jpg'],
+            color: booking.color || booking.Color || booking.vehicle?.color || 'N/A',
+            year: booking.year || booking.Year || booking.vehicle?.year || 'N/A',
+            location: booking.stationName || booking.StationName || booking.station?.name || 'N/A',
             specifications: {
-              seats: booking.seats || '4 chỗ',
-              power: booking.power || '150 HP',
-              transmission: booking.transmission || 'Tự động',
-              chargingTime: booking.chargingTime || '8 giờ'
+              seats: booking.seats || booking.Seats || booking.vehicle?.seats || booking.specifications?.seats || '5 chỗ',
+              power: booking.power || booking.Power || booking.vehicle?.power || booking.specifications?.power || '150 HP',
+              transmission: booking.transmission || booking.Transmission || booking.vehicle?.transmission || 'Tự động',
+              chargingTime: booking.chargingTime || booking.ChargingTime || booking.vehicle?.chargingTime || '8 giờ'
             }
           },
           
@@ -217,7 +218,7 @@ export default function ContractDetailPage() {
         {/* Header */}
         <ContractHeader 
           contract={contract} 
-          onSignContract={() => setShowOtpModal(true)}
+          onSignContract={() => setShowEmailModal(true)}
           onSignContractDirect={handleSignContractDirect}
         />
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -230,11 +231,11 @@ export default function ContractDetailPage() {
             <RentalPaymentInfo contract={contract} />
           </div>
         </div>
-        {/* OTP popup */}
-        <OTPVerificationPopup 
+        {/* Email Verification popup */}
+        <EmailVerificationPopup 
           contract={contract} 
-          isOpen={showOtpModal} 
-          onClose={() => setShowOtpModal(false)} 
+          isOpen={showEmailModal} 
+          onClose={() => setShowEmailModal(false)} 
         />
       </div>
     </div>
