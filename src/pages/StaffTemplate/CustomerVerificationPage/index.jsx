@@ -8,7 +8,8 @@ import CustomerDocumentsSection from './CustomerDocumentsSection';
 import VerificationActionsSection from './VerificationActionsSection';
 
 export default function CustomerVerificationPage() {
-  const { customerId } = useParams();
+  let { customerId } = useParams();
+  customerId = parseInt(customerId, 10);
   const navigate = useNavigate();
   const { customersData, updateCustomer } = useCustomers();
   const { addActivity } = useActivities();
