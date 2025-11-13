@@ -238,7 +238,7 @@ export default function CustomerList({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <span className="text-sm font-semibold text-gray-900">
-                      {customer.totalRentals}
+                      {customer.bookingCount}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
