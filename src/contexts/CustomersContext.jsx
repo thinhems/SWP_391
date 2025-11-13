@@ -35,20 +35,19 @@ export const CustomersProvider = ({ children }) => {
   useEffect(() => {
     fetchCustomers();
   }, []);
-  const filteredCustomers = customers.filter(c => c.roleID === 3);
   // Tính toán số liệu cho khách hàng
   const customersData = {
-    total: filteredCustomers.length,
-    verified: filteredCustomers.filter(c => c.status === 'verified').length,
-    unverified: filteredCustomers.filter(c => c.status === 'unverified').length,
-    vip: filteredCustomers.filter(c => c.customerType === 'vip').length,
-    regular: filteredCustomers.filter(c => c.customerType === 'regular').length,
-    new: filteredCustomers.filter(c => c.customerType === 'new').length,
-    allCustomers: filteredCustomers,
+    total: customers.length,
+    verified: customers.filter(c => c.status === 'verified').length,
+    unverified: customers.filter(c => c.status === 'unverified').length,
+    vip: customers.filter(c => c.customerType === 'vip').length,
+    regular: customers.filter(c => c.customerType === 'regular').length,
+    new: customers.filter(c => c.customerType === 'new').length,
+    allCustomers: customers,
     
-    getCustomerById: (id) => filteredCustomers.find(c => c.id === id),
-    getCustomersByStatus: (status) => filteredCustomers.filter(c => c.status === status),
-    getCustomersByType: (type) => filteredCustomers.filter(c => c.customerType === type)
+    getCustomerById: (id) => customers.find(c => c.id === id),
+    getCustomersByStatus: (status) => customers.filter(c => c.status === status),
+    getCustomersByType: (type) => customers.filter(c => c.customerType === type)
   };
 
   // Cập nhật khách hàng

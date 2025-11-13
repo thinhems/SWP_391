@@ -10,8 +10,8 @@ export default function CustomerDocumentsSection({ customer }) {
 
   // tất cả ảnh để hiển thị trong Lightbox
   const allImages = [
-    ...(customer.idCardImages || []),
-    ...(customer.idLicenseImages || [])
+    ...(customer?.idCardImages || []),
+    ...(customer?.idLicenseImages || [])
   ].filter(Boolean);
 
   // xử lý mở ảnh
@@ -35,7 +35,7 @@ export default function CustomerDocumentsSection({ customer }) {
           <div>
             <h3 className="text-lg font-semibold text-gray-800 mb-3">Căn cước công dân (CCCD)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {customer.idCardImages.map((image, idx) => (
+              {customer?.idCardImages?.map((image, idx) => (
                 <div
                   key={idx}
                   className="border-2 border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-500 transition-colors"
@@ -58,7 +58,7 @@ export default function CustomerDocumentsSection({ customer }) {
           <div>
             <h3 className="text-lg font-semibold text-gray-800 mb-3">Bằng lái xe (BLX)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {customer.idLicenseImages.map((image, idx) => (
+              {customer?.idLicenseImages?.map((image, idx) => (
                 <div
                   key={idx}
                   className="border-2 border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-500 transition-colors"
