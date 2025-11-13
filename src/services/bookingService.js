@@ -93,13 +93,14 @@ export const bookingService = {
   },
 
   /**
-   * Lấy chi tiết booking
+   * Lấy chi tiết booking (dùng API for Staff với response đầy đủ hơn)
    * @param {number} bookingId - ID của booking
    * @returns {Promise<Object>}
    */
   async getBookingDetail(bookingId) {
     try {
-      const response = await api.get(`/Booking/${bookingId}`);
+      // Sử dụng API for Staff để có response đầy đủ hơn (bao gồm model, customer, vehicle)
+      const response = await api.get(`/Booking/GetBookingByIdForStaff/${bookingId}`);
       return {
         success: true,
         data: response.data

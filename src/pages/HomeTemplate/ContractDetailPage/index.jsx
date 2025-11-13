@@ -12,33 +12,6 @@ export default function ContractDetailPage() {
   const [contract, setContract] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showEmailModal, setShowEmailModal] = useState(false);
-  const [vehicleId, setVehicleId] = useState(null);
-  
-  // Handler cho button "Ký hợp đồng" - gọi API cập nhật vehicle status
-  const handleSignContractDirect = async () => {
-    if (!vehicleId) {
-      alert('Không tìm thấy thông tin xe');
-      return;
-    }
-
-    const confirmSign = window.confirm('Bạn có chắc chắn muốn ký hợp đồng? Trạng thái xe sẽ được cập nhật.');
-    if (!confirmSign) return;
-
-    try {
-      const result = await bookingService.updateVehicleStatus(vehicleId);
-      
-      if (result.success) {
-        alert('Ký hợp đồng thành công! Trạng thái xe đã được cập nhật.');
-        // Reload contract data
-        window.location.reload();
-      } else {
-        alert(result.error || 'Không thể ký hợp đồng. Vui lòng thử lại.');
-      }
-    } catch (error) {
-      console.error('Error signing contract:', error);
-      alert('Có lỗi xảy ra khi ký hợp đồng.');
-    }
-  };
   
   // Fetch booking detail từ API
   useEffect(() => {
@@ -55,9 +28,13 @@ export default function ContractDetailPage() {
 
         const booking = result.data;
         console.log('Booking API Response:', booking); // Debug log
+        console.log('Vehicle data:', booking.vehicle); // Debug vehicle
+        console.log('Model data:', booking.model); // Debug model
+        console.log('Customer data:', booking.customer); // Debug customer
+        console.log('Model specifications:', booking.model?.specifications); // Debug specs
         
-        // Lưu vehicleId để dùng cho API update status
-        setVehicleId(booking.vehicleID || booking.VehicleID);
+        // API response structure: { id, rentalType, status, vehicleID, renterID, stationID, stationName, 
+        // startDate, endDate, deposit, retalCost, baseCost, finalCost, model: {...}, customer: {...}, vehicle: {...} }
         
         // Map status giống MyContractsPage
         const statusNum = booking.status ?? 0;
@@ -94,33 +71,33 @@ export default function ContractDetailPage() {
           otpRequired: statusNum === 2, // Chỉ yêu cầu OTP khi status = 2 (chờ ký hợp đồng)
           notes: booking.note || null,
           
-          // Customer info - Map từ nhiều nguồn có thể
+          // Customer info - Sử dụng object customer từ API
           customer: {
-            name: booking.renterName || booking.RenterName || booking.renter?.name || 'N/A',
-            phone: booking.renterPhone || booking.RenterPhone || booking.renter?.phone || 'N/A',
-            email: booking.renterEmail || booking.RenterEmail || booking.renter?.email || 'N/A',
-            avatar: booking.renterAvatar || booking.renter?.avatar || '/images/default-avatar.png',
-            idCard: booking.renterIDCard || booking.RenterIDCard || booking.renter?.idCard || 'N/A',
-            driverLicense: booking.renterDriverLicense || booking.RenterDriverLicense || booking.renter?.driverLicense || 'N/A',
-            address: booking.renterAddress || booking.RenterAddress || booking.renter?.address || 'N/A',
-            idCardImages: booking.renterIDCardImages || booking.RenterIDCardImages || booking.renter?.idCardImages || ['/images/id-card-front.jpg', '/images/id-card-back.jpg'],
-            licenseImages: booking.renterLicenseImages || booking.RenterLicenseImages || booking.renter?.licenseImages || ['/images/license-front.jpg', '/images/license-back.jpg']
+            name: booking.customer?.fullName || booking.renterName || 'N/A',
+            phone: booking.customer?.phone || booking.renterPhone || 'N/A',
+            email: booking.customer?.email || booking.renterEmail || 'N/A',
+            avatar: '/images/default-avatar.png',
+            idCard: booking.customer?.idCard || 'N/A',
+            driverLicense: booking.customer?.driverLicense || 'N/A',
+            address: booking.customer?.address || 'N/A',
+            idCardImages: ['/images/id-card-front.jpg', '/images/id-card-back.jpg'],
+            licenseImages: ['/images/license-front.jpg', '/images/license-back.jpg']
           },
           
-          // Car info - Map từ nhiều nguồn có thể
+          // Car info - Sử dụng object vehicle và model từ API
           car: {
-            model: booking.modelName || booking.ModelName || booking.vehicle?.modelName || `Vehicle #${booking.vehicleID || booking.VehicleID || 'N/A'}`,
-            licensePlate: booking.licensePlate || booking.LicensePlate || booking.vehicle?.licensePlate || 'N/A',
-            image: booking.imageUrl || booking.ImageUrl || booking.vehicle?.imageUrl || '/images/default-car.jpg',
-            images: booking.vehicleImages || booking.VehicleImages || booking.vehicle?.images || [booking.imageUrl || booking.ImageUrl] || ['/images/default-car.jpg'],
-            color: booking.color || booking.Color || booking.vehicle?.color || 'N/A',
-            year: booking.year || booking.Year || booking.vehicle?.year || 'N/A',
-            location: booking.stationName || booking.StationName || booking.station?.name || 'N/A',
+            model: booking.model?.modelName || booking.vehicle?.modelName || `Vehicle #${booking.vehicleID || 'N/A'}`,
+            licensePlate: booking.vehicle?.plateNumber || 'N/A',
+            image: booking.model?.imageUrl || '/images/default-car.jpg',
+            images: booking.model?.images || (booking.model?.imageUrl ? [booking.model.imageUrl] : ['/images/default-car.jpg']),
+            color: 'N/A', // Vehicle không có thông tin màu trong API
+            year: 'N/A',  // Vehicle không có thông tin năm trong API
+            location: booking.vehicle?.location || booking.stationName || 'N/A',
             specifications: {
-              seats: booking.seats || booking.Seats || booking.vehicle?.seats || booking.specifications?.seats || '5 chỗ',
-              power: booking.power || booking.Power || booking.vehicle?.power || booking.specifications?.power || '150 HP',
-              transmission: booking.transmission || booking.Transmission || booking.vehicle?.transmission || 'Tự động',
-              chargingTime: booking.chargingTime || booking.ChargingTime || booking.vehicle?.chargingTime || '8 giờ'
+              seats: booking.model?.specifications?.seat ? `${booking.model.specifications.seat} chỗ` : 'N/A',
+              power: booking.model?.specifications?.hoursepower ? `${booking.model.specifications.hoursepower} HP` : 'N/A',
+              range: booking.model?.specifications?.range ? `${booking.model.specifications.range} km` : 'N/A',
+              trunkCapacity: booking.model?.specifications?.trunkCapatity ? `${booking.model.specifications.trunkCapatity} L` : 'N/A'
             }
           },
           
@@ -145,16 +122,16 @@ export default function ContractDetailPage() {
             batteryDeficitFee: 50000 // Default value
           },
           
-          // Mileage info (default values for now)
+          // Mileage info - Lấy từ vehicle.odometer
           mileage: {
-            initial: booking.initialMileage || null,
+            initial: booking.vehicle?.odometer || null,
             overageFee: 0,
             overage: 0
           },
           
-          // Battery info (default values for now)
+          // Battery info - Lấy từ vehicle.batteryLevel
           battery: {
-            initial: booking.initialBattery || null,
+            initial: booking.vehicle?.batteryLevel || null,
             deficitFee: 0,
             deficit: 0
           },
@@ -219,7 +196,6 @@ export default function ContractDetailPage() {
         <ContractHeader 
           contract={contract} 
           onSignContract={() => setShowEmailModal(true)}
-          onSignContractDirect={handleSignContractDirect}
         />
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* left content - thông tin xe & khách hàng */}
