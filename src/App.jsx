@@ -18,6 +18,7 @@ import PaymentResultPage from './pages/HomeTemplate/PaymentResultPage';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminTemplate/Dashboard';
 import FleetOverview from './pages/AdminTemplate/FleetOverview';
+import Revenue from './pages/AdminTemplate/Revenue';
 import Stations from './pages/AdminTemplate/Stations';
 import StaffManagement from './pages/AdminTemplate/StaffManagement';
 // Import Staff Pages
@@ -50,6 +51,7 @@ function App() {
             <Route path="/admin/*" element={<AdminTemplate />}>
               <Route index element={<AdminDashboard />} />
               <Route path="fleet" element={<FleetOverview />} />
+              <Route path="revenue" element={<Revenue />} />
               <Route path="stations" element={<Stations />} />
               <Route path="staff" element={<StaffManagement />} />
               <Route path="manage-cars" element={<ManagerCarsPage />} />

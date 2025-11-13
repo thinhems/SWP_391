@@ -1,62 +1,110 @@
-import React from 'react';
-import { useCustomers } from '../../contexts/CustomersContext';
+import React, { useState, useEffect } from 'react';
+import { customersService } from '../../services/customers.api';
 
-// Tạm thời dùng customers như danh sách người dùng để demo nhân viên
 export default function StaffManagement() {
-  const { customersData } = useCustomers();
-  const users = customersData?.allCustomers || [];
+  const [staffList, setStaffList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const staffList = users.slice(0, 12).map((u, idx) => ({
-    id: `staff_${idx}`,
-    name: u.name,
-    email: `${u.id}@company.vn`,
-    phone: u.phone,
-    station: ['Quận 1', 'Quận 3', 'Quận 5', 'Quận 7', 'Quận 9', 'Quận Bình Thạnh'][idx % 6],
-    role: idx % 4 === 0 ? 'supervisor' : 'staff',
-    status: idx % 5 === 0 ? 'off' : 'active'
-  }));
+  // Fetch danh sách nhân viên (role = 2)
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        setLoading(true);
+        const data = await customersService.getStaff();
+        setStaffList(data || []);
+      } catch (err) {
+        console.error('Error fetching staff:', err);
+        setError('Không thể tải danh sách nhân viên');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStaff();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang tải danh sách nhân viên...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Nhân viên</h1>
-          <p className="text-gray-600">Điều phối nhân sự theo điểm</p>
+          <h1 className="text-2xl font-bold text-gray-900">Quản lý Nhân viên</h1>
+          <p className="text-gray-600">Danh sách nhân viên trong hệ thống</p>
+        </div>
+        <div className="mt-4 sm:mt-0">
+          <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-semibold">
+            Tổng: {staffList.length} nhân viên
+          </span>
         </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold">Điều phối nhân viên</h3>
-          <div className="text-sm text-gray-600">Tổng nhân viên: <b>{staffList.length}</b></div>
-        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
-                <th className="text-left p-3">Tên</th>
-                <th className="text-left p-3">Email</th>
-                <th className="text-left p-3">SĐT</th>
-                <th className="text-left p-3">Điểm</th>
-                <th className="text-left p-3">Vai trò</th>
-                <th className="text-left p-3">Trạng thái</th>
+                <th className="text-left p-3 font-semibold">ID</th>
+                <th className="text-left p-3 font-semibold">Họ tên</th>
+                <th className="text-left p-3 font-semibold">Email</th>
+                <th className="text-left p-3 font-semibold">Số điện thoại</th>
+                <th className="text-left p-3 font-semibold">Role</th>
+                <th className="text-left p-3 font-semibold">Trạng thái</th>
               </tr>
             </thead>
             <tbody>
-              {staffList.map(s => (
-                <tr key={s.id} className="border-t">
-                  <td className="p-3">{s.name}</td>
-                  <td className="p-3">{s.email}</td>
-                  <td className="p-3">{s.phone}</td>
-                  <td className="p-3">{s.station}</td>
-                  <td className="p-3 capitalize">{s.role}</td>
-                  <td className="p-3">
-                    <span className={`px-2 py-1 text-xs rounded-full ${s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                      {s.status === 'active' ? 'Đang làm' : 'Nghỉ'}
-                    </span>
+              {staffList.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center p-8 text-gray-500">
+                    Không có nhân viên nào trong hệ thống
                   </td>
                 </tr>
-              ))}
+              ) : (
+                staffList.map(staff => (
+                  <tr key={staff.id} className="border-t hover:bg-gray-50 transition-colors">
+                    <td className="p-3 font-medium text-gray-900">{staff.id}</td>
+                    <td className="p-3">{staff.fullName || staff.name || 'N/A'}</td>
+                    <td className="p-3 text-gray-600">{staff.email || 'N/A'}</td>
+                    <td className="p-3 text-gray-600">{staff.phone || 'N/A'}</td>
+                    <td className="p-3">
+                      <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 font-medium">
+                        Staff
+                      </span>
+                    </td>
+                    <td className="p-3">
+                      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
+                        Hoạt động
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

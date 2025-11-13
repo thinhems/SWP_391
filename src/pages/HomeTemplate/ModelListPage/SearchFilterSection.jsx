@@ -1,6 +1,8 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useStations } from '../../../contexts/StationsContext';
+import { useModels } from '../../../contexts/ModelsContext';
 
 export default function SearchFilterSection({ 
   activeTab,
@@ -10,25 +12,32 @@ export default function SearchFilterSection({
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formLocation, setFormLocation] = useState(selectedLocation);
+  const { stations, loading: stationsLoading } = useStations();
+  const { setSelectedStationId } = useModels();
+  
   // xử lý tìm kiếm với loading giả lập
   const handleSearch = () => {
     setIsLoading(true);
+    
+    // Tìm station được chọn để lấy ID
+    const selectedStation = stations.find(s => s.name === formLocation);
+    
     setTimeout(() => {
       setIsLoading(false);
       onSearch(formLocation); // Truyền location được chọn
+      
+      // Set station ID để fetch models theo station
+      if (selectedStation) {
+        setSelectedStationId(selectedStation.id);
+      }
     }, 1500);
   };
+  
   // Xử lý thay đổi tab và đồng bộ URL
   const handleTabChange = (newTab) => {
     navigate(`/model-rental?tab=${newTab}`);
   };
-  // Các lựa chọn khu vực thuê xe
-  const stations = [
-    'Quận 1',
-    'Quận 7', 
-    'Quận 9',
-    'Quận Bình Thạnh'
-  ];
+  
   // Các lựa chọn khoảng thời gian thuê
   const rentalPeriods = [
     { id: 'daily', label: 'Thuê ngày', unit: 'ngày'},
@@ -91,10 +100,17 @@ export default function SearchFilterSection({
                     value={formLocation} 
                     onChange={(e) => setFormLocation(e.target.value)}
                     className="w-full px-3 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-800 font-medium focus:outline-none focus:border-green-400 focus:bg-white transition-all duration-300 shadow-sm hover:border-green-300"
+                    disabled={stationsLoading}
                   >
-                    {stations.map(station => (
-                      <option key={station} value={station}>{station}</option>
-                    ))}
+                    {stationsLoading ? (
+                      <option>Đang tải...</option>
+                    ) : stations.length > 0 ? (
+                      stations.map(station => (
+                        <option key={station.id} value={station.name}>{station.name}</option>
+                      ))
+                    ) : (
+                      <option>Không có điểm thuê xe</option>
+                    )}
                   </select>
                 </div>
                 <div className="flex flex-col justify-end">

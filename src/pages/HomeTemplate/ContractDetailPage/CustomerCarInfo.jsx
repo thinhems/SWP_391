@@ -195,12 +195,12 @@ export default function CustomerCarInfo({ contract }) {
                       <span className="font-medium text-gray-900">{contract.car.specifications.power}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Hộp số:</span>
-                      <span className="font-medium text-gray-900">{contract.car.specifications.transmission}</span>
+                      <span className="text-gray-500">Phạm vi:</span>
+                      <span className="font-medium text-gray-900">{contract.car.specifications.range}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Thời gian sạc:</span>
-                      <span className="font-medium text-gray-900">{contract.car.specifications.chargingTime}</span>
+                      <span className="text-gray-500">Dung tích cốp:</span>
+                      <span className="font-medium text-gray-900">{contract.car.specifications.trunkCapacity}</span>
                     </div>
                   </div>
                 </div>
