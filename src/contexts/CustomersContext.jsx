@@ -22,7 +22,7 @@ export const CustomersProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await customersService.getCustomers();
+      const data = await customersService.getAllUsers();
       setCustomers(data);
     } catch (err) {
       console.error('Error fetching customers data:', err);
