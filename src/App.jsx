@@ -24,6 +24,7 @@ import StaffManagement from './pages/AdminTemplate/StaffManagement';
 // Import Staff Pages
 import OverviewPage from './pages/StaffTemplate/OverviewPage';
 import ManagerCarsPage from './pages/StaffTemplate/ManagerCarsPage';
+import AdminManagerCarsPage from './pages/AdminTemplate/ManagerCarsPage';
 import CarDeliveryPage from './pages/StaffTemplate/CarDeliveryPage';
 import CarReturnPage from './pages/StaffTemplate/CarReturnPage';
 import ApprovalReviewPage from './pages/StaffTemplate/ApprovalReviewPage';
@@ -54,7 +55,7 @@ function App() {
               <Route path="revenue" element={<Revenue />} />
               <Route path="stations" element={<Stations />} />
               <Route path="staff" element={<StaffManagement />} />
-              <Route path="manage-cars" element={<ManagerCarsPage />} />
+              <Route path="manage-cars" element={<AdminManagerCarsPage />} />
               <Route path="manage-cars/car-delivery/:carId" element={<CarDeliveryPage />} />
               <Route path="manage-cars/car-return/:carId" element={<CarReturnPage />} />
               <Route path="manage-cars/approval-review/:carId" element={<ApprovalReviewPage />} />

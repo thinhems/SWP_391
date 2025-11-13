@@ -16,6 +16,7 @@ export default function ManagerCarsPage() {
   useEffect(() => {
     setUserStation(user.station);
   }, [user.station]);
+
   // xử lý đồng bộ tab với URL 
   useEffect(() => {
     if (tabFromUrl) {
@@ -60,6 +61,14 @@ export default function ManagerCarsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Quản lý xe</h1>
+          <p className="text-gray-600 mt-1">Quản lý thông tin và trạng thái các xe trong hệ thống</p>
+        </div>
+      </div>
+      
       <StatsSection cars={organizedCars} />
       <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} cars={organizedCars} />
       <ListCarsSection cars={filteredCars} activeTab={activeTab} />

@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHouse, faCar, faUsers, faRightFromBracket, faArrowLeft, faChartLine } from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faCar, faUsers, faRightFromBracket, faArrowLeft, faChartLine, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function AdminSidebar({ isOpen }) {
   const location = useLocation();
@@ -10,7 +10,7 @@ export default function AdminSidebar({ isOpen }) {
   const menuItems = [
     { name: 'Tổng quan', path: '/admin', icon: (<FontAwesomeIcon icon={faHouse} />) },
     { name: 'Doanh thu', path: '/admin/revenue', icon: (<FontAwesomeIcon icon={faChartLine} />) },
-    // { name: 'Điểm thuê', path: '/admin/stations', icon: (<FontAwesomeIcon icon={faHouse} />) },
+    { name: 'Điểm cho thuê', path: '/admin/stations', icon: (<FontAwesomeIcon icon={faMapMarkerAlt} />) },
     { name: 'Nhân viên', path: '/admin/staff', icon: (<FontAwesomeIcon icon={faUsers} />) },
     { name: 'Quản lý xe', path: '/admin/manage-cars?tab=available', icon: (<FontAwesomeIcon icon={faCar} />) },
     { name: 'Quản lý khách hàng', path: '/admin/manage-customer', icon: (<FontAwesomeIcon icon={faUsers} />) },
