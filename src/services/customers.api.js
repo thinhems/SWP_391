@@ -4,7 +4,7 @@ export const customersService = {
   // Lấy danh sách khách hàng
   getCustomers: async () => {
     try {
-      const response = await api.get('/User');
+      const response = await api.get('/User/GetAllRentersForStaff');
       return response.data;
     } catch (error) {
       console.error('Error fetching customers:', error);

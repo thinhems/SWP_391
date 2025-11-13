@@ -65,7 +65,14 @@ export const CarsProvider = ({ children }) => {
     rented: filteredCars.filter(car => car.status === 4 && car.booking?.status === 4).length,
     allCars: filteredCars,
     // lấy danh sách xe theo trạng thái
-    getCarsByStatus: (status) => filteredCars.filter(car => car.status === status),
+    getCarsByStatus: (status) => {
+      if (status === 0) return filteredCars.filter(car => car.status === status);
+      else if (status === 1) return filteredCars.filter(car => car.status === status && car.booking?.status === 1);
+      else if (status === 2) return filteredCars.filter(car => car.status === status && car.booking?.status === 2);
+      else if (status === 3) return filteredCars.filter(car => car.status === status && car.booking?.status === 3);
+      else if (status === 4) return filteredCars.filter(car => car.status === status && car.booking?.status === 4);
+      else return [];
+    },
     // lấy xe theo ID 
     getCarById: (id) => filteredCars.find(car => car.id === id),
   };

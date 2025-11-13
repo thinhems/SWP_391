@@ -60,10 +60,6 @@ export default function CustomerList({
       </span>
     );
   };
-  // hàm định dạng ngày tháng
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('vi-VN');
-  };
   // hàm toggle dropdown
   const toggleDropdown = (customerId) => {
     setOpenDropdown(openDropdown === customerId ? null : customerId);
@@ -202,9 +198,6 @@ export default function CustomerList({
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Số lượt thuê
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ngày đăng ký
-                </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Hành động
                 </th>
@@ -247,11 +240,6 @@ export default function CustomerList({
                     <span className="text-sm font-semibold text-gray-900">
                       {customer.totalRentals}
                     </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {formatDate(customer.registeredDate)}
-                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">

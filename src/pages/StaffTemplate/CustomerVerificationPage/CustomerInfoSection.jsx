@@ -1,14 +1,5 @@
 
-export default function CustomerInfoSection({ customer, onNavigateBack, isProcessing }) {
-  // format ngày tháng
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-
+export default function CustomerInfoSection({ customer }) {
   // lấy badge trạng thái
   const getStatusBadge = (status) => {
     const config = {
@@ -56,12 +47,12 @@ export default function CustomerInfoSection({ customer, onNavigateBack, isProces
             <div className="text-center">
               <div className="w-32 h-32 rounded-full bg-blue-100 mx-auto mb-4 flex items-center justify-center overflow-hidden">
                 {customer.avatar ? (
-                  <img src={customer.avatar} alt={customer.name} className="w-full h-full object-cover" />
+                  <img src={customer.avatar} alt={customer.fullName} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-5xl text-blue-600 font-bold">{customer.name.charAt(0)}</span>
+                  <span className="text-5xl text-blue-600 font-bold">{customer.fullName.charAt(0)}</span>
                 )}
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">{customer.name}</h3>
+              <h3 className="text-xl font-semibold text-gray-900">{customer.fullName}</h3>
               <p className="text-sm text-gray-600 mt-1">{customer.email}</p>
             </div>
           </div>
@@ -74,23 +65,23 @@ export default function CustomerInfoSection({ customer, onNavigateBack, isProces
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-sm text-gray-600 mb-1">Số CCCD</p>
-                <p className="text-lg font-semibold text-gray-900">{customer.idCard}</p>
+                <p className="text-lg font-semibold text-gray-900">{customer?.idCard || 'N/A'}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-sm text-gray-600 mb-1">Bằng lái xe</p>
-                <p className="text-lg font-semibold text-gray-900">{customer.driverLicense}</p>
+                <p className="text-lg font-semibold text-gray-900">{customer?.driverLicense || 'N/A'}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Ngày đăng ký</p>
-                <p className="text-lg font-semibold text-gray-900">{formatDate(customer.registeredDate)}</p>
+                <p className="text-sm text-gray-600 mb-1">Trạng thái xác thực</p>
+                <p className="text-lg font-semibold text-gray-900">{customer?.status || 'N/A'}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 md:col-span-2">
                 <p className="text-sm text-gray-600 mb-1">Địa chỉ</p>
-                <p className="text-lg font-semibold text-gray-900">{customer.address}</p>
+                <p className="text-lg font-semibold text-gray-900">{customer?.address || 'N/A'}</p>
               </div>
               <div className="bg-blue-50 rounded-lg p-4">
                 <p className="text-sm text-blue-700 mb-1">Tổng số lượt thuê</p>
-                <p className="text-2xl font-bold text-blue-900">{customer.totalRentals}</p>
+                <p className="text-2xl font-bold text-blue-900">{customer?.totalRentals || 'N/A'}</p>
               </div>
               <div className="bg-purple-50 rounded-lg p-4">
                 <p className="text-sm text-purple-700 mb-1">Loại khách hàng</p>
