@@ -39,7 +39,7 @@ export default function FeeCalculationSummary({ carData, inspectionData, fees })
               <span className="text-gray-600">Phí vượt km</span>
               {kmOverage > 0 && (
                 <div className="text-xs text-gray-500 mt-1">
-                  {kmOverage.toLocaleString()} km × 10.000đ/km
+                  {kmOverage.toLocaleString()} km × 5.000đ/km
                 </div>
               )}
             </div>
@@ -53,7 +53,7 @@ export default function FeeCalculationSummary({ carData, inspectionData, fees })
               <span className="text-gray-600">Phí thiếu pin</span>
               {batteryDeficit > 0 && (
                 <div className="text-xs text-gray-500 mt-1">
-                  {batteryDeficit}% × 5.000đ/%
+                  {batteryDeficit}% × 50.000đ/%
                 </div>
               )}
             </div>

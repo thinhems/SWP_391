@@ -48,6 +48,7 @@ export default function ManagerCarsPage() {
         .sort((a, b) => (priority[a.status] || 99) - (priority[b.status] || 99))
     : organizedCars[activeTab];
 
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">

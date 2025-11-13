@@ -12,7 +12,7 @@ export default function ApprovalReviewPage() {
   let { carId } = useParams();
   carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { autoUpdateStatusCar, updateCar, carsData, loading } = useCars();
+  const { autoUpdateStatusCar, rejectCarApproval, carsData, loading } = useCars();
   const { addActivity } = useActivities();
   const [carData, setCarData] = useState(null);
   const [error, setError] = useState(null);
@@ -69,20 +69,7 @@ export default function ApprovalReviewPage() {
   const handleReject = async (reason) => {
     setIsProcessing(true);
     try {
-      // Cập nhật status xe về available (0)
-      const updateData = {
-        plateNumber: carData.plateNumber,
-        modelID: carData.modelID,
-        stationID: carData.stationID,
-        location: carData.location,
-        batteryLevel: carData.batteryLevel,
-        odometer: carData.odometer,
-        color: carData.color || '',
-        status: 0
-      };
-
-      await updateCar(carId, updateData);
-
+      await rejectCarApproval(carId); // Từ chối yêu cầu thuê xe
       addActivity({
         type: 'rejection',
         title: `Đã từ chối yêu cầu thuê xe ${carData.modelName}`,

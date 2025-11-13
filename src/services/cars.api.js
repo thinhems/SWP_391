@@ -43,10 +43,19 @@ export const carService = {
       throw error;
     }
   },
-  // Tự động cập nhật trạng thái xe
+  // Tự động cập nhật status xe + booking dành cho duyệt yêu cầu thuê, trả xe
   updateStatusCar: async (idCar) => {
     try {
       const response = await api.put(`/Vehicle/AutpUpdateStatus/${idCar}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  // từ chối duyệt xe
+  rejectCarApproval: async (idCar) => {
+    try {
+      const response = await api.put(`/Vehicle/StaffRefusedStatus/${idCar}`);
       return response.data;
     } catch (error) {
       throw error;
