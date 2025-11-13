@@ -12,7 +12,7 @@ const modelsApi = {
    */
   async getAllModels() {
     try {
-      const response = await api.get('/Model');
+      const response = await api.get('/Model/GetAll');
       return {
         success: true,
         data: response.data

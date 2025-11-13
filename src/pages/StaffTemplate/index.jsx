@@ -6,6 +6,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { CarsProvider } from "../../contexts/CarsContext";
 import { CustomersProvider } from "../../contexts/CustomersContext";
 import { ActivitiesProvider } from "../../contexts/ActivitiesContext";
+import { StationsProvider } from "../../contexts/StationsContext";
 
 export default function StaffTemplate() {
   const { user, loading } = useAuth();
@@ -26,22 +27,24 @@ export default function StaffTemplate() {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
-    <CarsProvider>
-      <CustomersProvider>
-        <ActivitiesProvider>
-          <div className="flex h-screen bg-gray-100">
-            <div className={`${sidebarOpen ? "w-64" : "w-16"} transition-all duration-300 ease-in-out`}>
-              <StaffSidebar isOpen={sidebarOpen} />
+    <StationsProvider>
+      <CarsProvider>
+        <CustomersProvider>
+          <ActivitiesProvider>
+            <div className="flex h-screen bg-gray-100">
+              <div className={`${sidebarOpen ? "w-64" : "w-16"} transition-all duration-300 ease-in-out`}>
+                <StaffSidebar isOpen={sidebarOpen} />
+              </div>
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <HeaderStaff onToggleSidebar={toggleSidebar} />
+                <main className="flex-1 overflow-y-auto p-6">
+                  <Outlet />
+                </main>
+              </div>
             </div>
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <HeaderStaff onToggleSidebar={toggleSidebar} />
-              <main className="flex-1 overflow-y-auto p-6">
-                <Outlet />
-              </main>
-            </div>
-          </div>
-        </ActivitiesProvider>
-      </CustomersProvider>
-    </CarsProvider>
+          </ActivitiesProvider>
+        </CustomersProvider>
+      </CarsProvider>
+    </StationsProvider>
   );
 }
