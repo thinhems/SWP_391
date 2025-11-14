@@ -1,8 +1,6 @@
 export default function CarInspectionContent({ 
   organizedChecklist, 
-  notes, 
   onStatusChange, 
-  onNotesChange 
 }) {
   // hàm lấy thông tin label và màu sắc cho status (1: Tốt, 2: Vấn đề nhỏ, 3: Cần sửa chữa)
   const getStatusLabel = (status) => {
@@ -65,34 +63,6 @@ export default function CarInspectionContent({
             </div>
           </div>
         ))}
-      </div>
-
-      {/* ghi chú */}
-      <div className="border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Ghi chú kiểm tra</h3>
-        <textarea
-          value={notes}
-          onChange={onNotesChange}
-          placeholder="Ghi chú về tình trạng xe, các vấn đề phát hiện, đề xuất bảo trì..."
-          rows={4}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-        />
-        <p className="text-gray-500 text-sm mt-2">Ghi chú này sẽ được lưu trong hồ sơ xe</p>
-        {/* Character counter */}
-        <div className="flex justify-between items-center mt-2">
-          <div className="text-sm text-gray-500">
-            {notes.length === 0 ? (
-              <span>💡 Tip: Ghi chú chi tiết giúp dễ dàng theo dõi lịch sử xe</span>
-            ) : (
-              <span>Đã nhập {notes.length} ký tự</span>
-            )}
-          </div>
-          {notes.length > 500 && (
-            <span className="text-yellow-600 text-sm">
-              ⚠️ Ghi chú khá dài ({notes.length} ký tự)
-            </span>
-          )}
-        </div>
       </div>
     </div>
   );
