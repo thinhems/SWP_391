@@ -43,6 +43,15 @@ export const carService = {
       throw error;
     }
   },
+  // cập nhật item kiểm tra xe
+  updateCarInspectionItem: async (carId, itemData) => {
+    try {
+      const response = await api.put(`/Vehicle/UpdateCarItems/${carId}`, itemData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
   // Tự động cập nhật status xe + booking dành cho duyệt yêu cầu thuê, trả xe
   updateStatusCar: async (idCar) => {
     try {

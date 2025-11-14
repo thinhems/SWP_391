@@ -10,9 +10,8 @@ export default function CarInspectionHeader({
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     model: carData.model,
-    licensePlate: carData.licensePlate,
+    plateNumber: carData.plateNumber,
     color: carData.color,
-    year: carData.year,
     batteryLevel: carData.batteryLevel,
     location: carData.location
   });
@@ -29,7 +28,7 @@ export default function CarInspectionHeader({
   const handleCancel = () => {
     setEditData({
       model: carData.model,
-      licensePlate: carData.plateNumber,
+      plateNumber: carData.plateNumber,
       color: carData.color,
       year: carData.year,
       batteryLevel: carData.batteryLevel,
@@ -129,8 +128,8 @@ export default function CarInspectionHeader({
             {isEditing ? (
               <input
                 type="text"
-                value={editData.licensePlate}
-                onChange={(e) => handleInputChange('licensePlate', e.target.value)}
+                value={editData.plateNumber}
+                onChange={(e) => handleInputChange('plateNumber', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             ) : (

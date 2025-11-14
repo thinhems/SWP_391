@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 export default function ListCarsSection({ cars, activeTab }) {
   const navigate = useNavigate();
   if (activeTab == 'pending_approval') {
-    cars = cars.sort((a, b) => a.booking.requestTime + b.booking.requestTime);
+    cars = cars.sort((a, b) => a.booking?.requestTime + b.booking?.requestTime);
   }
   // Hàm đổi màu pin
   const getBatteryColor = (battery) => {
@@ -19,7 +19,7 @@ export default function ListCarsSection({ cars, activeTab }) {
       { bg: 'bg-green-100', text: 'text-green-800', label: 'Có sẵn' },           // 0 available
       { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Chờ xác nhận' },   // 1 pending_approval
       { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Chờ ký hợp đồng' },    // 2 pending_contract
-      { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Chờ bàn giao' },         // 3 pending_handover
+      { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Chờ bàn giao' },   // 3 pending_handover
       { bg: 'bg-purple-100', text: 'text-purple-800', label: 'Đang cho thuê' }   // 4 rented
     ];
     const config = statusConfig[status] || statusConfig[0];
@@ -134,7 +134,7 @@ export default function ListCarsSection({ cars, activeTab }) {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Yêu cầu lúc:</span>
                     <span className="text-sm font-medium text-gray-900">
-                      {formatDateTime(car.booking.requestTime)}
+                      {formatDateTime(car.booking?.requestTime)}
                     </span>
                   </div>
                 )}
