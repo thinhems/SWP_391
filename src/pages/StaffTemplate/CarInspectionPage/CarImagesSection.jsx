@@ -1,28 +1,8 @@
 export default function CarImagesSection({ 
-  carImages, 
-  setCarImages, 
+  carImages,
+  onRemoveImage,
+  onUploadImage
 }) {
-  // Xóa ảnh xe
-  const handleRemoveCarImage = (index) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa ảnh xe này?')) {
-      setCarImages(prev => prev.filter((_, i) => i !== index));
-    }
-  };
-
-  // Upload ảnh xe mới
-  const handleCarImageUpload = (event) => {
-    const files = Array.from(event.target.files);
-    
-    files.forEach(file => {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setCarImages(prev => [...prev, e.target.result]);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  };
 
   return (
     <div className="space-y-6">
@@ -45,7 +25,7 @@ export default function CarImagesSection({
               multiple 
               accept="image/*" 
               className="hidden" 
-              onChange={handleCarImageUpload}
+              onChange={onUploadImage}
             />
           </label>
         </div>
@@ -60,7 +40,7 @@ export default function CarImagesSection({
                   className="w-full h-40 object-cover rounded-lg border-2 border-gray-200"
                 />
                 <button
-                  onClick={() => handleRemoveCarImage(index)}
+                  onClick={() => onRemoveImage(index)}
                   className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-lg text-xl font-bold"
                   title="Xóa ảnh xe"
                 >

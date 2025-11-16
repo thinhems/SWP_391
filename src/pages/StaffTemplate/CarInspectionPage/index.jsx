@@ -12,7 +12,7 @@ export default function CarInspectionPage() {
   let { carId } = useParams();
   carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { updateCar, carsData, loading, updateCarInspectionItem } = useCars();
+  const { updateCar, carsData, loading, updateCarInspectionItem, uploadCarImage } = useCars();
   const { addActivity } = useActivities();
   const [carData, setCarData] = useState(null);
   const [carImages, setCarImages] = useState([]);
@@ -38,9 +38,12 @@ export default function CarInspectionPage() {
           setError("Yêu cầu duyệt không còn hợp lệ (xe không ở trạng thái có sẵn)."); 
         }
       setCarData(data);
-      // Load ảnh nếu có
-      if (data.images) {
-        setCarImages(data.images);
+      // Load ảnh nếu có và chuyển đổi base64 sang data URL
+      if (data.images && Array.isArray(data.images)) {
+        const processedImages = data.images.map(img => {
+          return `data:image/jpeg;base64,${img}`;
+        });
+        setCarImages(processedImages);
       }
       // lọc ra thành 1 list item theo category
       const flatChecklist = data.categories?.flatMap(category =>
@@ -73,6 +76,29 @@ export default function CarInspectionPage() {
         item.id === itemId ? { ...item, status: newStatus } : item
       )
     }));
+  };
+
+  // xử lý xóa ảnh xe
+  const handleRemoveCarImage = (index) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa ảnh xe này?')) {
+      setCarImages(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  // xử lý upload ảnh xe mới
+  const handleCarImageUpload = async (event) => {
+    const files = Array.from(event.target.files);
+    
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        try {
+          await uploadCarImage(carId, file);
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          alert('Có lỗi xảy ra khi upload ảnh. Vui lòng thử lại.');
+        }
+      }
+    }
   };
   
   // xử lý lưu kết quả kiểm tra
@@ -182,7 +208,8 @@ export default function CarInspectionPage() {
       
       <CarImagesSection 
         carImages={carImages}
-        setCarImages={setCarImages}
+        onRemoveImage={handleRemoveCarImage}
+        onUploadImage={handleCarImageUpload}
       />
       
       <CarInspectionContent
