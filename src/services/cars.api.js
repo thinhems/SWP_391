@@ -70,4 +70,20 @@ export const carService = {
       throw error;
     }
   },
+  //update ảnh xe
+  updateCarImage: async (vehicleId, imageFile) => {
+    try {
+      const formData = new FormData();
+      formData.append('vehicleId', vehicleId);
+      formData.append('file', imageFile);
+      const response = await api.post('/images/upload-vehicle', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };

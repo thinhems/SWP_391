@@ -135,6 +135,15 @@ export const CarsProvider = ({ children }) => {
       throw error;
     }
   };
+  // upload ảnh xe
+  const uploadCarImage = async (carId, imageFile) => { 
+    try {
+      await carService.updateCarImage(carId, imageFile);
+      await fetchListCars();
+    } catch (error) {
+      throw error;
+    }
+  };
   const value = {
     carsData,
     loading,
@@ -144,6 +153,7 @@ export const CarsProvider = ({ children }) => {
     createHandover,
     rejectCarApproval,
     updateCarInspectionItem,
+    uploadCarImage,
     setUserStation // Thêm function để set station từ bên ngoài
   };
 
