@@ -43,6 +43,15 @@ export const carService = {
       throw error;
     }
   },
+  // cập nhật item kiểm tra xe
+  updateCarInspectionItem: async (carId, itemData) => {
+    try {
+      const response = await api.put(`/Vehicle/UpdateCarItems/${carId}`, itemData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
   // Tự động cập nhật status xe + booking dành cho duyệt yêu cầu thuê, trả xe
   updateStatusCar: async (idCar) => {
     try {
@@ -56,6 +65,22 @@ export const carService = {
   rejectCarApproval: async (idCar) => {
     try {
       const response = await api.put(`/Vehicle/StaffRefusedStatus/${idCar}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  //update ảnh xe
+  updateCarImage: async (vehicleId, imageFile) => {
+    try {
+      const formData = new FormData();
+      formData.append('vehicleId', vehicleId);
+      formData.append('file', imageFile);
+      const response = await api.post('/images/upload-vehicle', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       return response.data;
     } catch (error) {
       throw error;

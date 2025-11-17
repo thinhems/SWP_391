@@ -50,7 +50,7 @@ export const authService = {
         phone: userData.phone || userData.phoneNumber || '',
         role: mappedRole,
         station: userData.stationId || null,
-        isVerified: userData.verified === 'Verified' || userData.isVerified || false
+        verifiedStatus: userData.verifiedStatus || 1
       };
 
       console.log('AuthService - Mapped user object:', user);

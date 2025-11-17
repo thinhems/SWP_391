@@ -20,9 +20,9 @@ export default function AccountVerification({ user }) {
 
   // lấy trạng thái xác thực của user 
   const getVerificationStatus = () => {
-    if (user?.isVerified === true) return 'verified';
-    else if (user?.isVerified === "pending") return 'pending';
-    else if (user?.isVerified === false) return 'not_started';
+    if (user?.verifiedStatus === 1) return 'not_started';
+    else if (user?.verifiedStatus === 2) return 'pending';
+    else if (user?.verifiedStatus === 3) return 'verified';
   };
 
   const verificationStatus = getVerificationStatus();

@@ -43,7 +43,17 @@ export const CarsProvider = ({ children }) => {
     fetchListCars();
     // tự động làm mới danh sách xe mỗi 20 giây
     const intervalId = setInterval(() => {
-      fetchListCars();
+      // Kiểm tra nếu đang ở trang con của manage-cars thì không fetch
+      const currentPath = window.location.pathname;
+      const isInDetailPage = /\/manage-cars\/\d+/.test(currentPath) || 
+                            currentPath.includes('/inspection/') ||
+                            currentPath.includes('/car-delivery/') ||
+                            currentPath.includes('/car-return/') ||
+                            currentPath.includes('/approval-review/');
+      
+      if (!isInDetailPage) {
+        fetchListCars();
+      }
     }, 20000);
     // cleanup interval khi unmount
     return () => {
@@ -76,7 +86,6 @@ export const CarsProvider = ({ children }) => {
     // lấy xe theo ID 
     getCarById: (id) => filteredCars.find(car => car.id === id),
   };
-
   // Cập nhật xe
   const updateCar = async (carId, updateCar) => { 
     try {
@@ -85,6 +94,16 @@ export const CarsProvider = ({ children }) => {
       await fetchListCars();
     } catch (error) {
       console.error('Error updating car:', error);
+      throw error;
+    }
+  };
+  //Cập nhât item kiểm tra xe
+  const updateCarInspectionItem = async (carId, itemData) => {
+    try {
+      await carService.updateCarInspectionItem(carId, itemData);
+      await fetchListCars();
+    } catch (error) {
+      console.error('Error updating car inspection item:', error);
       throw error;
     }
   };
@@ -116,6 +135,15 @@ export const CarsProvider = ({ children }) => {
       throw error;
     }
   };
+  // upload ảnh xe
+  const uploadCarImage = async (carId, imageFile) => { 
+    try {
+      await carService.updateCarImage(carId, imageFile);
+      await fetchListCars();
+    } catch (error) {
+      throw error;
+    }
+  };
   const value = {
     carsData,
     loading,
@@ -124,6 +152,8 @@ export const CarsProvider = ({ children }) => {
     autoUpdateStatusCar,
     createHandover,
     rejectCarApproval,
+    updateCarInspectionItem,
+    uploadCarImage,
     setUserStation // Thêm function để set station từ bên ngoài
   };
 

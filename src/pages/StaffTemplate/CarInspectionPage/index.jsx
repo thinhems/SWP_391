@@ -7,12 +7,12 @@ import CarImagesSection from './CarImagesSection';
 import CarInspectionContent from './CarInspectionContent';
 import CarInspectionSummary from './CarInspectionSummary';
 import PopupReport from './PopupReport';
-import { carService } from '../../../services/cars.api';
+
 export default function CarInspectionPage() {
   let { carId } = useParams();
   carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { updateCar, carsData, loading } = useCars();
+  const { updateCar, carsData, loading, updateCarInspectionItem, uploadCarImage } = useCars();
   const { addActivity } = useActivities();
   const [carData, setCarData] = useState(null);
   const [carImages, setCarImages] = useState([]);
@@ -23,7 +23,6 @@ export default function CarInspectionPage() {
   // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
-    notes: '',
     inspectionDate: new Date().toISOString()
   });
   // load dữ liệu xe filter context
@@ -39,9 +38,12 @@ export default function CarInspectionPage() {
           setError("Yêu cầu duyệt không còn hợp lệ (xe không ở trạng thái có sẵn)."); 
         }
       setCarData(data);
-      // Load ảnh nếu có
-      if (data.images) {
-        setCarImages(data.images);
+      // Load ảnh nếu có và chuyển đổi base64 sang data URL
+      if (data.images && Array.isArray(data.images)) {
+        const processedImages = data.images.map(img => {
+          return `data:image/jpeg;base64,${img}`;
+        });
+        setCarImages(processedImages);
       }
       // lọc ra thành 1 list item theo category
       const flatChecklist = data.categories?.flatMap(category =>
@@ -75,19 +77,47 @@ export default function CarInspectionPage() {
       )
     }));
   };
-  
-  // xử lý thay đổi ghi chú
-  const handleNotesChange = (e) => {
-    const newNotes = e.target.value;
-    setInspectionData(prev => ({
-      ...prev,
-      notes: newNotes
-    }));
+
+  // xử lý xóa ảnh xe
+  const handleRemoveCarImage = (index) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa ảnh xe này?')) {
+      setCarImages(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  // xử lý upload ảnh xe mới
+  const handleCarImageUpload = async (event) => {
+    const files = Array.from(event.target.files);
+    
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        try {
+          await uploadCarImage(carId, file);
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          alert('Có lỗi xảy ra khi upload ảnh. Vui lòng thử lại.');
+        }
+      }
+    }
   };
   
   // xử lý lưu kết quả kiểm tra
   const handleSaveInspection = async () => {
     try {
+      // Chuẩn bị dữ liệu theo format API yêu cầu
+      const dataToSend = {
+        vehicleID: carId,
+        categories: organizedChecklist.map(category => ({
+          categoryName: category.categoryName,
+          items: category.items.map(item => ({
+            id: item.id,
+            name: item.name,
+            status: item.status
+          }))
+        }))
+      };
+      
+      await updateCarInspectionItem(carId, dataToSend);
       addActivity({
         type: 'inspection',
         title: `Đã kiểm tra xe ${carData.modelName} (${carData.plateNumber})`,
@@ -100,6 +130,8 @@ export default function CarInspectionPage() {
       alert(`Đã lưu kết quả kiểm tra xe ${carData.plateNumber} thành công!`);
       navigate('/staff/manage-cars?tab=available');
     } catch (error) {
+      console.error('Error saving inspection data:', error);
+      console.error('Error response:', error.response?.data);
       alert('Có lỗi xảy ra khi lưu kết quả kiểm tra. Vui lòng thử lại.');
     }
   };
@@ -176,14 +208,13 @@ export default function CarInspectionPage() {
       
       <CarImagesSection 
         carImages={carImages}
-        setCarImages={setCarImages}
+        onRemoveImage={handleRemoveCarImage}
+        onUploadImage={handleCarImageUpload}
       />
       
       <CarInspectionContent
         organizedChecklist={organizedChecklist}
-        notes={inspectionData.notes}
         onStatusChange={handleStatusChange}
-        onNotesChange={handleNotesChange}
       />
       
       <CarInspectionSummary
