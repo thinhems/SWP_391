@@ -53,7 +53,7 @@ export default function CustomerVerificationPage() {
         bgColor: 'bg-green-100'
       });
       
-      alert(`Đã duyệt khách hàng: ${customer.name}\n\nThông báo đã được gửi tới email: ${customer.email}`);
+      alert(`Đã duyệt khách hàng: ${customer.name}\n`);
       navigate('/staff/manage-customer');
     } catch (error) {
       console.error('Error approving customer:', error);
@@ -77,7 +77,7 @@ export default function CustomerVerificationPage() {
         bgColor: 'bg-red-100'
       });
       
-      alert(`Đã từ chối khách hàng: ${customer.name}\n\nThông báo đã được gửi tới email: ${customer.email}`);
+      alert(`Đã từ chối khách hàng: ${customer.name}\n`);
       navigate('/staff/manage-customer');
     } catch (error) {
       console.error('Error rejecting customer:', error);
@@ -124,6 +124,23 @@ export default function CustomerVerificationPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+
+      {isProcessing && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}>
+          <div className="bg-white rounded-xl shadow-2xl p-8 flex flex-col items-center space-y-4 min-w-[280px]">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
+              <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-semibold text-gray-800">Đang xử lý</p>
+              <p className="text-sm text-gray-500 mt-1">Vui lòng đợi...</p>
+            </div>
+          </div>
+        </div>
+      )}
       <HeaderSection 
         customer={customer}
         onNavigateBack={handleNavigateBack}

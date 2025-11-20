@@ -151,6 +151,68 @@ export const authService = {
   // Check if user is authenticated
   isAuthenticated: () => {
     return !!localStorage.getItem('token');
+  },
+
+  sendVerificationInfo: async (userId, verificationData) => {
+    try {
+      const formData = new FormData();
+      formData.append('renterid', userId);
+      formData.append('idNumber', verificationData.cccdNumber);
+      formData.append('driverLicenseNo', verificationData.blxNumber);
+      formData.append('idFront', verificationData.cccdFrontImage);
+      formData.append('idBack', verificationData.cccdBackImage);
+      formData.append('dlFront', verificationData.blxFrontImage);
+      formData.append('dlBack', verificationData.blxBackImage);
+
+      const response = await api.post('/RenterProfile/upload-profile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      // Cập nhật verifiedStatus trong localStorage sau khi gọi API thành công
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        user.verifiedStatus = 2;
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+      
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Update user profile
+  updateProfile: async (userId, profileData) => {
+    try {
+      const formData = new FormData();
+      formData.append('FullName', profileData.name || '');
+      formData.append('Email', '');
+      formData.append('Phone', profileData.phone || '');
+      formData.append('Address', profileData.address || '');
+      formData.append('IsEmailVerified', '');
+      formData.append('RoleID', '');
+
+      const response = await api.put(`/User/${userId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Cập nhật thông tin user trong localStorage
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        user.name = profileData.name || user.name;
+        user.phone = profileData.phone || user.phone;
+        user.address = profileData.address || user.address;
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };
 

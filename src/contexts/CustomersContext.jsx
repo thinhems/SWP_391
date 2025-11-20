@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { mockCustomers } from '../data/mockCustomers';
 import { customersService } from '../services/customers.api';
 
@@ -16,10 +16,13 @@ export const CustomersProvider = ({ children }) => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isFirstLoadRef = useRef(true); // ← Thêm ref
 
   // Fetch dữ liệu khách hàng
   const fetchCustomers = async () => {
-    setLoading(true);
+    if (isFirstLoadRef.current) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const data = await customersService.getAllUsers();
@@ -28,12 +31,26 @@ export const CustomersProvider = ({ children }) => {
       console.error('Error fetching customers data:', err);
       setError('Có lỗi xảy ra khi tải dữ liệu khách hàng');
     } finally {
-      setLoading(false);
+       if (isFirstLoadRef.current) {
+        setLoading(false);
+        isFirstLoadRef.current = false; // ← Đánh dấu đã load xong
+      }
     }
   };
 
   useEffect(() => {
     fetchCustomers();
+    // Auto refresh mỗi 20 giây
+    const intervalId = setInterval(() => {
+      const isInDetailPage = /\/manage-customer\/\d+/.test(currentPath) || 
+                            currentPath.includes('/verify/')
+      
+      if (!isInDetailPage) {
+        fetchCustomers();
+      }
+    }, 20000);
+    
+    return () => clearInterval(intervalId);
   }, []);
   // Tính toán số liệu cho khách hàng
   const customersData = {
@@ -79,7 +96,16 @@ export const CustomersProvider = ({ children }) => {
       throw error;
     }
   };
-
+  // update type khách hàng
+  const updateCustomerType = async (customerId, type) => {
+    try {
+      await customersService.updateTypeCus(customerId, type);
+      await fetchCustomers();
+    } catch (error) {
+      console.error('Error updating customer type:', error);
+      throw error;
+    }
+  };
   const value = {
     customersData,
     loading,
@@ -87,7 +113,8 @@ export const CustomersProvider = ({ children }) => {
     fetchCustomers,
     updateCustomer,
     refreshCustomers,
-    updateVerificationStatus
+    updateVerificationStatus,
+    updateCustomerType
   };
 
   return (

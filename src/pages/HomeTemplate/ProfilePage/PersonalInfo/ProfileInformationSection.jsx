@@ -4,11 +4,9 @@ const ProfileInformationSection = ({
   user, 
   isEditing, 
   loading, 
-  profileForm, 
-  handleProfileChange, 
+  formik,
   handleEditProfile, 
-  handleCancelEdit, 
-  handleSaveProfile 
+  handleCancelEdit
 }) => {
   return (
     <div>
@@ -31,7 +29,7 @@ const ProfileInformationSection = ({
       </div>
       {/* render form chỉnh sửa thông tin cá nhân  */}
       {isEditing ? (
-        <form onSubmit={handleSaveProfile} className="space-y-6">
+        <form onSubmit={formik.handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -40,24 +38,29 @@ const ProfileInformationSection = ({
               <input
                 type="text"
                 name="name"
-                value={profileForm.name}
-                onChange={handleProfileChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                  formik.touched.name && formik.errors.name ? 'border-red-500' : 'border-gray-300'
+                }`}
               />
+              {formik.touched.name && formik.errors.name && (
+                <p className="mt-1 text-sm text-red-600">{formik.errors.name}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email *
+                Email
               </label>
               <input
                 type="email"
                 name="email"
-                value={profileForm.email}
-                onChange={handleProfileChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                value={user.email}
+                disabled
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
               />
+              <p className="mt-1 text-xs text-gray-500">Email không thể thay đổi</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -66,38 +69,34 @@ const ProfileInformationSection = ({
               <input
                 type="tel"
                 name="phone"
-                value={profileForm.phone}
-                onChange={handleProfileChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                value={formik.values.phone}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                  formik.touched.phone && formik.errors.phone ? 'border-red-500' : 'border-gray-300'
+                }`}
               />
+              {formik.touched.phone && formik.errors.phone && (
+                <p className="mt-1 text-sm text-red-600">{formik.errors.phone}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Ngày sinh
+                Địa chỉ
               </label>
               <input
-                type="date"
-                name="dateOfBirth"
-                value={profileForm.dateOfBirth}
-                onChange={handleProfileChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                type="text"
+                name="address"
+                value={formik.values.address}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                  formik.touched.address && formik.errors.address ? 'border-red-500' : 'border-gray-300'
+                }`}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Giới tính
-              </label>
-              <select
-                name="gender"
-                value={profileForm.gender}
-                onChange={handleProfileChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option value="">Chọn giới tính</option>
-                <option value="male">Nam</option>
-                <option value="female">Nữ</option>
-                <option value="other">Khác</option>
-              </select>
+              {formik.touched.address && formik.errors.address && (
+                <p className="mt-1 text-sm text-red-600">{formik.errors.address}</p>
+              )}
             </div>
           </div>
           <div className="flex items-center space-x-4">
@@ -140,14 +139,8 @@ const ProfileInformationSection = ({
               <p className="text-gray-900 font-medium">{user.phone || 'Chưa cập nhật'}</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-500 mb-1">Ngày sinh</label>
-              <p className="text-gray-900 font-medium">{user.dateOfBirth || 'Chưa cập nhật'}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-500 mb-1">Giới tính</label>
-              <p className="text-gray-900 font-medium">
-                {user.gender === 'male' ? 'Nam' : user.gender === 'female' ? 'Nữ' : user.gender === 'other' ? 'Khác' : 'Chưa cập nhật'}
-              </p>
+              <label className="block text-sm font-medium text-gray-500 mb-1">Địa chỉ</label>
+              <p className="text-gray-900 font-medium">{user.address || 'Chưa cập nhật'}</p>
             </div>
           </div>
         </div>

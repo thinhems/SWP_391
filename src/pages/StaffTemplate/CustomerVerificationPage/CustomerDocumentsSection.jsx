@@ -8,11 +8,20 @@ export default function CustomerDocumentsSection({ customer }) {
   const [open, setOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
 
+  // chuyển đổi base64 thành data URL
+  const getImageUrl = (base64) => {
+    if (!base64) return null;
+    if (base64.startsWith('data:')) return base64;
+    return `data:image/jpeg;base64,${base64}`;
+  };
+
   // tất cả ảnh để hiển thị trong Lightbox
   const allImages = [
-    ...(customer?.idCardImages || []),
-    ...(customer?.idLicenseImages || [])
-  ].filter(Boolean);
+    customer?.idCardFrontImage,
+    customer?.idCardBackImage,
+    customer?.driverLicenseFrontImage,
+    customer?.driverLicenseBackImage
+  ].filter(Boolean).map(getImageUrl);
 
   // xử lý mở ảnh
   const handleOpenImage = (index) => {
@@ -35,46 +44,76 @@ export default function CustomerDocumentsSection({ customer }) {
           <div>
             <h3 className="text-lg font-semibold text-gray-800 mb-3">Căn cước công dân (CCCD)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {customer?.idCardImages?.map((image, idx) => (
+              {customer?.idCardFrontImage && (
                 <div
-                  key={idx}
                   className="border-2 border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-500 transition-colors"
-                  onClick={() => handleOpenImage(idx)}
+                  onClick={() => handleOpenImage(0)}
                 >
                   <div className="aspect-w-16 aspect-h-10">
                     <div className="w-full h-56 bg-gray-100 flex items-center justify-center">
-                      <img src={image} alt={`CCCD ${idx === 0 ? 'Mặt trước' : 'Mặt sau'}`} className="w-full h-full object-cover" />
+                      <img src={getImageUrl(customer.idCardFrontImage)} alt="CCCD Mặt trước" className="w-full h-full object-cover" />
                     </div>
                   </div>
                   <div className="p-3 bg-gray-50">
-                    <p className="text-sm font-medium text-gray-900">CCCD - {idx === 0 ? 'Mặt trước' : 'Mặt sau'}</p>
+                    <p className="text-sm font-medium text-gray-900">CCCD - Mặt trước</p>
                     <p className="text-xs text-gray-600 mt-1">Click để xem phóng to</p>
                   </div>
                 </div>
-              ))}
+              )}
+              {customer?.idCardBackImage && (
+                <div
+                  className="border-2 border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-500 transition-colors"
+                  onClick={() => handleOpenImage(1)}
+                >
+                  <div className="aspect-w-16 aspect-h-10">
+                    <div className="w-full h-56 bg-gray-100 flex items-center justify-center">
+                      <img src={getImageUrl(customer.idCardBackImage)} alt="CCCD Mặt sau" className="w-full h-full object-cover" />
+                    </div>
+                  </div>
+                  <div className="p-3 bg-gray-50">
+                    <p className="text-sm font-medium text-gray-900">CCCD - Mặt sau</p>
+                    <p className="text-xs text-gray-600 mt-1">Click để xem phóng to</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           {/* bằng lái xe */}
           <div>
             <h3 className="text-lg font-semibold text-gray-800 mb-3">Bằng lái xe (BLX)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {customer?.idLicenseImages?.map((image, idx) => (
+              {customer?.driverLicenseFrontImage && (
                 <div
-                  key={idx}
                   className="border-2 border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-500 transition-colors"
-                  onClick={() => handleOpenImage(customer.idCardImages.length + idx)}
+                  onClick={() => handleOpenImage(2)}
                 >
                   <div className="aspect-w-16 aspect-h-10">
                     <div className="w-full h-56 bg-gray-100 flex items-center justify-center">
-                      <img src={image} alt={`BLX ${idx === 0 ? 'Mặt trước' : 'Mặt sau'}`} className="w-full h-full object-cover" />
+                      <img src={getImageUrl(customer.driverLicenseFrontImage)} alt="BLX Mặt trước" className="w-full h-full object-cover" />
                     </div>
                   </div>
                   <div className="p-3 bg-gray-50">
-                    <p className="text-sm font-medium text-gray-900">BLX - {idx === 0 ? 'Mặt trước' : 'Mặt sau'}</p>
+                    <p className="text-sm font-medium text-gray-900">BLX - Mặt trước</p>
                     <p className="text-xs text-gray-600 mt-1">Click để xem phóng to</p>
                   </div>
                 </div>
-              ))}
+              )}
+              {customer?.driverLicenseBackImage && (
+                <div
+                  className="border-2 border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-500 transition-colors"
+                  onClick={() => handleOpenImage(3)}
+                >
+                  <div className="aspect-w-16 aspect-h-10">
+                    <div className="w-full h-56 bg-gray-100 flex items-center justify-center">
+                      <img src={getImageUrl(customer.driverLicenseBackImage)} alt="BLX Mặt sau" className="w-full h-full object-cover" />
+                    </div>
+                  </div>
+                  <div className="p-3 bg-gray-50">
+                    <p className="text-sm font-medium text-gray-900">BLX - Mặt sau</p>
+                    <p className="text-xs text-gray-600 mt-1">Click để xem phóng to</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

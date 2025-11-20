@@ -5,13 +5,13 @@ export default function HeaderSection( { customer, onNavigateBack, isProcessing 
   // lấy badge trạng thái
   const getStatusBadge = (status) => {
     const config = {
-      verified: { bg: 'bg-green-100', text: 'text-green-800', label: 'Đã xác thực', icon: '✓' },
-      unverified: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Chưa xác thực', icon: '⏳' }
+      1: { bg: 'bg-red-100', text: 'text-red-800', label: 'Chưa xác thực' },
+      2: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Chờ xác thực' },
+      3: { bg: 'bg-green-100', text: 'text-green-800', label: 'Đã xác thực' }
     };
     const c = config[status] || config.unverified;
     return (
       <span className={`px-4 py-2 rounded-full text-sm font-medium ${c.bg} ${c.text} inline-flex items-center`}>
-        <span className="mr-2 text-lg">{c.icon}</span>
         {c.label}
       </span>
     );
@@ -44,7 +44,7 @@ export default function HeaderSection( { customer, onNavigateBack, isProcessing 
           </h1>
           <div className="mt-2 flex items-center space-x-4">
             <p className="text-gray-600">ID: {customer.id}</p>
-            {getStatusBadge(customer.status)}
+            {getStatusBadge(customer.isVerified)}
             {getTypeBadge(customer.customerType)}
           </div>
         </div>
