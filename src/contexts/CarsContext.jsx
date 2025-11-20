@@ -45,13 +45,13 @@ export const CarsProvider = ({ children }) => {
     const intervalId = setInterval(() => {
       // Kiểm tra nếu đang ở trang con của manage-cars thì không fetch
       const currentPath = window.location.pathname;
-      const isInDetailPage = /\/manage-cars\/\d+/.test(currentPath) || 
-                            currentPath.includes('/inspection/') ||
-                            currentPath.includes('/car-delivery/') ||
-                            currentPath.includes('/car-return/') ||
-                            currentPath.includes('/approval-review/');
-      
-      if (!isInDetailPage) {
+      const isInManageCarPage = currentPath.includes('/manage-cars');
+      const isInDetailPage = currentPath.includes('/car-delivery') || 
+                            currentPath.includes('/car-return') ||
+                            currentPath.includes('/approval-review') ||
+                            currentPath.includes('/inspection');
+      // Chỉ refresh khi ở trang manage-cars và KHÔNG ở các trang chi tiết
+      if (isInManageCarPage && !isInDetailPage) {
         fetchListCars();
       }
     }, 20000);

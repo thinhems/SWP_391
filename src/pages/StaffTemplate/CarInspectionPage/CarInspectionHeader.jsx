@@ -4,14 +4,16 @@ export default function CarInspectionHeader({
   carData, 
   carId, 
   onCarDataUpdate, 
-  onNavigateBack,
-  onOpenReport
+  onNavigateBack
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const validColors = ["Trắng", "Đen", "Xanh", "Đỏ", "Xám", "Bạc", "Vàng", "Xanh dương", "Xanh lá"];
+  const getValidColor = (color) => validColors.includes(color) ? color : "Trắng";
+  
   const [editData, setEditData] = useState({
     model: carData.model,
     plateNumber: carData.plateNumber,
-    color: carData.color,
+    color: getValidColor(carData.color),
     batteryLevel: carData.batteryLevel,
     location: carData.location
   });
@@ -70,15 +72,6 @@ export default function CarInspectionHeader({
           </div>
         </div>
         <div className="flex space-x-3">
-          <button
-            onClick={onOpenReport}
-            className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2 cursor-pointer"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-            <span>Báo cáo Admin</span>
-          </button>
           <button
             onClick={onNavigateBack}
             className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center space-x-2 cursor-pointer"
@@ -156,7 +149,7 @@ export default function CarInspectionHeader({
                 <option value="Xanh lá">Xanh lá</option>
               </select>
             ) : (
-              <p className="font-semibold text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{carData.color}</p>
+              <p className="font-semibold text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{getValidColor(carData.color)}</p>
             )}
           </div>
           {/* năm sản xuất */}

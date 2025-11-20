@@ -11,32 +11,25 @@ export default function CustomerVerificationPage() {
   let { customerId } = useParams();
   customerId = parseInt(customerId, 10);
   const navigate = useNavigate();
-  const { customersData, updateVerificationStatus  } = useCustomers();
+  const { customersData, updateVerificationStatus, loading  } = useCustomers();
   const { addActivity } = useActivities();
   const [customer, setCustomer] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   // load dữ liệu khách hàng
   useEffect(() => {
-    setLoading(true);
     setError(null);
-    
-    setTimeout(() => {
-      try {
-        const foundCustomer = customersData.getCustomerById(customerId);
-        if (foundCustomer) {
-          setCustomer(foundCustomer);
-        } else {
-          setError(`Không tìm thấy khách hàng có ID: ${customerId}`);
-        }
-      } catch (err) {
-        console.error('Error loading customer:', err);
-        setError('Có lỗi xảy ra khi tải thông tin khách hàng');
-      } finally {
-        setLoading(false);
+    try {
+      const foundCustomer = customersData.getCustomerById(customerId);
+      if (foundCustomer) {
+        setCustomer(foundCustomer);
+      } else {
+        setError(`Không tìm thấy khách hàng có ID: ${customerId}`);
       }
-    }, 500);
+    } catch (err) {
+      console.error('Error loading customer:', err);
+      setError('Có lỗi xảy ra khi tải thông tin khách hàng');
+    }
   }, [customerId, customersData]);
   // xử lý duyệt khách hàng
   const handleApprove = async () => {
@@ -53,7 +46,6 @@ export default function CustomerVerificationPage() {
         bgColor: 'bg-green-100'
       });
       
-      alert(`Đã duyệt khách hàng: ${customer.name}\n`);
       navigate('/staff/manage-customer');
     } catch (error) {
       console.error('Error approving customer:', error);
@@ -77,7 +69,6 @@ export default function CustomerVerificationPage() {
         bgColor: 'bg-red-100'
       });
       
-      alert(`Đã từ chối khách hàng: ${customer.name}\n`);
       navigate('/staff/manage-customer');
     } catch (error) {
       console.error('Error rejecting customer:', error);
@@ -93,10 +84,14 @@ export default function CustomerVerificationPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
+          <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
+        </div>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-b-4 border-gray-300 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Đang tải thông tin khách hàng...</p>
+          <p className="text-lg font-semibold text-gray-800">Đang tải thông tin khách hàng...</p>
+          <p className="text-gray-500 text-sm mt-1">Customer ID: {customerId}</p>
         </div>
       </div>
     );
@@ -123,41 +118,37 @@ export default function CustomerVerificationPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-
+    <>
       {isProcessing && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}>
-          <div className="bg-white rounded-xl shadow-2xl p-8 flex flex-col items-center space-y-4 min-w-[280px]">
-            <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
-              <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-semibold text-gray-800">Đang xử lý</p>
-              <p className="text-sm text-gray-500 mt-1">Vui lòng đợi...</p>
-            </div>
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
+            <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
           </div>
         </div>
       )}
-      <HeaderSection 
-        customer={customer}
-        onNavigateBack={handleNavigateBack}
-        isProcessing={isProcessing}
-      />
-      <CustomerInfoSection 
-        customer={customer}
-        onNavigateBack={handleNavigateBack}
-        isProcessing={isProcessing}
-      />
-      <CustomerDocumentsSection customer={customer} />
-      <VerificationActionsSection 
-        customer={customer}
-        onApprove={handleApprove}
-        onReject={handleReject}
-        isProcessing={isProcessing}
-      />
-    </div>
+      
+      <div className="max-w-6xl mx-auto space-y-6">
+        <HeaderSection 
+          customer={customer}
+          onNavigateBack={handleNavigateBack}
+          isProcessing={isProcessing}
+        />
+        <CustomerInfoSection 
+          customer={customer}
+          onNavigateBack={handleNavigateBack}
+          isProcessing={isProcessing}
+        />
+        <CustomerDocumentsSection customer={customer} />
+        <VerificationActionsSection 
+          customer={customer}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          isProcessing={isProcessing}
+        />
+      </div>
+    </>
   );
 }

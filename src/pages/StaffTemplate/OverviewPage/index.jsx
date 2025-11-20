@@ -10,7 +10,7 @@ import RecentActivities from './RecentActivities';
 
 export default function OverviewPage() {
   const navigate = useNavigate();
-  const { carsData, loading: carsLoading, error: carsError, fetchCars, setUserStation } = useCars();
+  const { carsData, loading: carsLoading, error: carsError, setUserStation } = useCars();
   const { customersData, loading: customersLoading, error: customersError } = useCustomers();
   const { activities } = useActivities();
   const { user } = useAuth();
@@ -28,8 +28,14 @@ export default function OverviewPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-green-500 border-b-4 border-gray-300"></div>
-        <p className="mt-4 text-gray-600 font-medium text-lg">Đang tải dữ liệu tổng quan...</p>
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
+          <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
+        </div>
+        <div className="text-center">
+          <p className="text-lg font-semibold text-gray-800">Đang tải dữ liệu tổng quan</p>
+          <p className="text-sm text-gray-500 mt-1">Vui lòng đợi...</p>
+        </div>
       </div>
     );
   }
@@ -43,13 +49,7 @@ export default function OverviewPage() {
           </svg>
         </div>
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Có lỗi xảy ra</h2>
-        <p className="text-gray-600 mb-4">{error}</p>
-        <button
-          onClick={fetchCars}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Thử lại
-        </button>
+        <p className="text-gray-600 mb-4">{typeof error === 'string' ? error : 'Không thể tải dữ liệu. Vui lòng thử lại.'}</p>
       </div>
     );
   }

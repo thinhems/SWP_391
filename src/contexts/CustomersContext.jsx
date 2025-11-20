@@ -42,10 +42,12 @@ export const CustomersProvider = ({ children }) => {
     fetchCustomers();
     // Auto refresh mỗi 20 giây
     const intervalId = setInterval(() => {
-      const isInDetailPage = /\/manage-customer\/\d+/.test(currentPath) || 
-                            currentPath.includes('/verify/')
+      const currentPath = window.location.pathname;
+      const isInManageCustomerPage = currentPath.includes('/manage-customer');
+      const isInVerifyPage = currentPath.includes('/verify');
       
-      if (!isInDetailPage) {
+      // Chỉ refresh khi ở trang manage-customer và KHÔNG ở trang verify
+      if (isInManageCustomerPage && !isInVerifyPage) {
         fetchCustomers();
       }
     }, 20000);
@@ -73,19 +75,6 @@ export const CustomersProvider = ({ children }) => {
       prevCustomers.map(c => c.id === customerId ? { ...c, ...updatedData } : c)
     );
   };
-
-  // Refresh customers data
-  const refreshCustomers = async () => {
-    setLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setCustomers([...mockCustomers]);
-    } catch (err) {
-      console.error('Error refreshing customers:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
   // cập nhật status verify khách hàng
   const updateVerificationStatus = async (customerId, status) => {
     try {
@@ -112,7 +101,6 @@ export const CustomersProvider = ({ children }) => {
     error,
     fetchCustomers,
     updateCustomer,
-    refreshCustomers,
     updateVerificationStatus,
     updateCustomerType
   };

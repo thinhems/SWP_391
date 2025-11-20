@@ -6,7 +6,6 @@ import CarInspectionHeader from './CarInspectionHeader';
 import CarImagesSection from './CarImagesSection';
 import CarInspectionContent from './CarInspectionContent';
 import CarInspectionSummary from './CarInspectionSummary';
-import PopupReport from './PopupReport';
 
 export default function CarInspectionPage() {
   let { carId } = useParams();
@@ -17,9 +16,6 @@ export default function CarInspectionPage() {
   const [carData, setCarData] = useState(null);
   const [carImages, setCarImages] = useState([]);
   const [error, setError] = useState(null);
-  // State cho report modal
-  const [showPopupReport, setShowPopupReport] = useState(false);
-  const [reportContent, setReportContent] = useState('');
   // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
@@ -136,26 +132,6 @@ export default function CarInspectionPage() {
     }
   };
   
-  // xử lý gửi báo cáo
-  const handleSubmitReport = () => {
-    try {
-      addActivity({
-        type: 'report',
-        title: `Báo cáo xe ${carData.modelName} (${carData.plateNumber})`,
-        customer: reportContent.substring(0, 50) + '...',
-        icon: 'bell',
-        color: 'text-orange-600',
-        bgColor: 'bg-orange-100'
-      });
-      
-      alert(`Đã gửi báo cáo cho Admin!\n\nXe: ${carData.modelName} (${carData.plateNumber})\nNội dung: ${reportContent}`);
-      setShowPopupReport(false);
-      setReportContent('');
-    } catch (error) {
-      alert('Có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.');
-    }
-  };
-  
   // Tổ chức checklist từ dữ liệu API
   const organizedChecklist = carData?.categories?.map(category => ({
     ...category,
@@ -164,12 +140,16 @@ export default function CarInspectionPage() {
       return currentItem || item;
     })
   })) || [];
+  
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
+          <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
+        </div>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-green-500 border-b-4 border-gray-300 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Đang tải thông tin xe...</p>
+          <p className="text-lg font-semibold text-gray-800">Đang tải thông tin xe...</p>
           <p className="text-gray-500 text-sm mt-1">Car ID: {carId}</p>
         </div>
       </div>
@@ -203,7 +183,6 @@ export default function CarInspectionPage() {
         carId={carId}
         onCarDataUpdate={handleCarDataUpdate}
         onNavigateBack={() => navigate('/staff/manage-cars?tab=available')}
-        onOpenReport={() => setShowPopupReport(true)}
       />
       
       <CarImagesSection 
@@ -221,15 +200,6 @@ export default function CarInspectionPage() {
         inspectionData={inspectionData}
         onCancel={() => navigate('/staff/manage-cars?tab=available')}
         onSave={handleSaveInspection}
-      />
-      
-      <PopupReport
-        isOpen={showPopupReport}
-        onClose={() => setShowPopupReport(false)}
-        carData={carData}
-        reportContent={reportContent}
-        setReportContent={setReportContent}
-        onSubmit={handleSubmitReport}
       />
     </div>
   );

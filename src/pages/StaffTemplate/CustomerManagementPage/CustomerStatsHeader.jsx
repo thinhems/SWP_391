@@ -19,14 +19,6 @@ export default function CustomerStatsHeader({ customers, onRefresh }) {
           <h1 className="text-2xl font-bold text-gray-900">Quản lý khách hàng</h1>
           <p className="text-gray-600">Quản lý thông tin và xác thực khách hàng</p>
         </div>
-        <div className="mt-4 sm:mt-0">
-          <button
-            onClick={onRefresh}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Làm mới
-          </button>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
