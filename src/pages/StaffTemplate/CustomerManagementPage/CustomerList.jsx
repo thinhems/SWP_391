@@ -35,25 +35,25 @@ export default function CustomerList({
   // hàm lấy nhãn trạng thái
   const getStatusBadge = (status) => {
     const config = {
-      verified: { bg: 'bg-green-100', text: 'text-green-800', label: 'Đã xác thực', icon: '✓' },
-      unverified: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Chưa xác thực', icon: '⏳' }
+      3: { bg: 'bg-green-100', text: 'text-green-800', label: 'Đã xác thực' },
+      2: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Chờ xác thực'},
+      1: { bg: 'bg-red-100', text: 'text-red-800', label: 'Chưa xác thực'}
     };
-    const c = config[status] || config.unverified;
+    const c = config[status] || config[1];
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-medium ${c.bg} ${c.text} inline-flex items-center`}>
-        <span className="mr-1">{c.icon}</span>
         {c.label}
       </span>
     );
   };
-  // hàm lấy nhãn loại khách hàng
+  // hàm lấy loại khách hàng
   const getTypeBadge = (type) => {
     const config = {
-      new: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Mới' },
-      regular: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Thường xuyên' },
-      vip: { bg: 'bg-purple-100', text: 'text-purple-800', label: 'VIP' }
+      1: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Mới' },
+      2: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Thường xuyên' },
+      3: { bg: 'bg-purple-100', text: 'text-purple-800', label: 'VIP' }
     };
-    const c = config[type] || config.new;
+    const c = config[type] || config[1];
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${c.bg} ${c.text}`}>
         {c.label}
@@ -231,10 +231,10 @@ export default function CustomerList({
                     <div className="text-sm text-gray-900">{customer.idCard}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getTypeBadge(customer.customerType)}
+                    {getTypeBadge(customer.cusType)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(customer.status)}
+                    {getStatusBadge(customer.isVerified)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <span className="text-sm font-semibold text-gray-900">

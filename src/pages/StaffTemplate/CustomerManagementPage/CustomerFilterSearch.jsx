@@ -48,8 +48,9 @@ export default function CustomerFilterSearch({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="all">Tất cả</option>
-            <option value="verified">Đã xác thực</option>
-            <option value="unverified">Chưa xác thực</option>
+            <option value="3">Đã xác thực</option>
+            <option value="2">Chờ xác thực</option>
+            <option value="1">Chưa xác thực</option>
           </select>
         </div>
         {/* type Filter */}
@@ -63,9 +64,9 @@ export default function CustomerFilterSearch({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="all">Tất cả</option>
-            <option value="new">Mới</option>
-            <option value="regular">Thường xuyên</option>
-            <option value="vip">VIP</option>
+            <option value="1">Mới</option>
+            <option value="2">Thường xuyên</option>
+            <option value="3">VIP</option>
           </select>
         </div>
       </div>

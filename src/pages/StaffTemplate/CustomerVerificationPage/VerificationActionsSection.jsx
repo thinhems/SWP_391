@@ -3,8 +3,7 @@ import { useState } from 'react';
 
 export default function VerificationActionsSection({ customer, onApprove, onReject, isProcessing }) {
   const [showApproveConfirm, setShowApproveConfirm] = useState(false);
-  const [showRejectForm, setShowRejectForm] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
+  const [showRejectConfirm, setShowRejectConfirm] = useState(false);
 
   // format ngày tháng
   const formatDate = (dateString) => {
@@ -18,7 +17,7 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
   // xử lý duyệt khách hàng
   const handleApprove = () => {
     setShowApproveConfirm(true);
-    setShowRejectForm(false);
+    setShowRejectConfirm(false);
   };
 
   const confirmApprove = async () => {
@@ -28,27 +27,22 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
 
   // xử lý từ chối
   const handleReject = () => {
-    setShowRejectForm(true);
+    setShowRejectConfirm(true);
     setShowApproveConfirm(false);
-    setRejectReason('');
   };
 
   const confirmReject = async () => {
-    const success = await onReject(rejectReason);
-    if (success) {
-      setShowRejectForm(false);
-      setRejectReason('');
-    }
+    setShowRejectConfirm(false);
+    await onReject();
   };
 
   const cancelAction = () => {
     setShowApproveConfirm(false);
-    setShowRejectForm(false);
-    setRejectReason('');
+    setShowRejectConfirm(false);
   };
 
   // nếu đã verified thì hiển thị thông báo
-  if (customer.status === 'verified') {
+  if (customer.isVerified === 3) {
     return (
       <div className="bg-green-50 border border-green-200 rounded-lg p-6">
         <div className="flex items-center space-x-3">
@@ -60,7 +54,7 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
           <div>
             <h3 className="text-lg font-semibold text-green-800">Khách hàng đã được xác thực</h3>
             <p className="text-green-700 mt-1">
-              Tài khoản này đã được xác thực vào ngày {formatDate(customer.registeredDate)}. 
+              Tài khoản này đã được xác thực. 
               Khách hàng có thể sử dụng đầy đủ các dịch vụ của hệ thống.
             </p>
           </div>
@@ -114,34 +108,17 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
         </div>
       )}
       {/* form từ chối */}
-      {showRejectForm && (
+      {showRejectConfirm && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-start space-x-3">
             <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
             <div className="flex-1">
-              <h4 className="font-semibold text-red-800 mb-2">Từ chối xác thực</h4>
+              <h4 className="font-semibold text-red-800 mb-2">Xác nhận từ chối khách hàng</h4>
               <p className="text-red-700 text-sm mb-4">
-                Vui lòng nhập lý do từ chối để thông báo cho khách hàng
+                Bạn có chắc chắn muốn từ chối xác thực tài khoản này? Khách hàng sẽ nhận được thông báo từ chối.
               </p>
-              
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Lý do từ chối <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  placeholder="Nhập lý do từ chối xác thực khách hàng..."
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Lý do này sẽ được gửi trực tiếp cho khách hàng
-                </p>
-              </div>
-
               <div className="flex space-x-3">
                 <button
                   onClick={confirmReject}
@@ -167,7 +144,7 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
         </div>
       )}
       {/* nút chính */}
-      {!showApproveConfirm && !showRejectForm && (
+      {!showApproveConfirm && !showRejectConfirm && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
             onClick={handleApprove}
@@ -205,7 +182,7 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
         </div>
       )}
       {/* thông tin quan trọng */}
-      {!showApproveConfirm && !showRejectForm && (
+      {!showApproveConfirm && !showRejectConfirm && (
         <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
           <div className="flex items-start space-x-3">
             <svg className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +192,7 @@ export default function VerificationActionsSection({ customer, onApprove, onReje
               <h5 className="font-semibold text-gray-800 mb-1">Thông tin quan trọng</h5>
               <ul className="text-gray-700 text-sm space-y-1">
                 <li>• <strong>Nếu duyệt:</strong> Khách hàng sẽ được xác thực và có thể sử dụng đầy đủ dịch vụ</li>
-                <li>• <strong>Nếu từ chối:</strong> Khách hàng sẽ nhận thông báo kèm lý do từ chối</li>
+                <li>• <strong>Nếu từ chối:</strong> Khách hàng sẽ nhận thông báo từ chối xác thực</li>
                 <li>• Quyết định này không thể hoàn tác sau khi thực hiện</li>
                 <li>• Kiểm tra kỹ giấy tờ trước khi đưa ra quyết định</li>
               </ul>
