@@ -92,10 +92,13 @@ export default function ApprovalReviewPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
+          <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
+        </div>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-purple-500 border-b-4 border-gray-300 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Đang tải thông tin yêu cầu duyệt...</p>
+          <p className="text-lg font-semibold text-gray-800">Đang tải thông tin yêu cầu duyệt...</p>
           <p className="text-gray-500 text-sm mt-1">Car ID: {carId}</p>
         </div>
       </div>

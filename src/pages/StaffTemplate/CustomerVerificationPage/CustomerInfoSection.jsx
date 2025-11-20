@@ -49,7 +49,7 @@ export default function CustomerInfoSection({ customer }) {
                 {customer.avatar ? (
                   <img src={customer.avatar} alt={customer.fullName} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-5xl text-blue-600 font-bold">{customer.fullName.charAt(0)}</span>
+                  <span className="text-5xl text-blue-600 font-bold">{customer.fullName.toUpperCase().charAt(0)}</span>
                 )}
               </div>
               <h3 className="text-xl font-semibold text-gray-900">{customer.fullName}</h3>

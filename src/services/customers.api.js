@@ -4,7 +4,9 @@ export const customersService = {
   // Lấy danh sách tất cả users
   getAllUsers: async () => {
     try {
-      const response = await api.get('/User/GetAllRentersForStaff');
+      const response = await api.get('/User/GetAllRentersForStaff', {
+        timeout: 30000 // 30 giây
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching users:', error);
