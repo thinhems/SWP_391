@@ -66,6 +66,21 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const getProfile = async (userId) => {
+    try {
+      setLoading(true);
+      await authService.getProfile(userId);
+      const currentUser = authService.getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const value = {
     user,
     login,
@@ -73,6 +88,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     verifyAccount,
     updateProfile,
+    getProfile,
     isAuthenticated: !!user,
     loading
   };
