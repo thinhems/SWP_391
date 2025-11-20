@@ -42,7 +42,10 @@ export default function MyContractsPage() {
         const apiOrders = Array.isArray(res.data) ? res.data : (res.data?.data || []);
 
         // Transform API data to UI order shape used by OrderRow/filters
-        const transformed = apiOrders.map((b) => {
+        // Lọc bỏ các booking có status = 0 (Chờ thanh toán)
+        const filteredOrders = apiOrders.filter(b => (b.status ?? b.Status) !== 0);
+
+        const transformed = filteredOrders.map((b) => {
           const start = b.startDate || b.StartDate;
           const end = b.endDate || b.EndDate;
           const rentalTypeNum = b.rentalType || b.RentalType;
@@ -52,9 +55,9 @@ export default function MyContractsPage() {
           const totalDays = Math.max(1, Math.ceil((endDate - startDate) / (1000*60*60*24)));
           const statusNum = b.status ?? b.Status;
           // Map numeric status to UI keys (Booking table status)
-          // 0: Chờ thanh toán, 1: Chờ phê duyệt, 2: Chờ ký hợp đồng, 3: Chờ bàn giao, 4: Đang thuê, 5: Hoàn thành
+          // 0: Chờ thanh toán (bị lọc bỏ), 1: Chờ phê duyệt, 2: Chờ ký hợp đồng, 3: Chờ bàn giao, 4: Đang thuê, 5: Hoàn thành
           const statusMap = {
-            0: 'pending_payment',         // Chờ thanh toán (new create)
+            0: 'pending_payment',         // Chờ thanh toán (new create) - không hiển thị
             1: 'pending_approval',        // Chờ phê duyệt (paid)
             2: 'pending_contract',        // Chờ ký hợp đồng (Approval)
             3: 'pending_handover',        // Chờ bàn giao (Pending Handover)
