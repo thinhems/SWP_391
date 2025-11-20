@@ -69,6 +69,16 @@ export const CustomersProvider = ({ children }) => {
       setLoading(false);
     }
   };
+  // cập nhật status verify khách hàng
+  const updateVerificationStatus = async (customerId, status) => {
+    try {
+      await customersService.updateVerificationStatus(customerId, status);
+      await fetchCustomers();
+    } catch (error) {
+      console.error('Error updating verification status:', error);
+      throw error;
+    }
+  };
 
   const value = {
     customersData,
@@ -76,7 +86,8 @@ export const CustomersProvider = ({ children }) => {
     error,
     fetchCustomers,
     updateCustomer,
-    refreshCustomers
+    refreshCustomers,
+    updateVerificationStatus
   };
 
   return (

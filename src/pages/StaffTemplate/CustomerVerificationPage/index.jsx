@@ -11,7 +11,7 @@ export default function CustomerVerificationPage() {
   let { customerId } = useParams();
   customerId = parseInt(customerId, 10);
   const navigate = useNavigate();
-  const { customersData, updateCustomer } = useCustomers();
+  const { customersData, updateVerificationStatus  } = useCustomers();
   const { addActivity } = useActivities();
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ export default function CustomerVerificationPage() {
   const handleApprove = async () => {
     setIsProcessing(true);
     try {
-      updateCustomer(customerId, { status: 'verified' });
+      await updateVerificationStatus(customerId, 3);
       
       addActivity({
         type: 'customer_verified',
@@ -63,30 +63,25 @@ export default function CustomerVerificationPage() {
     }
   };
   // xử lý từ chối khách hàng
-  const handleReject = async (rejectReason) => {
-    if (!rejectReason.trim()) {
-      alert('Vui lòng nhập lý do từ chối');
-      return false;
-    }
-    
+  const handleReject = async () => {
     setIsProcessing(true);
     try {
+      await updateVerificationStatus(customerId, 1);
+      
       addActivity({
         type: 'customer_rejected',
         title: `Đã từ chối xác thực khách hàng ${customer.name}`,
-        customer: rejectReason,
+        customer: customer.email,
         icon: 'clock',
         color: 'text-red-600',
         bgColor: 'bg-red-100'
       });
       
-      alert(`Đã từ chối khách hàng: ${customer.name}\n\nLý do: ${rejectReason}\n\nThông báo đã được gửi tới email: ${customer.email}`);
+      alert(`Đã từ chối khách hàng: ${customer.name}\n\nThông báo đã được gửi tới email: ${customer.email}`);
       navigate('/staff/manage-customer');
-      return true;
     } catch (error) {
       console.error('Error rejecting customer:', error);
       alert('Có lỗi xảy ra khi từ chối khách hàng. Vui lòng thử lại.');
-      return false;
     } finally {
       setIsProcessing(false);
     }

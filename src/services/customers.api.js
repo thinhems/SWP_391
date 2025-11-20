@@ -36,5 +36,15 @@ export const customersService = {
       console.error('Error fetching staff:', error);
       throw error;
     }
-  }
+  },
+  // cập nhật trạng thái verify khách hàng
+  updateVerificationStatus: async (userId, status) => {
+    try {
+      const response = await api.put(`/User/UpdateVerifiedStatus/${userId}/${status}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating verification status:', error);
+      throw error;
+    }
+  } 
 }

@@ -20,9 +20,9 @@ export default function CustomerManagementPage() {
       customer.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.phone.includes(searchTerm);
-
-    const statusMatch = statusFilter === 'all' || customer.status === statusFilter;
-    const typeMatch = typeFilter === 'all' || customer.customerType === typeFilter;
+    
+    const statusMatch = statusFilter === 'all' || customer.isVerified === parseInt(statusFilter);
+    const typeMatch = typeFilter === 'all' || customer.cusType === parseInt(typeFilter);
 
     return searchMatch && statusMatch && typeMatch;
   });
