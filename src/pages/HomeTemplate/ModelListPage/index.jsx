@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useModels } from '../../../contexts/ModelsContext';
+import ModelListHeader from './ModelListHeader';
 import SearchFilterSection from './SearchFilterSection';
 import CarModelCarousel from './CarModelCarousel';
+import ModelListFooter from './ModelListFooter';
 
 export default function ModelListPage() {
   const navigate = useNavigate();
@@ -36,9 +38,9 @@ export default function ModelListPage() {
   // Hiển thị loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-white to-green-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#188f49' }}></div>
           <p className="text-gray-600">Đang tải dữ liệu...</p>
         </div>
       </div>
@@ -47,12 +49,13 @@ export default function ModelListPage() {
   // Hiển thị error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-white to-green-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+            className="px-4 py-2 text-white rounded-lg hover:opacity-90"
+            style={{ backgroundColor: '#188f49' }}
           >
             Thử lại
           </button>
@@ -61,7 +64,8 @@ export default function ModelListPage() {
     );
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-green-50">
+      <ModelListHeader />
       <div>
         {/* Search & Filter Section */}
         <SearchFilterSection
@@ -78,6 +82,9 @@ export default function ModelListPage() {
             modelsData={modelsData}
           />
         </div>
+        
+        {/* CTA Section */}
+        <ModelListFooter />
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import HomeTemplate from './pages/HomeTemplate';
 import StaffTemplate from './pages/StaffTemplate';
 import AdminTemplate from './pages/AdminTemplate';
 // Import Home Pages
-import Home from './pages/Home';
+import HomePage from './pages/HomeTemplate/HomePage';
 import LoginPage from './pages/HomeTemplate/LoginPage';
 import RegisterPage from './pages/HomeTemplate/RegisterPage';
 import ProfilePage from './pages/HomeTemplate/ProfilePage';
@@ -15,6 +15,8 @@ import MyContractsPage from './pages/HomeTemplate/MyContractsPage';
 import ContractDetailPage from './pages/HomeTemplate/ContractDetailPage';
 import ConfirmSignaturePage from './pages/HomeTemplate/ConfirmSignaturePage';
 import PaymentResultPage from './pages/HomeTemplate/PaymentResultPage';
+import AboutPage from './pages/HomeTemplate/AboutPage';
+import ContactPage from './pages/HomeTemplate/ContactPage';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminTemplate/Dashboard';
 import FleetOverview from './pages/AdminTemplate/FleetOverview';
@@ -76,7 +78,9 @@ function App() {
             </Route>
             {/* HOME ROUTES*/}
             <Route path="/*" element={<HomeTemplate />}>
-              <Route index element={<Home />} />
+              <Route index element={<HomePage />} />
+              <Route path="about" element={<AboutPage />} />
+              <Route path="contact" element={<ContactPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
               <Route path="profile" element={<ProfilePage />} />
