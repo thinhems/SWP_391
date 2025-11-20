@@ -44,7 +44,7 @@ const VerificationStatusDisplay = ({ status }) => {
             <span className="font-medium">Thời gian xử lý: 2-3 ngày làm việc</span>
           </div>
           <p className="text-sm">
-            Chúng tôi sẽ thông báo qua email khi quá trình xác thực hoàn tất.
+            Chúng tôi sẽ thông báo qua cuộc gọi khi quá trình xác thực hoàn tất.
           </p>
         </div>
       </div>

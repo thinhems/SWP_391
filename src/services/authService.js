@@ -213,7 +213,29 @@ export const authService = {
     } catch (error) {
       throw error;
     }
-  }
+  }, 
+
+  //lấy profile theo id
+  getProfile: async (userId) => {
+    try {
+      const response = await api.get(`/User/GetRenterByIdForStaff/${userId}`);
+      const profileData = response.data;
+      // Cập nhật thông tin user trong localStorage
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        user.name = profileData.name || user.name;
+        user.email = profileData.email || user.email;
+        user.phone = profileData.phone || user.phone;
+        user.address = profileData.address || user.address;
+        user.verifiedStatus = profileData.isVerified || user.verifiedStatus;
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+      return profileData;
+    } catch (error) {
+      throw error;
+    } 
+  }, 
+
 };
 
 export default authService;
