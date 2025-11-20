@@ -1,6 +1,6 @@
 import FileUploadBox from '../../../../components/FileUploadBox';
 
-export default function DocumentUploadSection({ verificationData, handleFileChange }) {
+export default function DocumentUploadSection({ formik, handleFileChange }) {
   return (
     <div className="space-y-6">
       <h4 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -14,36 +14,56 @@ export default function DocumentUploadSection({ verificationData, handleFileChan
       <div className="bg-blue-50 rounded-lg p-6">
         <h5 className="font-medium text-blue-900 mb-4">📄 Căn cước công dân (CCCD)</h5>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FileUploadBox
-            id="cccdFront"
-            label="Mặt trước CCCD *"
-            file={verificationData.cccdFrontImage}
-            onChange={(e) => handleFileChange(e, 'cccdFrontImage')}
-          />
-          <FileUploadBox
-            id="cccdBack"
-            label="Mặt sau CCCD *"
-            file={verificationData.cccdBackImage}
-            onChange={(e) => handleFileChange(e, 'cccdBackImage')}
-          />
+          <div>
+            <FileUploadBox
+              id="cccdFront"
+              label="Mặt trước CCCD *"
+              file={formik.values.cccdFrontImage}
+              onChange={(e) => handleFileChange(e, 'cccdFrontImage')}
+            />
+            {formik.touched.cccdFrontImage && formik.errors.cccdFrontImage && (
+              <p className="mt-1 text-sm text-red-600">{formik.errors.cccdFrontImage}</p>
+            )}
+          </div>
+          <div>
+            <FileUploadBox
+              id="cccdBack"
+              label="Mặt sau CCCD *"
+              file={formik.values.cccdBackImage}
+              onChange={(e) => handleFileChange(e, 'cccdBackImage')}
+            />
+            {formik.touched.cccdBackImage && formik.errors.cccdBackImage && (
+              <p className="mt-1 text-sm text-red-600">{formik.errors.cccdBackImage}</p>
+            )}
+          </div>
         </div>
       </div>
       {/* ảnh BLX */}
       <div className="bg-green-50 rounded-lg p-6">
         <h5 className="font-medium text-green-900 mb-4">🚗 Bằng lái xe (BLX)</h5>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FileUploadBox
-            id="blxFront"
-            label="Mặt trước BLX *"
-            file={verificationData.blxFrontImage}
-            onChange={(e) => handleFileChange(e, 'blxFrontImage')}
-          />
-          <FileUploadBox
-            id="blxBack"
-            label="Mặt sau BLX *"
-            file={verificationData.blxBackImage}
-            onChange={(e) => handleFileChange(e, 'blxBackImage')}
-          />
+          <div>
+            <FileUploadBox
+              id="blxFront"
+              label="Mặt trước BLX *"
+              file={formik.values.blxFrontImage}
+              onChange={(e) => handleFileChange(e, 'blxFrontImage')}
+            />
+            {formik.touched.blxFrontImage && formik.errors.blxFrontImage && (
+              <p className="mt-1 text-sm text-red-600">{formik.errors.blxFrontImage}</p>
+            )}
+          </div>
+          <div>
+            <FileUploadBox
+              id="blxBack"
+              label="Mặt sau BLX *"
+              file={formik.values.blxBackImage}
+              onChange={(e) => handleFileChange(e, 'blxBackImage')}
+            />
+            {formik.touched.blxBackImage && formik.errors.blxBackImage && (
+              <p className="mt-1 text-sm text-red-600">{formik.errors.blxBackImage}</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

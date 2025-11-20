@@ -5,7 +5,7 @@ import CustomerList from './CustomerList';
 import CustomerFilterSearch from './CustomerFilterSearch';
 
 export default function CustomerManagementPage() {
-  const { customersData, loading, refreshCustomers } = useCustomers(); 
+  const { customersData, loading, refreshCustomers, updateCustomerType } = useCustomers(); 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -80,6 +80,7 @@ export default function CustomerManagementPage() {
         startIndex={startIndex}
         endIndex={endIndex}
         onPageChange={handlePageChange}
+        onUpdateType={updateCustomerType}
       />
     </div>
   );

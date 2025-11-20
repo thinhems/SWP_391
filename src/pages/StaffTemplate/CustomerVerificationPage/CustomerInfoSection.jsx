@@ -73,7 +73,9 @@ export default function CustomerInfoSection({ customer }) {
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-sm text-gray-600 mb-1">Trạng thái xác thực</p>
-                <p className="text-lg font-semibold text-gray-900">{customer?.status || 'N/A'}</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {customer?.isVerified == 1 ? 'Chưa xác thực' : customer?.isVerified == 2 ? 'Chờ xác thực' : 'Đã xác thực'} &nbsp;
+                </p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 md:col-span-2">
                 <p className="text-sm text-gray-600 mb-1">Địa chỉ</p>
@@ -81,7 +83,7 @@ export default function CustomerInfoSection({ customer }) {
               </div>
               <div className="bg-blue-50 rounded-lg p-4">
                 <p className="text-sm text-blue-700 mb-1">Tổng số lượt thuê</p>
-                <p className="text-2xl font-bold text-blue-900">{customer?.totalRentals || 'N/A'}</p>
+                <p className="text-2xl font-bold text-blue-900">{customer?.bookingCount || 'N/A'}</p>
               </div>
               <div className="bg-purple-50 rounded-lg p-4">
                 <p className="text-sm text-purple-700 mb-1">Loại khách hàng</p>

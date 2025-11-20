@@ -46,5 +46,26 @@ export const customersService = {
       console.error('Error updating verification status:', error);
       throw error;
     }
-  } 
+  },
+  // update type khách hàng
+  updateTypeCus: async (userId, type) => {
+    try {
+      const formData = new FormData();
+      formData.append('FullName', '');
+      formData.append('Email', '');
+      formData.append('Phone', '');
+      formData.append('Address', '');
+      formData.append('Type', type);
+      formData.append('IsEmailVerified', '');
+
+      const response = await api.put(`/User/UpdateRenter/${userId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
