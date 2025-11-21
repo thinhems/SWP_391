@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCars } from '../../../contexts/CarsContext';
 import { useActivities } from '../../../contexts/ActivitiesContext';
+import { customersService } from '../../../services/customers.api';
 import HeaderSection from './HeaderSection';  
 import CustomerInfoSection from './CustomerInfoSection';
 import CarInfoSection from './CarInfoSection';
@@ -17,7 +18,8 @@ export default function ApprovalReviewPage() {
   const [carData, setCarData] = useState(null);
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  
+  const [customerData, setCustomerData] = useState(null);
+  const [customerLoading, setCustomerLoading] = useState(false);
   // load dữ liệu yêu cầu duyệt từ filter car context
   useEffect(() => {
     const loadData = async () => {
@@ -40,6 +42,26 @@ export default function ApprovalReviewPage() {
     
     loadData();
   }, [carId, carsData]);
+  // call api lấy thông tin khách hàng khi có carData
+  useEffect(() => {
+    const loadCustomerData = async () => {
+      if (!carData || !carData.customer || !carData.customer.id) {
+        return;
+      }
+      try {
+        setCustomerLoading(true);
+        const customer = await customersService.getCustomerById(carData.customer.id);
+        setCustomerData(customer);
+      } catch (err) {
+        console.error('Error fetching customer data:', err);
+      } finally {
+        setCustomerLoading(false);
+      }
+    };
+    
+    loadCustomerData();
+  }, [carData]);  
+
   // xử lý duyệt yêu cầu
   const handleApprove = async () => {
     setIsProcessing(true);
@@ -90,7 +112,7 @@ export default function ApprovalReviewPage() {
     }
   };
 
-  if (loading) {
+  if (loading || customerLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="relative">
@@ -132,7 +154,7 @@ export default function ApprovalReviewPage() {
         isProcessing={isProcessing}
         onNavigateBack={() => navigate('/staff/manage-cars?tab=pending_approval')}
       />
-      <CustomerInfoSection customer={carData?.customer} />
+      <CustomerInfoSection customer={customerData} />
       <CarInfoSection car={carData} />
       <RentalInfoSection 
         carData={carData}

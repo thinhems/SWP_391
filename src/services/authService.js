@@ -190,9 +190,7 @@ export const authService = {
       formData.append('FullName', profileData.name || '');
       formData.append('Email', '');
       formData.append('Phone', profileData.phone || '');
-      formData.append('Address', profileData.address || '');
-      formData.append('IsEmailVerified', '');
-      formData.append('RoleID', '');
+      formData.append('Address', profileData.address || '')
 
       const response = await api.put(`/User/${userId}`, formData, {
         headers: {
@@ -218,7 +216,7 @@ export const authService = {
   //lấy profile theo id
   getProfile: async (userId) => {
     try {
-      const response = await api.get(`/User/GetRenterByIdForStaff/${userId}`);
+      const response = await api.get(`/User/GetRenter/${userId}`);
       const profileData = response.data;
       // Cập nhật thông tin user trong localStorage
       const user = JSON.parse(localStorage.getItem('user'));
