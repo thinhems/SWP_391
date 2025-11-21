@@ -1,10 +1,12 @@
 
 import { useNavigate } from 'react-router-dom';
 
-export default function ListCarsSection({ cars, activeTab }) {
+export default function ListCarsSection({ cars, activeTab, isAdmin }) {
   const navigate = useNavigate();
+  const basePath = isAdmin ? '/admin' : '/staff';
+  
   if (activeTab == 'pending_approval') {
-    cars = cars.sort((a, b) => a.booking.requestTime + b.booking.requestTime);
+    cars = cars.sort((a, b) => a.booking?.requestTime + b.booking?.requestTime);
   }
   // Hàm đổi màu pin
   const getBatteryColor = (battery) => {
@@ -32,22 +34,22 @@ export default function ListCarsSection({ cars, activeTab }) {
 
   // Hàm chuyển trang nhận xe trả
   const handleCarReturn = (car) => {
-    navigate(`/staff/manage-cars/car-return/${car.id}`);
+    navigate(`${basePath}/manage-cars/car-return/${car.id}`);
   };
 
   // Hàm chuyển trang giao xe
   const handleCarDelivery = (car) => {
-    navigate(`/staff/manage-cars/car-delivery/${car.id}`);
+    navigate(`${basePath}/manage-cars/car-delivery/${car.id}`);
   };
 
   // Hàm chuyển trang duyệt xe
   const handleApprovalReview = (car) => {
-    navigate(`/staff/manage-cars/approval-review/${car.id}`);
+    navigate(`${basePath}/manage-cars/approval-review/${car.id}`);
   };
 
   // Hàm chuyển trang kiểm tra xe
   const handleInspectionCar = (car) => {
-    navigate(`/staff/manage-cars/inspection/${car.id}`);
+    navigate(`${basePath}/manage-cars/inspection/${car.id}`);
   };
 
   // Hàm định dạng tiền
@@ -134,7 +136,7 @@ export default function ListCarsSection({ cars, activeTab }) {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Yêu cầu lúc:</span>
                     <span className="text-sm font-medium text-gray-900">
-                      {formatDateTime(car.booking.requestTime)}
+                      {formatDateTime(car.booking?.requestTime)}
                     </span>
                   </div>
                 )}

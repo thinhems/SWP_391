@@ -9,6 +9,21 @@ export default function CarModelCard({
   activeTab, 
   onModelSelect 
 }) {
+  // Xử lý an toàn cho price
+  const price = model?.price || { daily: 0, weekly: 0, monthly: 0 };
+  const currentPrice = price[activeTab] || 0;
+  
+  // Xử lý an toàn cho images
+  const images = model?.images || [];
+  const imageUrl = images[0] || 'https://placehold.co/800x500?text=No+Image';
+  
+  // Xử lý an toàn cho specifications
+  const specs = model?.specifications || {
+    seats: 5,
+    range: '400km',
+    trunkCapacity: '500L'
+  };
+  
   return (
     <div
       className={`
@@ -46,7 +61,7 @@ export default function CarModelCard({
           {model.name}
         </h3>
         <div className={`font-bold ${isCenter ? 'text-2xl' : 'text-xl'}`} style={{ color: '#188f49' }}>
-          {model.price[activeTab].toLocaleString('vi-VN')}₫ 
+          {currentPrice.toLocaleString('vi-VN')}₫ 
           <span className="text-gray-500 font-normal text-base ml-1">
             /{activeTab === 'daily' ? 'ngày' : activeTab === 'weekly' ? 'tuần' : 'tháng'}
           </span>
@@ -58,8 +73,8 @@ export default function CarModelCard({
         style={{ height: isCenter ? '200px' : '170px' }}
       >
         <img 
-          src={model.images[0]} 
-          alt={model.name}
+          src={imageUrl} 
+          alt={model?.name || 'Car model'}
           className="max-h-full max-w-full object-contain drop-shadow-lg"
         />
       </div>
@@ -70,25 +85,25 @@ export default function CarModelCard({
             <div className={`rounded-full p-2 ${isCenter ? 'w-8 h-8' : 'w-7 h-7'} flex items-center justify-center`} style={{ backgroundColor: '#e8f5e9' }}>
               <FontAwesomeIcon icon={faCar} style={{ color: '#188f49' }} />
             </div>
-            <span className="font-medium text-slate-700">{model.type}</span>
+            <span className="font-medium text-slate-700">{model?.type || 'Xe điện'}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className={`rounded-full p-2 ${isCenter ? 'w-8 h-8' : 'w-7 h-7'} flex items-center justify-center`} style={{ backgroundColor: '#e8f5e9' }}>
               <FontAwesomeIcon icon={faBatteryFull} style={{ color: '#188f49' }} />
             </div>
-            <span className="font-medium text-slate-700">{model.specifications.range}</span>
+            <span className="font-medium text-slate-700">{specs.range}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className={`rounded-full p-2 ${isCenter ? 'w-8 h-8' : 'w-7 h-7'} flex items-center justify-center`} style={{ backgroundColor: '#e8f5e9' }}>
               <FontAwesomeIcon icon={faUser} style={{ color: '#188f49' }} />
             </div>
-            <span className="font-medium text-slate-700">{model.specifications.seats} chỗ</span>
+            <span className="font-medium text-slate-700">{specs.seats} chỗ</span>
           </div>
           <div className="flex items-center gap-2">
             <div className={`rounded-full p-2 ${isCenter ? 'w-8 h-8' : 'w-7 h-7'} flex items-center justify-center`} style={{ backgroundColor: '#e8f5e9' }}>
               <FontAwesomeIcon icon={faSuitcase} style={{ color: '#188f49' }} />
             </div>
-            <span className="font-medium text-slate-700">Cốp {model.specifications.trunkCapacity}</span>
+            <span className="font-medium text-slate-700">Cốp {specs.trunkCapacity}</span>
           </div>
         </div>
       </div>
