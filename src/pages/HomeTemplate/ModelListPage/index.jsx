@@ -38,10 +38,14 @@ export default function ModelListPage() {
   // Hiển thị loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-green-50 flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
+          <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
+        </div>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#188f49' }}></div>
-          <p className="text-gray-600">Đang tải dữ liệu...</p>
+          <p className="text-lg font-semibold text-gray-800">Đang tải dữ liệu model</p>
+          <p className="text-sm text-gray-500 mt-1">Vui lòng đợi...</p>
         </div>
       </div>
     );

@@ -4,7 +4,7 @@ export const customersService = {
   // Lấy danh sách tất cả users
   getAllUsers: async () => {
     try {
-      const response = await api.get('/User/GetAllRentersForStaff', {
+      const response = await api.get('/User/GetAllRenters', {
         timeout: 30000 // 30 giây
       });
       return response.data;
@@ -36,6 +36,16 @@ export const customersService = {
       return users.filter(user => user.roleID === 2 || user.roleID === '2' || user.role === 2 || user.role === '2');
     } catch (error) {
       console.error('Error fetching staff:', error);
+      throw error;
+    }
+  },
+  // LẤY THÔNG TIN KHÁCH HÀNG THEO ID
+  getCustomerById: async (userId) => {
+    try {
+      const response = await api.get(`/User/GetRenter/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching customer by ID:', error);
       throw error;
     }
   },

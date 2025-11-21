@@ -7,11 +7,19 @@ export default function CustomerInfoSection({ customer }) {
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
 
-  // gom tất cả ảnh (CCCD + BLX) vào 1 mảng
+  // Xử lý ảnh base64
+  const processBase64Image = (image) => {
+    if (!image) return null;
+    return `data:image/jpeg;base64,${image}`;
+  };
+
+  // Gom tất cả ảnh (CCCD + BLX) vào 1 mảng với thông tin
   const allImages = [
-    ...(customer?.idCardImages || []),
-    ...(customer?.idLicenseImages || []),
-  ].filter(Boolean); // bỏ null/undefined
+    { src: processBase64Image(customer?.idCardFrontImage), label: "CCCD - Mặt trước" },
+    { src: processBase64Image(customer?.idCardBackImage), label: "CCCD - Mặt sau" },
+    { src: processBase64Image(customer?.driverLicenseFrontImage), label: "BLX - Mặt trước" },
+    { src: processBase64Image(customer?.driverLicenseBackImage), label: "BLX - Mặt sau" },
+  ].filter(img => img.src); // Chỉ giữ ảnh có dữ liệu
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
@@ -41,7 +49,7 @@ export default function CustomerInfoSection({ customer }) {
               {customer?.avatar ? (
                 <img
                   src={customer?.avatar}
-                  alt={customer?.name}
+                  alt={customer?.fullName}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -61,7 +69,7 @@ export default function CustomerInfoSection({ customer }) {
               )}
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
-              {customer?.name}
+              {customer?.fullName}
             </h3>
             <p className="text-sm text-gray-600 mt-1">{customer?.email}</p>
           </div>
@@ -157,21 +165,15 @@ export default function CustomerInfoSection({ customer }) {
                 <div className="aspect-w-16 aspect-h-10">
                   <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
                     <img
-                      src={image}
-                      alt={`Giấy tờ ${idx + 1}`}
+                      src={image.src}
+                      alt={image.label}
                       className="w-full h-full object-cover"
                     />
                   </div>
                 </div>
                 <div className="p-3 bg-gray-50">
                   <p className="text-sm font-medium text-gray-900">
-                    {idx < (customer?.idCardImages?.length || 0)
-                      ? `CCCD - ${idx === 0 ? "Mặt trước" : "Mặt sau"}`
-                      : `BLX - ${
-                          idx - (customer?.idCardImages?.length || 0) === 0
-                            ? "Mặt trước"
-                            : "Mặt sau"
-                        }`}
+                    {image.label}
                   </p>
                 </div>
               </div>
@@ -186,7 +188,7 @@ export default function CustomerInfoSection({ customer }) {
 				close={() => setOpen(false)}
 				index={index}
 				plugins={[Zoom]}
-				slides={allImages.map((src) => ({ src }))}
+				slides={allImages.map((img) => ({ src: img.src }))}
 				styles={{
 					container: {
 						backgroundColor: "rgba(0, 0, 0, 0.7)", // nền sáng
