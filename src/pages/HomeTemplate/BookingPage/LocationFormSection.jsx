@@ -1,8 +1,70 @@
+import { useState, useEffect } from 'react';
 import { useStations } from '../../../contexts/StationsContext';
+import modelsApi from '../../../services/models.api';
 
 export default function LocationFormSection({ carModel, selectedLocation, onStationChange, availableCount }) {
   const { stations, loading: stationsLoading } = useStations();
-  const isOutOfStock = availableCount === 0;
+  const [actualAvailableCount, setActualAvailableCount] = useState(availableCount);
+  const [loadingQuantity, setLoadingQuantity] = useState(false);
+  const isOutOfStock = actualAvailableCount === 0;
+
+  // Fetch số xe khả dụng khi chọn trạm
+  useEffect(() => {
+    const fetchAvailableQuantity = async () => {
+      if (!selectedLocation || !carModel?.id) {
+        setActualAvailableCount(0);
+        return;
+      }
+
+      // Tìm station ID từ tên trạm
+      const selectedStation = stations.find(s => s.name === selectedLocation);
+      if (!selectedStation) {
+        setActualAvailableCount(0);
+        return;
+      }
+
+      setLoadingQuantity(true);
+      try {
+        const result = await modelsApi.getAvailableQuantityByStation(selectedStation.id);
+        console.log('API Response:', result);
+        console.log('Station ID:', selectedStation.id);
+        console.log('Looking for Model ID:', carModel.id);
+        
+        if (result.success && result.data) {
+          console.log('API Data:', result.data);
+          
+          // Kiểm tra nếu data là object với modelId làm key
+          if (typeof result.data === 'object' && !Array.isArray(result.data)) {
+            // Format: { modelId: quantity }
+            const quantity = result.data[carModel.id];
+            console.log('Found quantity (object format):', quantity);
+            setActualAvailableCount(quantity ?? 0);
+          } else if (Array.isArray(result.data)) {
+            // Format: [{ id: ..., availableQuantity: ... }]
+            const modelData = result.data.find(m => m.id === carModel.id);
+            console.log('Found model data (array format):', modelData);
+            setActualAvailableCount(modelData?.availableQuantity ?? modelData?.quantity ?? 0);
+          } else {
+            // Trường hợp khác, thử dùng trực tiếp
+            console.log('Direct data:', result.data);
+            setActualAvailableCount(result.data ?? 0);
+          }
+        } else {
+          console.log('API failed or no data');
+          setActualAvailableCount(0);
+        }
+      } catch (error) {
+        console.error('Error fetching available quantity:', error);
+        setActualAvailableCount(0);
+      } finally {
+        setLoadingQuantity(false);
+      }
+    };
+
+    fetchAvailableQuantity();
+  }, [selectedLocation, carModel?.id, stations]);
+  
+  const displayCount = loadingQuantity ? '...' : actualAvailableCount;
 
   return (
     <div className="space-y-6">
@@ -37,13 +99,22 @@ export default function LocationFormSection({ carModel, selectedLocation, onStat
         {selectedLocation && (
           <div className={`p-4 rounded-lg mb-6 ${isOutOfStock ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
             <div className="flex items-center">
-              <div className={`w-3 h-3 rounded-full mr-3 ${isOutOfStock ? 'bg-red-500' : 'bg-green-500'}`}></div>
-              <span className={`font-medium ${isOutOfStock ? 'text-red-700' : 'text-green-700'}`}>
-                {isOutOfStock 
-                  ? 'Không có xe khả dụng tại điểm này'
-                  : `Còn ${availableCount} xe khả dụng tại ${selectedLocation}`
-                }
-              </span>
+              {loadingQuantity ? (
+                <>
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-green-500 mr-3"></div>
+                  <span className="font-medium text-gray-700">Đang kiểm tra số lượng xe...</span>
+                </>
+              ) : (
+                <>
+                  <div className={`w-3 h-3 rounded-full mr-3 ${isOutOfStock ? 'bg-red-500' : 'bg-green-500'}`}></div>
+                  <span className={`font-medium ${isOutOfStock ? 'text-red-700' : 'text-green-700'}`}>
+                    {isOutOfStock 
+                      ? 'Không có xe khả dụng tại điểm này'
+                      : `Còn ${displayCount} xe khả dụng tại ${selectedLocation}`
+                    }
+                  </span>
+                </>
+              )}
             </div>
           </div>
         )}
