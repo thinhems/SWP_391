@@ -2,10 +2,8 @@
 export default function PasswordChangeSection({ 
   loading, 
   showPasswords, 
-  passwordForm, 
-  handlePasswordChange, 
-  togglePasswordVisibility, 
-  handleChangePassword 
+  formik,
+  togglePasswordVisibility
 }) {
   return (
     <div className="mt-12 pt-8 border-t border-gray-200">
@@ -14,7 +12,7 @@ export default function PasswordChangeSection({
         <p className="text-gray-600">Thay đổi mật khẩu để bảo mật tài khoản</p>
       </div>
       { /* form nhập mật khẩu cũ */ }
-      <form onSubmit={handleChangePassword} className="space-y-6">
+      <form onSubmit={formik.handleSubmit} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Mật khẩu hiện tại *
@@ -23,10 +21,14 @@ export default function PasswordChangeSection({
             <input
               type={showPasswords.current ? "text" : "password"}
               name="currentPassword"
-              value={passwordForm.currentPassword}
-              onChange={handlePasswordChange}
-              required
-              className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              value={formik.values.currentPassword}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                formik.errors.currentPassword && formik.touched.currentPassword 
+                  ? 'border-red-500' 
+                  : 'border-gray-300'
+              }`}
             />
             <button
               type="button"
@@ -45,6 +47,9 @@ export default function PasswordChangeSection({
               )}
             </button>
           </div>
+          {formik.errors.currentPassword && formik.touched.currentPassword && (
+            <p className="text-red-500 text-sm mt-1">{formik.errors.currentPassword}</p>
+          )}
         </div>
         {/* form nhập mật khẩu mới */}
         <div>
@@ -55,10 +60,14 @@ export default function PasswordChangeSection({
             <input
               type={showPasswords.new ? "text" : "password"}
               name="newPassword"
-              value={passwordForm.newPassword}
-              onChange={handlePasswordChange}
-              required
-              className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              value={formik.values.newPassword}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                formik.errors.newPassword && formik.touched.newPassword 
+                  ? 'border-red-500' 
+                  : 'border-gray-300'
+              }`}
             />
             <button
               type="button"
@@ -77,6 +86,9 @@ export default function PasswordChangeSection({
               )}
             </button>
           </div>
+          {formik.errors.newPassword && formik.touched.newPassword && (
+            <p className="text-red-500 text-sm mt-1">{formik.errors.newPassword}</p>
+          )}
         </div>
         {/* form nhập lại mật khẩu mới */}
         <div>
@@ -87,10 +99,14 @@ export default function PasswordChangeSection({
             <input
               type={showPasswords.confirm ? "text" : "password"}
               name="confirmPassword"
-              value={passwordForm.confirmPassword}
-              onChange={handlePasswordChange}
-              required
-              className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              value={formik.values.confirmPassword}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                formik.errors.confirmPassword && formik.touched.confirmPassword 
+                  ? 'border-red-500' 
+                  : 'border-gray-300'
+              }`}
             />
             <button
               type="button"
@@ -109,6 +125,9 @@ export default function PasswordChangeSection({
               )}
             </button>
           </div>
+          {formik.errors.confirmPassword && formik.touched.confirmPassword && (
+            <p className="text-red-500 text-sm mt-1">{formik.errors.confirmPassword}</p>
+          )}
         </div>
 
         <div>
@@ -123,7 +142,7 @@ export default function PasswordChangeSection({
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             )}
-            <span>Đổi mật khẩu</span>
+            <span>{loading ? 'Đang đổi mật khẩu...' : 'Đổi mật khẩu'}</span>
           </button>
         </div>
       </form>

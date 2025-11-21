@@ -10,7 +10,14 @@ export default function PersonalInfo({ user }) {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [isEditing, setIsEditing] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
-  const { updateProfile } = useAuth();
+   // state loading + show password
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+  const { updateProfile, changePassword } = useAuth();
   // Validation schema cho profile form
   const profileValidationSchema = Yup.object({
     name: Yup.string()
@@ -58,65 +65,58 @@ export default function PersonalInfo({ user }) {
     setIsEditing(false);
     profileFormik.resetForm();
   };
+  
+  // Validation schema cho password form
+  const passwordValidationSchema = Yup.object({
+    currentPassword: Yup.string()
+      .required('Vui lòng nhập mật khẩu hiện tại'),
+    newPassword: Yup.string()
+      .required('Vui lòng nhập mật khẩu mới')
+      .min(6, 'Mật khẩu mới phải có ít nhất 6 ký tự'),
+    confirmPassword: Yup.string()
+      .required('Vui lòng xác nhận mật khẩu mới')
+      .oneOf([Yup.ref('newPassword')], 'Mật khẩu xác nhận không khớp')
+  });
 
-  // password change state
-  const [passwordLoading, setPasswordLoading] = useState(false);
-  const [showPasswords, setShowPasswords] = useState({
-    current: false,
-    new: false,
-    confirm: false
+  // Formik cho password form
+  const passwordFormik = useFormik({
+    initialValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    },
+    validationSchema: passwordValidationSchema,
+    onSubmit: async (values, { resetForm }) => {
+      setPasswordLoading(true);
+      setMessage({ type: '', text: '' });
+
+      try {
+        // Chuẩn bị data theo format API yêu cầu
+        await changePassword(user.id, {
+          CurrentPassword: values.currentPassword,
+          NewPassword: values.newPassword,
+          ConfirmNewPassword: values.confirmPassword
+        });
+        
+        setMessage({ type: 'success', text: 'Đổi mật khẩu thành công!' });
+        resetForm();
+      } catch (error) {
+        setMessage({ 
+          type: 'error', 
+          text: error.response?.data?.message || error.response?.data?.title || 'Có lỗi xảy ra. Vui lòng thử lại!' 
+        });
+      } finally {
+        setPasswordLoading(false);
+      }
+    }
   });
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-  const handlePasswordChange = (e) => {
-    setPasswordForm({
-      ...passwordForm,
-      [e.target.name]: e.target.value
-    });
-  };
+
   // handle show/hide password
   const togglePasswordVisibility = (field) => {
     setShowPasswords(prev => ({
       ...prev,
       [field]: !prev[field]
     }));
-  };
-  // handle submit đổi mật khẩu
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
-    setPasswordLoading(true);
-    setMessage({ type: '', text: '' });
-
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setMessage({ type: 'error', text: 'Mật khẩu mới không khớp!' });
-      setPasswordLoading(false);
-      return;
-    }
-
-    if (passwordForm.newPassword.length < 6) {
-      setMessage({ type: 'error', text: 'Mật khẩu mới phải có ít nhất 6 ký tự!' });
-      setPasswordLoading(false);
-      return;
-    }
-
-    try {
-      // fake call API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setMessage({ type: 'success', text: 'Đổi mật khẩu thành công!' });
-      setPasswordForm({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Có lỗi xảy ra. Vui lòng thử lại!' });
-    } finally {
-      setPasswordLoading(false);
-    }
   };
 
   return (
@@ -155,10 +155,8 @@ export default function PersonalInfo({ user }) {
         <PasswordChangeSection 
           loading={passwordLoading}
           showPasswords={showPasswords}
-          passwordForm={passwordForm}
-          handlePasswordChange={handlePasswordChange}
+          formik={passwordFormik}
           togglePasswordVisibility={togglePasswordVisibility}
-          handleChangePassword={handleChangePassword}
         />
       </div>
     </div>
