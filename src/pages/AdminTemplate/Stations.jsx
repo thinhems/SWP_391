@@ -12,12 +12,36 @@ export default function Stations() {
   const [loadingVehicles, setLoadingVehicles] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [allVehicles, setAllVehicles] = useState([]);
+  const [loadingAllVehicles, setLoadingAllVehicles] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     location: '',
     description: '',
     capacity: 50
   });
+
+  // Load tất cả vehicles khi component mount
+  useEffect(() => {
+    const loadVehicles = async () => {
+      try {
+        const vehicles = await carService.getCars();
+        setAllVehicles(vehicles);
+      } catch (error) {
+        console.error('Error loading all vehicles:', error);
+        setAllVehicles([]);
+      } finally {
+        setLoadingAllVehicles(false);
+      }
+    };
+    
+    loadVehicles();
+  }, []);
+
+  // Hàm đếm số xe theo station ID
+  const getVehicleCount = (stationId) => {
+    return allVehicles.filter(v => v.stationID === stationId).length;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,18 +54,10 @@ export default function Stations() {
   const handleViewDetail = async (station) => {
     setSelectedStation(station);
     setShowDetailModal(true);
-    setLoadingVehicles(true);
     
-    try {
-      const allVehicles = await carService.getCars();
-      const filteredVehicles = allVehicles.filter(v => v.stationID === station.id);
-      setStationVehicles(filteredVehicles);
-    } catch (error) {
-      console.error('Error loading vehicles:', error);
-      setStationVehicles([]);
-    } finally {
-      setLoadingVehicles(false);
-    }
+    // Sử dụng allVehicles đã load sẵn
+    const filteredVehicles = allVehicles.filter(v => v.stationID === station.id);
+    setStationVehicles(filteredVehicles);
   };
 
   const getStatusBadge = (status) => {
@@ -193,7 +209,7 @@ export default function Stations() {
             <div>
               <p className="text-gray-500 text-sm">Số xe hiện có</p>
               <h3 className="text-2xl font-bold text-purple-600 mt-1">
-                {stations.reduce((sum, s) => sum + (s.quantity || 0), 0)}
+                {loadingAllVehicles ? '...' : allVehicles.length}
               </h3>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
@@ -266,7 +282,9 @@ export default function Stations() {
                   </div>
                   <div className="bg-gray-50 rounded-lg p-3">
                     <p className="text-xs text-gray-500 mb-1">Hiện có</p>
-                    <p className="text-lg font-semibold text-green-600">{station.quantity || 0} xe</p>
+                    <p className="text-lg font-semibold text-green-600">
+                      {loadingAllVehicles ? '...' : getVehicleCount(station.id)} xe
+                    </p>
                   </div>
                 </div>
 
@@ -463,12 +481,7 @@ export default function Stations() {
                 Danh sách xe ({stationVehicles.length})
               </h4>
 
-              {loadingVehicles ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-b-4 border-gray-300"></div>
-                  <p className="mt-4 text-gray-600">Đang tải danh sách xe...</p>
-                </div>
-              ) : stationVehicles.length === 0 ? (
+              {stationVehicles.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-lg">
                   <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />

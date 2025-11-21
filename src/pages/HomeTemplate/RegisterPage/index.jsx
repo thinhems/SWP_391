@@ -53,23 +53,35 @@ export default function RegisterPage() {
         fullName: values.fullName,
         email: values.email,
         phone: values.phone,
-        password: values.password
+        password: values.password,
+        confirmPassword: values.confirmPassword
       });
-      if (result.success) {
-        alert('Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.');
-        navigate('/login');
-      } else {
-        if (result.errors) {
-          Object.keys(result.errors).forEach(field => {
-            setFieldError(field, result.errors[field]);
-          });
-        } else {
-          setStatus(result.message || 'Đăng ký thất bại');
-        }
-      }
+      
+      console.log('Register result:', result);
+      
+      // Xử lý response từ BE
+      alert('Đăng ký thành công! Vui lòng đăng nhập.');
+      navigate('/login');
     } catch (error) {
       console.error('Register error:', error);
-      setStatus('Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.');
+      
+      // Xử lý error từ BE
+      let errorMessage = 'Đăng ký thất bại';
+      
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error.message) {
+        errorMessage = error.message;
+      } else if (error.errors) {
+        // Validation errors từ BE
+        Object.keys(error.errors).forEach(field => {
+          const fieldName = field.charAt(0).toLowerCase() + field.slice(1);
+          setFieldError(fieldName, error.errors[field][0] || error.errors[field]);
+        });
+        errorMessage = 'Vui lòng kiểm tra lại thông tin';
+      }
+      
+      setStatus(errorMessage);
     } finally {
       setSubmitting(false);
     }
