@@ -17,6 +17,7 @@ import ConfirmSignaturePage from './pages/HomeTemplate/ConfirmSignaturePage';
 import PaymentResultPage from './pages/HomeTemplate/PaymentResultPage';
 import AboutPage from './pages/HomeTemplate/AboutPage';
 import ContactPage from './pages/HomeTemplate/ContactPage';
+import EmailVerifyPage from './pages/HomeTemplate/EmailVerifyPage';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminTemplate/Dashboard';
 import FleetOverview from './pages/AdminTemplate/FleetOverview';
@@ -83,6 +84,7 @@ function App() {
               <Route path="contact" element={<ContactPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
+              <Route path="verify" element={<EmailVerifyPage />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="model-rental" element={<ModelListPage />} />
               <Route path="booking/:modelId" element={<BookingPage />} />

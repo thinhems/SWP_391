@@ -117,22 +117,31 @@ export const authService = {
   // Register user
   register: async (userData) => {
     try {
+      console.log('Register - Request data:', userData);
+      
       const response = await api.post('/Auth/register', {
+        fullName: userData.fullName,
         email: userData.email,
+        phone: userData.phone,
         password: userData.password,
-        fullName: userData.name,
-        phoneNumber: userData.phone
+        confirmPassword: userData.confirmPassword
       });
-      return { 
-        success: response.data.success, 
-        data: response.data.data,
-        error: response.data.success ? null : response.data.message
-      };
+      
+      console.log('Register - Response:', response.data);
+      
+      // Trả về response từ BE nguyên bản
+      return response.data;
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Đăng ký thất bại' 
-      };
+      console.error('Register - Error:', error);
+      console.error('Register - Error response:', error.response?.data);
+      
+      // Nếu có error response từ BE, throw nó
+      if (error.response?.data) {
+        throw error.response.data;
+      }
+      
+      // Nếu không có response, throw error message
+      throw new Error(error.message || 'Đăng ký thất bại');
     }
   },
 

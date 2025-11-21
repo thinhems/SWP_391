@@ -79,5 +79,25 @@ export const customersService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  // Tạo nhân viên mới
+  createStaff: async (staffData) => {
+    try {
+      const formData = new FormData();
+      formData.append('UserID', staffData.userId);
+      formData.append('StationID', staffData.stationId);
+      formData.append('StaffCode', staffData.staffCode);
+
+      const response = await api.post('/User/CreateStaffProfile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error creating staff:', error);
+      throw error;
+    }
   }
 }
