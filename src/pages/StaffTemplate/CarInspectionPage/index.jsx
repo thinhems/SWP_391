@@ -11,11 +11,12 @@ export default function CarInspectionPage() {
   let { carId } = useParams();
   carId = parseInt(carId, 10);
   const navigate = useNavigate();
-  const { updateCar, carsData, loading, updateCarInspectionItem, uploadCarImage } = useCars();
+  const { updateCar, carsData, loading, updateCarInspectionItem, uploadCarImage, deleteCarImage } = useCars();
   const { addActivity } = useActivities();
   const [carData, setCarData] = useState(null);
   const [carImages, setCarImages] = useState([]);
   const [error, setError] = useState(null);
+  const [loadingImages, setLoadingImages] = useState(false);
   // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
     checklist: [],
@@ -75,16 +76,28 @@ export default function CarInspectionPage() {
   };
 
   // xử lý xóa ảnh xe
-  const handleRemoveCarImage = (index) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa ảnh xe này?')) {
-      setCarImages(prev => prev.filter((_, i) => i !== index));
-    }
+  const handleRemoveCarImage = async (carId, base64Image) => {
+    setLoadingImages(true); 
+    try {
+      // xóa chuỗi data:image/jpeg;base64
+      let cleanBase64 = base64Image;
+      if (base64Image.startsWith('data:')) {
+        cleanBase64 = base64Image.split(',')[1];
+      }
+      await deleteCarImage(carId, cleanBase64);
+      setCarImages(prev => prev.filter(img => img !== base64Image));
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      alert('Có lỗi xảy ra khi xóa ảnh. Vui lòng thử lại.');
+    } finally {
+      setLoadingImages(false);
+    } 
   };
 
   // xử lý upload ảnh xe mới
   const handleCarImageUpload = async (event) => {
+    setLoadingImages(true); 
     const files = Array.from(event.target.files);
-    
     for (const file of files) {
       if (file.type.startsWith('image/')) {
         try {
@@ -92,7 +105,9 @@ export default function CarInspectionPage() {
         } catch (error) {
           console.error('Error uploading image:', error);
           alert('Có lỗi xảy ra khi upload ảnh. Vui lòng thử lại.');
-        }
+        } finally {   
+          setLoadingImages(false);
+        } 
       }
     }
   };
@@ -177,30 +192,44 @@ export default function CarInspectionPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <CarInspectionHeader 
-        carData={carData}
-        carId={carId}
-        onCarDataUpdate={handleCarDataUpdate}
-        onNavigateBack={() => navigate('/staff/manage-cars?tab=available')}
-      />
-      
-      <CarImagesSection 
-        carImages={carImages}
-        onRemoveImage={handleRemoveCarImage}
-        onUploadImage={handleCarImageUpload}
-      />
-      
-      <CarInspectionContent
-        organizedChecklist={organizedChecklist}
-        onStatusChange={handleStatusChange}
-      />
-      
-      <CarInspectionSummary
-        inspectionData={inspectionData}
-        onCancel={() => navigate('/staff/manage-cars?tab=available')}
-        onSave={handleSaveInspection}
-      />
-    </div>
+    <>
+      {/* Loading overlay khi đang xử lý ảnh */}
+      {loadingImages && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}>
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
+            <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
+          </div>
+        </div>
+      )}
+      <div className="max-w-6xl mx-auto space-y-6">
+        <CarInspectionHeader 
+          carData={carData}
+          carId={carId}
+          onCarDataUpdate={handleCarDataUpdate}
+          onNavigateBack={() => navigate('/staff/manage-cars?tab=available')}
+        />
+        
+        <CarImagesSection 
+          carId={carId}
+          carImages={carImages}
+          onRemoveImage={handleRemoveCarImage}
+          onUploadImage={handleCarImageUpload}
+        />
+        
+        <CarInspectionContent
+          organizedChecklist={organizedChecklist}
+          onStatusChange={handleStatusChange}
+        />
+        
+        <CarInspectionSummary
+          inspectionData={inspectionData}
+          onCancel={() => navigate('/staff/manage-cars?tab=available')}
+          onSave={handleSaveInspection}
+        />
+      </div>
+    </>
   );
 }

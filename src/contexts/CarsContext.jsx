@@ -144,6 +144,15 @@ export const CarsProvider = ({ children }) => {
       throw error;
     }
   };
+  // xóa ảnh xe
+  const deleteCarImage = async (vehicleId, base64Image) => { 
+    try {
+      await carService.deleteCarImage(vehicleId, base64Image);
+      await fetchListCars();
+    } catch (error) {
+      throw error;
+    }
+  };
   const value = {
     carsData,
     loading,
@@ -154,6 +163,7 @@ export const CarsProvider = ({ children }) => {
     rejectCarApproval,
     updateCarInspectionItem,
     uploadCarImage,
+    deleteCarImage,
     setUserStation // Thêm function để set station từ bên ngoài
   };
 

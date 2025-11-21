@@ -104,6 +104,17 @@ export default function CustomerManagementPage() {
 
   return (
     <>
+      {/* Loading update type */}
+        {updating && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}>
+            <div className="relative">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
+              <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
+            </div>
+          </div>
+        )}
       <div className="space-y-6">
         <CustomerStatsHeader 
           customers={customers} 
@@ -133,18 +144,6 @@ export default function CustomerManagementPage() {
           onClassify={handleClassifyCustomer}
         />
       </div>
-
-      {/* Loading update type */}
-      {updating && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
-            <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
