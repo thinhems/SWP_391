@@ -88,4 +88,19 @@ export const carService = {
       throw error;
     }
   },
+  // Xóa ảnh xe theo base64
+  deleteCarImage: async (vehicleId, base64Image) => {
+    try {
+      const requestData = {
+        VehicleId: vehicleId,
+        Base64Image: base64Image
+      };
+      
+      const response = await api.post('/images/vehicle/delete-by-base64/', requestData);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting car image:', error.response?.data || error.message);
+      throw error;
+    }
+  },
 };

@@ -114,13 +114,6 @@ export default function bookingInfoSection({ carData }) {
           </div>
         </div>
       </div>
-      {/* ghi chú */}
-      <div className="mt-6 pt-6 border-t border-gray-200">
-        <h4 className="font-semibold text-gray-800 mb-3">Ghi chú từ khách hàng</h4>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-gray-800 italic">{booking?.notes ? booking.notes : 'Không có ghi chú'}</p>
-        </div>
-      </div>
       {/* lưu ý quan trọng */}
       <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
         <div className="flex items-start space-x-3">

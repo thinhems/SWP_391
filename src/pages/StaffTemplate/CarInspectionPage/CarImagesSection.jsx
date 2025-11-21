@@ -1,4 +1,5 @@
 export default function CarImagesSection({ 
+  carId,
   carImages,
   onRemoveImage,
   onUploadImage
@@ -40,7 +41,7 @@ export default function CarImagesSection({
                   className="w-full h-40 object-cover rounded-lg border-2 border-gray-200"
                 />
                 <button
-                  onClick={() => onRemoveImage(index)}
+                  onClick={() => onRemoveImage(carId, image)}
                   className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-lg text-xl font-bold"
                   title="Xóa ảnh xe"
                 >
