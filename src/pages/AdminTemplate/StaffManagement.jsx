@@ -13,12 +13,17 @@ export default function StaffManagement() {
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { stations } = useStations();
   const [formData, setFormData] = useState({
-    userId: '',
+    fullName: '',
+    password: '',
+    email: '',
+    phone: '',
+    address: '',
     stationId: '',
-    staffCode: ''
+    isActive: true
   });
 
   // Fetch danh sách nhân viên (role = 2)
@@ -84,18 +89,26 @@ export default function StaffManagement() {
     setSubmitting(true);
     
     try {
-      await customersService.createStaff({
-        userId: parseInt(formData.userId),
+      await customersService.createStaffNew({
+        fullName: formData.fullName,
+        password: formData.password,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
         stationId: parseInt(formData.stationId),
-        staffCode: formData.staffCode
+        isActive: formData.isActive
       });
 
       alert('Thêm nhân viên thành công!');
       setShowAddModal(false);
       setFormData({
-        userId: '',
+        fullName: '',
+        password: '',
+        email: '',
+        phone: '',
+        address: '',
         stationId: '',
-        staffCode: ''
+        isActive: true
       });
       
       // Refresh staff list
@@ -103,6 +116,56 @@ export default function StaffManagement() {
     } catch (error) {
       console.error('Error creating staff:', error);
       alert('Có lỗi xảy ra khi thêm nhân viên. Vui lòng thử lại!');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEdit = (staff) => {
+    setSelectedStaff(staff);
+    setFormData({
+      fullName: staff.fullName || staff.name || '',
+      password: '',
+      email: staff.email || '',
+      phone: staff.phone || '',
+      address: staff.address || '',
+      stationId: staff.staff?.stationID || '',
+      isActive: staff.isActive !== undefined ? staff.isActive : true
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    
+    try {
+      await customersService.updateStaff(selectedStaff.id, {
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        stationId: parseInt(formData.stationId)
+      });
+
+      alert('Cập nhật nhân viên thành công!');
+      setShowEditModal(false);
+      setSelectedStaff(null);
+      setFormData({
+        fullName: '',
+        password: '',
+        email: '',
+        phone: '',
+        address: '',
+        stationId: '',
+        isActive: true
+      });
+      
+      // Refresh staff list
+      fetchStaff();
+    } catch (error) {
+      console.error('Error updating staff:', error);
+      alert('Có lỗi xảy ra khi cập nhật nhân viên. Vui lòng thử lại!');
     } finally {
       setSubmitting(false);
     }
@@ -281,6 +344,9 @@ export default function StaffManagement() {
                   Liên hệ
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Trạm làm việc
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Vai trò
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -331,6 +397,18 @@ export default function StaffManagement() {
                       <div className="text-sm text-gray-500">{staff.email || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      {staff.staff?.stationName ? (
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {staff.staff.stationName}
+                          </div>
+                          
+                        </div>
+                      ) : (
+                        <span className="text-sm text-gray-400 italic">Chưa phân công</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                         Staff
                       </span>
@@ -353,7 +431,11 @@ export default function StaffManagement() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                       </button>
-                      <button className="text-yellow-600 hover:text-yellow-900 mr-3">
+                      <button 
+                        onClick={() => handleEdit(staff)}
+                        className="text-yellow-600 hover:text-yellow-900 mr-3"
+                        title="Chỉnh sửa"
+                      >
                         <svg className="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
@@ -441,13 +523,14 @@ export default function StaffManagement() {
       {/* Detail Modal */}
       {showDetailModal && selectedStaff && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-500 to-blue-600">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-gray-900">Thông tin nhân viên</h3>
+                <h3 className="text-xl font-bold text-white">Thông tin chi tiết nhân viên</h3>
                 <button
                   onClick={() => setShowDetailModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-white hover:text-gray-200 transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -455,53 +538,161 @@ export default function StaffManagement() {
                 </button>
               </div>
             </div>
+
+            {/* Content */}
             <div className="p-6">
-              <div className="flex items-center mb-6">
-                <div className="h-20 w-20 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-3xl font-semibold">
+              {/* Profile Section */}
+              <div className="flex items-center mb-6 pb-6 border-b border-gray-200">
+                <div className="h-24 w-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-4xl font-bold shadow-lg">
                   {(selectedStaff.fullName || selectedStaff.name || 'N').charAt(0).toUpperCase()}
                 </div>
-                <div className="ml-6">
+                <div className="ml-6 flex-1">
                   <h4 className="text-2xl font-bold text-gray-900">{selectedStaff.fullName || selectedStaff.name || 'N/A'}</h4>
-                  <p className="text-gray-500">ID: #{selectedStaff.id}</p>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                      Nhân viên
+                    </span>
+                    <span className="px-3 py-1 inline-flex items-center text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      Đang hoạt động
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Email</label>
-                    <p className="mt-1 text-gray-900">{selectedStaff.email || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Số điện thoại</label>
-                    <p className="mt-1 text-gray-900">{selectedStaff.phone || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Vai trò</label>
-                    <p className="mt-1">
-                      <span className="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                        Staff
-                      </span>
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Trạng thái</label>
-                    <p className="mt-1">
-                      <span className="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                        Hoạt động
-                      </span>
-                    </p>
+
+              {/* Information Grid */}
+              <div className="space-y-6">
+                {/* Personal Information */}
+                <div>
+                  <h5 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Thông tin cá nhân
+                  </h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">ID Nhân viên</label>
+                      <p className="mt-1 text-base font-semibold text-gray-900">#{selectedStaff.id}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Họ và tên</label>
+                      <p className="mt-1 text-base font-semibold text-gray-900">{selectedStaff.fullName || selectedStaff.name || 'N/A'}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Email</label>
+                      <p className="mt-1 text-base text-blue-600 break-all">{selectedStaff.email || 'N/A'}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Số điện thoại</label>
+                      <p className="mt-1 text-base font-semibold text-gray-900">{selectedStaff.phone || 'N/A'}</p>
+                    </div>
+                    {selectedStaff.address && (
+                      <div className="bg-gray-50 p-4 rounded-lg col-span-2">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Địa chỉ</label>
+                        <p className="mt-1 text-base text-gray-900">{selectedStaff.address}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {/* Work Information */}
+                <div>
+                  <h5 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Thông tin công việc
+                  </h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Trạm làm việc</label>
+                      <p className="mt-1 text-base font-semibold text-gray-900">
+                        {selectedStaff.staff?.stationName ? (
+                          <>
+                            {selectedStaff.staff.stationName}
+                            
+                          </>
+                        ) : 'Chưa phân công'}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Vai trò</label>
+                      <p className="mt-1">
+                        <span className="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
+                          Nhân viên (Staff)
+                        </span>
+                      </p>
+                    </div>
+                    {selectedStaff.staffCode && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Mã nhân viên</label>
+                        <p className="mt-1 text-base font-semibold text-gray-900">{selectedStaff.staffCode}</p>
+                      </div>
+                    )}
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái tài khoản</label>
+                      <p className="mt-1">
+                        {selectedStaff.isActive !== false ? (
+                          <span className="px-3 py-1 inline-flex items-center text-sm font-semibold rounded-full bg-green-100 text-green-800">
+                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            Hoạt động
+                          </span>
+                        ) : (
+                          <span className="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-red-100 text-red-800">
+                            Không hoạt động
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Account Information */}
+                {(selectedStaff.createdAt || selectedStaff.roleID) && (
+                  <div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                     
+                      {selectedStaff.createdAt && (
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày tạo</label>
+                          <p className="mt-1 text-base text-gray-900">
+                            {new Date(selectedStaff.createdAt).toLocaleDateString('vi-VN')}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
+
+            {/* Footer */}
             <div className="p-6 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
               <button
                 onClick={() => setShowDetailModal(false)}
-                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
               >
                 Đóng
               </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button 
+                onClick={() => {
+                  setShowDetailModal(false);
+                  handleEdit(selectedStaff);
+                }}
+                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
                 Chỉnh sửa
               </button>
             </div>
@@ -529,21 +720,83 @@ export default function StaffManagement() {
 
             <form onSubmit={handleSubmit} className="p-6">
               <div className="space-y-4">
-                {/* User ID */}
+                {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    User ID <span className="text-red-500">*</span>
+                    Họ và tên <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type="number"
-                    name="userId"
-                    value={formData.userId}
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
                     onChange={handleInputChange}
                     required
-                    placeholder="Nhập User ID"
+                    placeholder="Nhập họ và tên"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-                  <p className="mt-1 text-xs text-gray-500">ID của user muốn chuyển thành nhân viên</p>
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Mật khẩu <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Nhập mật khẩu"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="user@example.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Số điện thoại <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="+3287362080565"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Address */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Địa chỉ
+                  </label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    placeholder="Nhập địa chỉ"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
                 </div>
 
                 {/* Station Selection */}
@@ -567,21 +820,18 @@ export default function StaffManagement() {
                   </select>
                 </div>
 
-                {/* Staff Code */}
+                {/* IsActive */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Mã nhân viên <span className="text-red-500">*</span>
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="isActive"
+                      checked={formData.isActive}
+                      onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Kích hoạt tài khoản</span>
                   </label>
-                  <input
-                    type="text"
-                    name="staffCode"
-                    value={formData.staffCode}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="VD: NV001, STAFF001"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Mã định danh duy nhất cho nhân viên</p>
                 </div>
               </div>
 
@@ -609,6 +859,167 @@ export default function StaffManagement() {
                     </>
                   ) : (
                     'Thêm nhân viên'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Staff Modal */}
+      {showEditModal && selectedStaff && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-gray-900">Chỉnh sửa nhân viên</h3>
+                <button
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setSelectedStaff(null);
+                    setFormData({
+                      fullName: '',
+                      password: '',
+                      email: '',
+                      phone: '',
+                      address: '',
+                      stationId: '',
+                      isActive: true
+                    });
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleUpdate} className="p-6">
+              <div className="space-y-4">
+                {/* Full Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Họ và tên <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Nhập họ và tên"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="user@example.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Số điện thoại <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="+3002809982"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Address */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Địa chỉ
+                  </label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    placeholder="Nhập địa chỉ"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Station Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Trạm làm việc <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="stationId"
+                    value={formData.stationId}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">-- Chọn trạm --</option>
+                    {stations.map(station => (
+                      <option key={station.id} value={station.id}>
+                        {station.name} - {station.location}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setSelectedStaff(null);
+                    setFormData({
+                      fullName: '',
+                      password: '',
+                      email: '',
+                      phone: '',
+                      address: '',
+                      stationId: '',
+                      isActive: true
+                    });
+                  }}
+                  disabled={submitting}
+                  className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {submitting ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Đang cập nhật...
+                    </>
+                  ) : (
+                    'Cập nhật'
                   )}
                 </button>
               </div>

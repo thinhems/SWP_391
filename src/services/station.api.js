@@ -42,6 +42,36 @@ export const stationService = {
       console.error('Error creating station:', error);
       throw error;
     }
+  },
+
+  /**
+   * Update an existing station
+   * @param {number} id - Station ID
+   * @param {Object} stationData - Station data to update
+   * @param {string} stationData.name - Station name
+   * @param {string} stationData.location - Station location
+   * @param {string} stationData.description - Station description
+   * @param {number} stationData.capacity - Station capacity
+   * @returns {Promise} Updated station
+   */
+  updateStation: async (id, stationData) => {
+    try {
+      const formData = new FormData();
+      formData.append('Name', stationData.name);
+      formData.append('Description', stationData.description);
+      formData.append('Location', stationData.location);
+      formData.append('Capacity', stationData.capacity);
+
+      const response = await api.put(`/Station/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error updating station:', error);
+      throw error;
+    }
   }
 };
 
