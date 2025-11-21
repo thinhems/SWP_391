@@ -81,6 +81,14 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const changePassword = async (userId, passwordData) => {
+    try {
+      await authService.changePassword(userId, passwordData);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   const value = {
     user,
     login,
@@ -89,6 +97,7 @@ export const AuthProvider = ({ children }) => {
     verifyAccount,
     updateProfile,
     getProfile,
+    changePassword,
     isAuthenticated: !!user,
     loading
   };

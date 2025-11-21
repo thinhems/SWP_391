@@ -233,7 +233,20 @@ export const authService = {
       throw error;
     } 
   }, 
-
-};
+  // đổi mk
+  changePassword: async (userId, passwords) => {
+    try {
+      const response = await api.post(`/Auth/change-password`, {
+        userId: userId,
+        CurrentPassword: passwords.CurrentPassword,
+        NewPassword: passwords.NewPassword,
+        ConfirmNewPassword: passwords.ConfirmNewPassword
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+}
 
 export default authService;
