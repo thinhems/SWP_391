@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { mockCustomers } from '../data/mockCustomers';
 import { customersService } from '../services/customers.api';
 
@@ -16,10 +16,13 @@ export const CustomersProvider = ({ children }) => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isFirstLoadRef = useRef(true); // ← Thêm ref
 
   // Fetch dữ liệu khách hàng
   const fetchCustomers = async () => {
-    setLoading(true);
+    if (isFirstLoadRef.current) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const data = await customersService.getAllUsers();
@@ -28,12 +31,28 @@ export const CustomersProvider = ({ children }) => {
       console.error('Error fetching customers data:', err);
       setError('Có lỗi xảy ra khi tải dữ liệu khách hàng');
     } finally {
-      setLoading(false);
+       if (isFirstLoadRef.current) {
+        setLoading(false);
+        isFirstLoadRef.current = false; // ← Đánh dấu đã load xong
+      }
     }
   };
 
   useEffect(() => {
     fetchCustomers();
+    // Auto refresh mỗi 20 giây
+    const intervalId = setInterval(() => {
+      const currentPath = window.location.pathname;
+      const isInManageCustomerPage = currentPath.includes('/manage-customer');
+      const isInVerifyPage = currentPath.includes('/verify');
+      
+      // Chỉ refresh khi ở trang manage-customer và KHÔNG ở trang verify
+      if (isInManageCustomerPage && !isInVerifyPage) {
+        fetchCustomers();
+      }
+    }, 20000);
+    
+    return () => clearInterval(intervalId);
   }, []);
   // Tính toán số liệu cho khách hàng
   const customersData = {
@@ -56,27 +75,34 @@ export const CustomersProvider = ({ children }) => {
       prevCustomers.map(c => c.id === customerId ? { ...c, ...updatedData } : c)
     );
   };
-
-  // Refresh customers data
-  const refreshCustomers = async () => {
-    setLoading(true);
+  // cập nhật status verify khách hàng
+  const updateVerificationStatus = async (customerId, status) => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setCustomers([...mockCustomers]);
-    } catch (err) {
-      console.error('Error refreshing customers:', err);
-    } finally {
-      setLoading(false);
+      await customersService.updateVerificationStatus(customerId, status);
+      await fetchCustomers();
+    } catch (error) {
+      console.error('Error updating verification status:', error);
+      throw error;
     }
   };
-
+  // update type khách hàng
+  const updateCustomerType = async (customerId, type) => {
+    try {
+      await customersService.updateTypeCus(customerId, type);
+      await fetchCustomers();
+    } catch (error) {
+      console.error('Error updating customer type:', error);
+      throw error;
+    }
+  };
   const value = {
     customersData,
     loading,
     error,
     fetchCustomers,
     updateCustomer,
-    refreshCustomers
+    updateVerificationStatus,
+    updateCustomerType
   };
 
   return (

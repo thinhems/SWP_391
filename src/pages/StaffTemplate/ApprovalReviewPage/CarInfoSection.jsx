@@ -5,6 +5,13 @@ import "yet-another-react-lightbox/styles.css";
 export default function CarInfoSection({ car }) {
 	const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
+	
+	// Xử lý ảnh base64 cho lightbox
+	const lightboxSlides = car?.images?.map((image) => {
+		const imageSrc = `data:image/jpeg;base64,${image}`;
+		return { src: imageSrc };
+	}) || [];
+	
 	// hàm lấy màu pin
   const getBatteryColor = (battery) => {
     if (battery >= 80) return 'text-green-600 bg-green-100';
@@ -41,21 +48,25 @@ export default function CarInfoSection({ car }) {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
-              {car.images.slice(0, 4).map((image, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg overflow-hidden cursor-pointer" onClick={() => {
-                  setIndex(index);
-                  setOpen(true);
-                }}>
-                  <div className="aspect-w-16 aspect-h-12">
-                    <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
-                      <img 
-                        src={image} 
-                        alt={`${car?.modelName} - Ảnh ${index + 1}`}
-                        className="w-full h-full object-cover"/>
+              {car.images.slice(0, 4).map((image, index) => {
+                // Xử lý ảnh base64
+                const imageSrc =  `data:image/jpeg;base64,${image}`;
+                return (
+                  <div key={index} className="border border-gray-200 rounded-lg overflow-hidden cursor-pointer" onClick={() => {
+                    setIndex(index);
+                    setOpen(true);
+                  }}>
+                    <div className="aspect-w-16 aspect-h-12">
+                      <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
+                        <img 
+                          src={imageSrc} 
+                          alt={`${car?.modelName} - Ảnh ${index + 1}`}
+                          className="w-full h-full object-cover"/>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -65,7 +76,7 @@ export default function CarInfoSection({ car }) {
 					close={() => setOpen(false)}
 					index={index}
 					plugins={[Zoom]}
-					slides={car?.images?.map((src) => ({ src }))}
+					slides={lightboxSlides}
 					styles={{
 						container: {
 							backgroundColor: "rgba(0, 0, 0, 0.7)", // nền sáng

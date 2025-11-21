@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 export default function CustomerList({ 
   customers = [], 
   allCustomersCount = 0,
@@ -7,10 +7,11 @@ export default function CustomerList({
   totalPages = 1,
   startIndex = 0,
   endIndex = 0,
-  onPageChange
+  onPageChange,
+  onOpenClassifyModal
 }) {
   const navigate = useNavigate();
-  const [openDropdown, setOpenDropdown] = useState(null);
+
   // Mảng các loại khách hàng
   const customerTypes = [
     { 
@@ -22,56 +23,47 @@ export default function CustomerList({
     { 
       value: 'regular', 
       label: 'Thường xuyên', 
-      color: 'bg-gray-600',
-      hoverBg: 'hover:bg-gray-50' 
+      color: 'bg-purple-600',
+      hoverBg: 'hover:bg-purple-50' 
     },
     { 
       value: 'vip', 
       label: 'VIP', 
-      color: 'bg-purple-600',
-      hoverBg: 'hover:bg-purple-50' 
+      color: 'bg-yellow-600',
+      hoverBg: 'hover:bg-yellow-50' 
     }
   ];
   // hàm lấy nhãn trạng thái
   const getStatusBadge = (status) => {
     const config = {
-      verified: { bg: 'bg-green-100', text: 'text-green-800', label: 'Đã xác thực', icon: '✓' },
-      unverified: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Chưa xác thực', icon: '⏳' }
+      3: { bg: 'bg-green-100', text: 'text-green-800', label: 'Đã xác thực' },
+      2: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Chờ xác thực'},
+      1: { bg: 'bg-red-100', text: 'text-red-800', label: 'Chưa xác thực'}
     };
-    const c = config[status] || config.unverified;
+    const c = config[status] || config[1];
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-medium ${c.bg} ${c.text} inline-flex items-center`}>
-        <span className="mr-1">{c.icon}</span>
         {c.label}
       </span>
     );
   };
-  // hàm lấy nhãn loại khách hàng
+  // hàm lấy loại khách hàng
   const getTypeBadge = (type) => {
     const config = {
-      new: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Mới' },
-      regular: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Thường xuyên' },
-      vip: { bg: 'bg-purple-100', text: 'text-purple-800', label: 'VIP' }
+      1: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Mới' },
+      2: { bg: 'bg-purple-100', text: 'text-purple-800', label: 'Thường xuyên' },
+      3: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'VIP' }
     };
-    const c = config[type] || config.new;
+    const c = config[type] || config[1];
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${c.bg} ${c.text}`}>
         {c.label}
       </span>
     );
   };
-  // hàm toggle dropdown
-  const toggleDropdown = (customerId) => {
-    setOpenDropdown(openDropdown === customerId ? null : customerId);
-  };
   // hàm kiểm tra tài khoản khách hàng
   const handleVerifyAccount = (customer) => {
     navigate(`/staff/manage-customer/verify/${customer.id}`);
-  };
-  // hàm xử lý chọn loại khách hàng
-  const handleClassifySelect = (customer, type) => {
-    alert(`Phân loại khách hàng: ${customer.fullName}\n(Chức năng sẽ được phát triển)`);
-    setOpenDropdown(null); // Đóng dropdown sau khi chọn
   };
   // hàm render phân trang
   const renderPagination = () => {
@@ -175,7 +167,7 @@ export default function CustomerList({
   }
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -211,13 +203,13 @@ export default function CustomerList({
                       <div className="flex-shrink-0 h-10 w-10">
                         <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                           <span className="text-blue-600 font-semibold">
-                            {customer.fullName.charAt(0)}
+                            {customer.fullName.toUpperCase().charAt(0)}
                           </span>
                         </div>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {customer.fullName}
+                          {customer.fullName || "N/A"}
                         </div>
                         <div className="text-xs text-gray-500">ID: {customer.id}</div>
                       </div>
@@ -228,13 +220,13 @@ export default function CustomerList({
                     <div className="text-sm text-blue-600">{customer.phone}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{customer.idCard}</div>
+                    <div className="text-sm text-gray-900">{customer.idCard || "N/A"}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getTypeBadge(customer.customerType)}
+                    {getTypeBadge(customer.cusType)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(customer.status)}
+                    {getStatusBadge(customer.isVerified)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <span className="text-sm font-semibold text-gray-900">
@@ -250,53 +242,17 @@ export default function CustomerList({
                       >
                         Kiểm tra
                       </button>
-                      {/* menu dropdown phân loại */}
-                      <div className="relative">
-                        <button
-                          onClick={() => toggleDropdown(customer.id)}
-                          className="text-purple-600 hover:text-purple-900 px-3 py-1 border border-purple-300 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer"
-                          title="Phân loại khách hàng"
-                        > Phân loại ▼ </button>
-                        {openDropdown === customer.id && (
-                          <>
-                            <div 
-                              className="fixed inset-0 z-10" 
-                              onClick={() => setOpenDropdown(null)}
-                            ></div>
-                            <div className="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
-                              <div className="px-4 py-2 border-b border-gray-200">
-                                <p className="text-xs font-semibold text-gray-700">Phân loại khách hàng</p>
-                              </div>
-                              {/* map qua mảng customerTypes */}
-                              {customerTypes.map((type) => (
-                                <button
-                                  key={type.value}
-                                  onClick={() => handleClassifySelect(customer, type.value)}
-                                  disabled={customer.customerType === type.value}
-                                  className={`w-full text-left px-4 py-2 ${type.hoverBg} transition-colors flex items-center space-x-2 cursor-pointer ${
-                                    customer.customerType === type.value ? 'opacity-50 cursor-not-allowed' : ''
-                                  }`}
-                                >
-                                  <span className={`w-3 h-3 rounded-full ${
-                                    customer.customerType === type.value 
-                                      ? type.color 
-                                      : 'border-2 border-gray-300'
-                                  }`}></span>
-                                  <span className="text-sm text-gray-700">
-                                    {type.label} {customer.customerType === type.value && '(hiện tại)'}
-                                  </span>
-                                </button>
-                              ))}
-                              <div className="border-t border-gray-200 mt-2 pt-2 px-4">
-                                <button
-                                  onClick={() => setOpenDropdown(null)}
-                                  className="w-full text-center text-xs text-gray-500 hover:text-gray-700 py-1 cursor-pointer"
-                                >Đóng</button>
-                              </div>
-                            </div>
-                          </>
-                        )}
-                      </div>
+                      {/* nút phân loại */}
+                      <button
+                        onClick={() => onOpenClassifyModal(customer)}
+                        disabled={customer.isVerified !== 3}
+                        className={`text-purple-600 hover:text-purple-900 px-3 py-1 border border-purple-300 rounded-lg hover:bg-purple-50 transition-colors ${
+                          customer.isVerified !== 3 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                        }`}
+                        title={customer.isVerified !== 3 ? 'Chỉ phân loại khách hàng đã xác thực' : 'Phân loại khách hàng'}
+                      >
+                        Phân loại
+                      </button>
                     </div>
                   </td>
                 </tr>

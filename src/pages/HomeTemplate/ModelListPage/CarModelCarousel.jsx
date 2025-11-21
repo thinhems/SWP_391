@@ -34,7 +34,7 @@ export default function CarModelCarousel({ selectedLocation, onModelSelect, acti
   };
   const visibleModels = getVisibleModels();
   return (
-    <div className="relative pt-8 pb-16">
+    <div className="relative pt-20">
       <div className="max-w-7xl mx-auto px-4">
         {/* Carousel Container */}
         <div className="relative px-20">
@@ -62,17 +62,23 @@ export default function CarModelCarousel({ selectedLocation, onModelSelect, acti
                 className={`
                   transition-all duration-300 rounded-full
                   ${index === currentIndex 
-                    ? 'w-8 h-3 bg-gradient-to-r from-green-500 to-emerald-500 scale-125 shadow-lg' 
-                    : 'w-3 h-3 bg-gray-300 hover:bg-green-300'
+                    ? 'w-8 h-3 scale-125 shadow-lg' 
+                    : 'w-3 h-3 bg-gray-300'
                   }
                 `}
+                style={index === currentIndex ? { backgroundColor: '#188f49' } : {}}
+                onMouseEnter={(e) => { if (index !== currentIndex) e.target.style.backgroundColor = '#a7d5b8' }}
+                onMouseLeave={(e) => { if (index !== currentIndex) e.target.style.backgroundColor = '#d1d5db' }}
               />
             ))}
           </div>
           {/* nút lùi */}
           <button
             onClick={goToPrevious}
-            className="cursor-pointer absolute -left-11 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-2xl border border-green-100 z-20 group"
+            className="cursor-pointer absolute -left-11 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-2xl border z-20 group"
+            style={{ borderColor: '#e8f5e9' }}
+            onMouseEnter={(e) => e.currentTarget.style.borderColor = '#188f49'}
+            onMouseLeave={(e) => e.currentTarget.style.borderColor = '#e8f5e9'}
           >
             <svg className="w-6 h-6 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -80,7 +86,10 @@ export default function CarModelCarousel({ selectedLocation, onModelSelect, acti
           </button>
           <button
             onClick={goToNext}
-            className="cursor-pointer absolute -right-11 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-2xl border border-green-100 z-20 group"
+            className="cursor-pointer absolute -right-11 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-2xl border z-20 group"
+            style={{ borderColor: '#e8f5e9' }}
+            onMouseEnter={(e) => e.currentTarget.style.borderColor = '#188f49'}
+            onMouseLeave={(e) => e.currentTarget.style.borderColor = '#e8f5e9'}
           >
             <svg className="w-6 h-6 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

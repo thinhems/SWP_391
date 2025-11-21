@@ -53,8 +53,14 @@ export default function ManagerCarsPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-green-500 border-b-4 border-gray-300"></div>
-        <p className="mt-4 text-gray-600 font-medium text-lg">Đang tải dữ liệu...</p>
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
+          <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
+        </div>
+        <div className="text-center">
+          <p className="text-lg font-semibold text-gray-800">Đang tải dữ liệu xe</p>
+          <p className="text-sm text-gray-500 mt-1">Vui lòng đợi...</p>
+        </div>
       </div>
     );
   }

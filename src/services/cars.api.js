@@ -4,7 +4,9 @@ export const carService = {
   // Lấy danh sách xe
   getCars: async () => {
     try {
-      const response = await api.get("/Vehicle");
+      const response = await api.get("/Vehicle", {
+        timeout: 30000 // 30 giây
+      });
       return response.data;
     } catch (error) {
       throw error;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function PersonalInfoForm({ verificationData, handleInputChange }) {
+export default function PersonalInfoForm({ formik }) {
   return (
     <div className="bg-gray-50 rounded-xl p-8 shadow-sm">
       { /* thông tin cá nhân */ }
@@ -11,7 +11,7 @@ export default function PersonalInfoForm({ verificationData, handleInputChange }
         Thông tin cá nhân
       </h4>
       { /* Form nhập thông tin cá nhân để xác thực */ }
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Số CCCD *
@@ -19,12 +19,19 @@ export default function PersonalInfoForm({ verificationData, handleInputChange }
           <input
             type="text"
             name="cccdNumber"
-            value={verificationData.cccdNumber}
-            onChange={handleInputChange}
-            required
+            value={formik.values.cccdNumber}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             placeholder="Nhập số căn cước công dân"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+              formik.touched.cccdNumber && formik.errors.cccdNumber 
+                ? 'border-red-500' 
+                : 'border-gray-300'
+            }`}
           />
+          {formik.touched.cccdNumber && formik.errors.cccdNumber && (
+            <p className="mt-1 text-sm text-red-600">{formik.errors.cccdNumber}</p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -33,56 +40,19 @@ export default function PersonalInfoForm({ verificationData, handleInputChange }
           <input
             type="text"
             name="blxNumber"
-            value={verificationData.blxNumber}
-            onChange={handleInputChange}
-            required
+            value={formik.values.blxNumber}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             placeholder="Nhập số bằng lái xe"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+              formik.touched.blxNumber && formik.errors.blxNumber 
+                ? 'border-red-500' 
+                : 'border-gray-300'
+            }`}
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Họ và tên (theo giấy tờ) *
-          </label>
-          <input
-            type="text"
-            name="fullName"
-            value={verificationData.fullName}
-            onChange={handleInputChange}
-            required
-            placeholder="Nhập họ và tên đầy đủ"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Ngày sinh *
-          </label>
-          <input
-            type="date"
-            name="dateOfBirth"
-            value={verificationData.dateOfBirth}
-            onChange={handleInputChange}
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Giới tính *
-          </label>
-          <select
-            name="gender"
-            value={verificationData.gender}
-            onChange={handleInputChange}
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors cursor-pointer"
-          >
-            <option value="">Chọn giới tính</option>
-            <option value="male">Nam</option>
-            <option value="female">Nữ</option>
-            <option value="other">Khác</option>
-          </select>
+          {formik.touched.blxNumber && formik.errors.blxNumber && (
+            <p className="mt-1 text-sm text-red-600">{formik.errors.blxNumber}</p>
+          )}
         </div>
       </div>
     </div>

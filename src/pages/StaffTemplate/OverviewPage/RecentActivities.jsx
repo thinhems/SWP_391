@@ -61,7 +61,7 @@ export default function RecentActivities({ activities }) {
         </div>
       )}
       
-      <style jsx>{`
+      <style>{`
         .max-h-96::-webkit-scrollbar {
           width: 8px;
         }

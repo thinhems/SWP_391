@@ -1,21 +1,79 @@
 import React, { useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import VerificationStatusDisplay from './VerificationStatusDisplay';
 import PersonalInfoForm from './PersonalInfoForm';
 import DocumentUploadSection from './DocumentUploadSection';
+import { useAuth } from '../../../../contexts/AuthContext';
 
 export default function AccountVerification({ user }) {
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
-  const [verificationData, setVerificationData] = useState({
-    cccdNumber: '',
-    blxNumber: '',
-    fullName: '',
-    dateOfBirth: '',
-    gender: '',
-    cccdFrontImage: null,
-    cccdBackImage: null,
-    blxFrontImage: null,
-    blxBackImage: null
+  const { verifyAccount } = useAuth();
+  // Validation schema với Yup
+  const validationSchema = Yup.object({
+    cccdNumber: Yup.string()
+      .required('Vui lòng nhập số CCCD')
+      .matches(/^[0-9]{12}$/, 'Số CCCD phải có 12 chữ số'),
+    blxNumber: Yup.string()
+      .required('Vui lòng nhập số bằng lái xe')
+      .matches(/^[0-9]{12}$/, 'Số bằng lái xe phải có 12 chữ số'),
+    cccdFrontImage: Yup.mixed()
+      .required('Vui lòng tải lên ảnh CCCD mặt trước')
+      .test('fileSize', 'Kích thước file không được vượt quá 5MB', (value) => {
+        return value && value.size <= 5 * 1024 * 1024;
+      })
+      .test('fileType', 'File phải là hình ảnh', (value) => {
+        return value && value.type.startsWith('image/');
+      }),
+    cccdBackImage: Yup.mixed()
+      .required('Vui lòng tải lên ảnh CCCD mặt sau')
+      .test('fileSize', 'Kích thước file không được vượt quá 5MB', (value) => {
+        return value && value.size <= 5 * 1024 * 1024;
+      })
+      .test('fileType', 'File phải là hình ảnh', (value) => {
+        return value && value.type.startsWith('image/');
+      }),
+    blxFrontImage: Yup.mixed()
+      .required('Vui lòng tải lên ảnh bằng lái mặt trước')
+      .test('fileSize', 'Kích thước file không được vượt quá 5MB', (value) => {
+        return value && value.size <= 5 * 1024 * 1024;
+      })
+      .test('fileType', 'File phải là hình ảnh', (value) => {
+        return value && value.type.startsWith('image/');
+      }),
+    blxBackImage: Yup.mixed()
+      .required('Vui lòng tải lên ảnh bằng lái mặt sau')
+      .test('fileSize', 'Kích thước file không được vượt quá 5MB', (value) => {
+        return value && value.size <= 5 * 1024 * 1024;
+      })
+      .test('fileType', 'File phải là hình ảnh', (value) => {
+        return value && value.type.startsWith('image/');
+      })
+  });
+
+  // Formik setup
+  const formik = useFormik({
+    initialValues: {
+      cccdNumber: '',
+      blxNumber: '',
+      cccdFrontImage: null,
+      cccdBackImage: null,
+      blxFrontImage: null,
+      blxBackImage: null
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values, { resetForm }) => {
+      setLoading(true);
+      try {
+        await verifyAccount(user.id, values);
+        // Reset form
+        resetForm();
+      } catch (error) {
+        console.error('Verification error:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
   });
 
   // lấy trạng thái xác thực của user 
@@ -27,109 +85,17 @@ export default function AccountVerification({ user }) {
 
   const verificationStatus = getVerificationStatus();
 
-  // hanle cập nhật value cho form
-  const handleInputChange = (e) => {
-    setVerificationData({
-      ...verificationData,
-      [e.target.name]: e.target.value
-    });
-  };
-
   // handle thay đổi file upload
   const handleFileChange = (e, fieldName) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setMessage({ type: 'error', text: 'Vui lòng chọn file hình ảnh!' });
-        return;
-      }
-      
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setMessage({ type: 'error', text: 'Kích thước file không được vượt quá 5MB!' });
-        return;
-      }
-
-      setVerificationData({
-        ...verificationData,
-        [fieldName]: file
-      });
-      setMessage({ type: '', text: '' });
-    }
-  };
-  // Handle form submission
-  const handleSubmitVerification = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage({ type: '', text: '' });
-
-    // Validate required fields
-    const requiredFields = ['cccdNumber', 'blxNumber', 'fullName', 'dateOfBirth', 'gender'];
-    const requiredFiles = ['cccdFrontImage', 'cccdBackImage', 'blxFrontImage', 'blxBackImage'];
-    for (let field of requiredFields) {
-      if (!verificationData[field]) {
-        setMessage({ type: 'error', text: `Vui lòng điền đầy đủ thông tin ${field}!` });
-        setLoading(false);
-        return;
-      }
-    }
-    for (let file of requiredFiles) {
-      if (!verificationData[file]) {
-        setMessage({ type: 'error', text: `Vui lòng tải lên đầy đủ hình ảnh!` });
-        setLoading(false);
-        return;
-      }
-    }
-    try {
-      // fake call API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setMessage({ 
-        type: 'success', 
-        text: 'Gửi yêu cầu xác thực thành công! Chúng tôi sẽ xem xét trong vòng 2-3 ngày làm việc.' 
-      });
-      // Reset form
-      setVerificationData({
-        cccdNumber: '',
-        blxNumber: '',
-        fullName: '',
-        dateOfBirth: '',
-        gender: '',
-        cccdFrontImage: null,
-        cccdBackImage: null,
-        blxFrontImage: null,
-        blxBackImage: null
-      });
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Có lỗi xảy ra. Vui lòng thử lại!' });
-    } finally {
-      setLoading(false);
+      formik.setFieldValue(fieldName, file);
+      formik.setFieldTouched(fieldName, true, false);
     }
   };
 
   return (
     <div className="min-h-full">
-      {/* msg thông báo */}
-      {message.text && (
-        <div className={`m-6 p-4 rounded-lg border ${
-          message.type === 'success' 
-            ? 'bg-green-50 border-green-200 text-green-800'
-            : 'bg-red-50 border-red-200 text-red-800'
-        }`}>
-          <div className="flex items-center">
-            {message.type === 'success' ? (
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            )}
-            {message.text}
-          </div>
-        </div>
-      )}
       {/* render nếu trạng thái xác thực là verified hoặc pending */}
       {(verificationStatus === 'verified' || verificationStatus === 'pending') && (
         <VerificationStatusDisplay status={verificationStatus} />
@@ -150,15 +116,14 @@ export default function AccountVerification({ user }) {
             </p>
           </div>
           {/* Form */}
-          <form onSubmit={handleSubmitVerification} className="space-y-10">
+          <form onSubmit={formik.handleSubmit} className="space-y-10">
             {/* Personal Information Form */}
             <PersonalInfoForm 
-              verificationData={verificationData}
-              handleInputChange={handleInputChange}
+              formik={formik}
             />
             {/* Document Upload Section */}
             <DocumentUploadSection 
-              verificationData={verificationData}
+              formik={formik}
               handleFileChange={handleFileChange}
             />
             {/* Guidelines */}

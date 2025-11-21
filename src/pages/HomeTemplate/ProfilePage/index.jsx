@@ -6,10 +6,18 @@ import PersonalInfo from './PersonalInfo';
 import AccountVerification from './AccountVerification';
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading, getProfile } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user?.id) {
+        await getProfile(user.id);
+      }
+    };
+    fetchProfile();
+  }, [user?.id]);
   // lấy tab từ URL hoặc mặc định là 'personal'
   const [activeTab, setActiveTab] = useState(() => {
     const tabFromUrl = searchParams.get('tab');
@@ -51,10 +59,14 @@ export default function ProfilePage() {
   // hiển thị loading khi đang kiểm tra authentication
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-          <p className="mt-4 text-gray-600">Đang tải...</p>
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200"></div>
+          <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
+        </div>
+        <div className="text-center">
+          <p className="text-lg font-semibold text-gray-800">Đang tải thông tin khách hàng...</p>
+          <p className="text-gray-500 text-sm mt-1">Customer ID: {user?.id}</p>
         </div>
       </div>
     );

@@ -42,11 +42,53 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const verifyAccount = async (userId, verificationData) => {
+    try {
+      await authService.sendVerificationInfo(userId, verificationData);
+      const currentUser = authService.getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  const updateProfile = async (userId, profileData) => {
+    try {
+      await authService.updateProfile(userId, profileData);
+      const currentUser = authService.getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  const getProfile = async (userId) => {
+    try {
+      setLoading(true);
+      await authService.getProfile(userId);
+      const currentUser = authService.getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const value = {
     user,
     login,
     register,
     logout,
+    verifyAccount,
+    updateProfile,
+    getProfile,
     isAuthenticated: !!user,
     loading
   };
