@@ -81,7 +81,7 @@ export const customersService = {
     }
   },
 
-  // Tạo nhân viên mới
+  // Tạo nhân viên mới (API cũ)
   createStaff: async (staffData) => {
     try {
       const formData = new FormData();
@@ -97,6 +97,52 @@ export const customersService = {
       return response.data;
     } catch (error) {
       console.error('Error creating staff:', error);
+      throw error;
+    }
+  },
+
+  // Tạo nhân viên mới (API mới)
+  createStaffNew: async (staffData) => {
+    try {
+      const formData = new FormData();
+      formData.append('FullName', staffData.fullName);
+      formData.append('Password', staffData.password);
+      formData.append('Email', staffData.email);
+      formData.append('Phone', staffData.phone);
+      formData.append('Address', staffData.address || '');
+      formData.append('StationID', staffData.stationId);
+      formData.append('IsActive', staffData.isActive !== undefined ? staffData.isActive : true);
+
+      const response = await api.post('/User/CreatedStaff', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error creating staff:', error);
+      throw error;
+    }
+  },
+
+  // Cập nhật nhân viên
+  updateStaff: async (id, staffData) => {
+    try {
+      const formData = new FormData();
+      formData.append('FullName', staffData.fullName);
+      formData.append('Email', staffData.email);
+      formData.append('Phone', staffData.phone);
+      formData.append('Address', staffData.address || '');
+      formData.append('StationID', staffData.stationId);
+
+      const response = await api.put(`/User/UpdateStaff/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error updating staff:', error);
       throw error;
     }
   }

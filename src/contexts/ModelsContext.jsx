@@ -31,13 +31,17 @@ export const ModelsProvider = ({ children }) => {
 			// Transform API data to the frontend expected format
 			const transformedModels = apiModels.map(item => {
 				const specs = item.specifications || {};
+				// Xử lý hình ảnh từ imageBase64List hoặc fallback
+				const imageList = Array.isArray(item.imageBase64List) && item.imageBase64List.length > 0
+					? item.imageBase64List.map(base64 => `data:image/jpeg;base64,${base64}`)
+					: (Array.isArray(item.images) && item.images.length > 0
+						? item.images
+						: [item.imageUrl || 'https://placehold.co/800x500?text=No+Image']);
 				return {
 					id: item.id,
 					name: item.modelName,
 					type: item.type || 'Xe điện',
-					images: Array.isArray(item.images) && item.images.length > 0
-						? item.images
-						: [item.imageUrl || 'https://placehold.co/800x500?text=No+Image'],
+					images: imageList,
 					price: item.price && (item.price.daily || item.price.weekly || item.price.monthly)
 						? item.price
 						: {
@@ -90,17 +94,26 @@ export const ModelsProvider = ({ children }) => {
 			
 			if (result.success) {
 				const apiModels = result.data || [];
+				console.log('API Models Response:', apiModels);
+				if (apiModels.length > 0) {
+					console.log('First model fields:', Object.keys(apiModels[0]));
+					console.log('First model imageBase64List:', apiModels[0].imageBase64List);
+				}
 				
 				// Transform API data
 				const transformedModels = apiModels.map(item => {
 					const specs = item.specifications || {};
+					// Xử lý hình ảnh từ imageBase64List hoặc fallback
+					const imageList = Array.isArray(item.imageBase64List) && item.imageBase64List.length > 0
+						? item.imageBase64List.map(base64 => `data:image/jpeg;base64,${base64}`)
+						: (Array.isArray(item.images) && item.images.length > 0
+							? item.images
+							: [item.imageUrl || 'https://placehold.co/800x500?text=No+Image']);
 					return {
 						id: item.id,
 						name: item.modelName,
 						type: item.type || 'Xe điện',
-						images: Array.isArray(item.images) && item.images.length > 0
-							? item.images
-							: [item.imageUrl || 'https://placehold.co/800x500?text=No+Image'],
+						images: imageList,
 						price: item.price && (item.price.daily || item.price.weekly || item.price.monthly)
 							? item.price
 							: {

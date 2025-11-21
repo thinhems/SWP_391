@@ -6,6 +6,7 @@ import { carService } from '../../services/cars.api';
 export default function Stations() {
   const { stations, loading, error, refetch } = useStations();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedStation, setSelectedStation] = useState(null);
   const [stationVehicles, setStationVehicles] = useState([]);
@@ -58,6 +59,49 @@ export default function Stations() {
     // Sử dụng allVehicles đã load sẵn
     const filteredVehicles = allVehicles.filter(v => v.stationID === station.id);
     setStationVehicles(filteredVehicles);
+  };
+
+  const handleEdit = (station) => {
+    setSelectedStation(station);
+    setFormData({
+      name: station.name,
+      location: station.location,
+      description: station.description || '',
+      capacity: station.capacity
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    
+    try {
+      await stationService.updateStation(selectedStation.id, {
+        name: formData.name,
+        location: formData.location,
+        description: formData.description,
+        capacity: parseInt(formData.capacity)
+      });
+
+      alert('Cập nhật điểm cho thuê thành công!');
+      setShowEditModal(false);
+      setSelectedStation(null);
+      setFormData({
+        name: '',
+        location: '',
+        description: '',
+        capacity: 50
+      });
+      
+      // Refresh station list
+      refetch();
+    } catch (error) {
+      console.error('Error updating station:', error);
+      alert('Có lỗi xảy ra khi cập nhật điểm cho thuê. Vui lòng thử lại!');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -297,7 +341,11 @@ export default function Stations() {
                   >
                     Xem chi tiết
                   </button>
-                  <button className="px-3 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
+                  <button 
+                    onClick={() => handleEdit(station)}
+                    className="px-3 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+                    title="Chỉnh sửa"
+                  >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
@@ -417,6 +465,140 @@ export default function Stations() {
                     </>
                   ) : (
                     'Thêm điểm cho thuê'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Station Modal */}
+      {showEditModal && selectedStation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-gray-900">Chỉnh sửa điểm cho thuê</h3>
+                <button
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setSelectedStation(null);
+                    setFormData({
+                      name: '',
+                      location: '',
+                      description: '',
+                      capacity: 50
+                    });
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleUpdate} className="p-6">
+              <div className="space-y-4">
+                {/* Station Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tên điểm cho thuê <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="VD: Quận 1, Quận 7"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Địa điểm <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="VD: HCM, Hà Nội"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Mô tả
+                  </label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    rows="3"
+                    placeholder="Mô tả về điểm cho thuê..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Capacity */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Sức chứa (số xe tối đa) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="capacity"
+                    value={formData.capacity}
+                    onChange={handleInputChange}
+                    required
+                    min="1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setSelectedStation(null);
+                    setFormData({
+                      name: '',
+                      location: '',
+                      description: '',
+                      capacity: 50
+                    });
+                  }}
+                  disabled={submitting}
+                  className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {submitting ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Đang cập nhật...
+                    </>
+                  ) : (
+                    'Cập nhật'
                   )}
                 </button>
               </div>

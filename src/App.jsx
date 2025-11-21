@@ -33,6 +33,7 @@ import CarReturnPage from './pages/StaffTemplate/CarReturnPage';
 import ApprovalReviewPage from './pages/StaffTemplate/ApprovalReviewPage';
 import CarInspectionPage from './pages/StaffTemplate/CarInspectionPage';
 import CustomerManagementPage from './pages/StaffTemplate/CustomerManagementPage';
+import AdminCustomerManagementPage from './pages/AdminTemplate/CustomerManagementPage';
 import CustomerVerificationPage from './pages/StaffTemplate/CustomerVerificationPage';
 // Context Providers
 import { AuthProvider } from './contexts/AuthContext';
@@ -63,8 +64,7 @@ function App() {
               <Route path="manage-cars/car-return/:carId" element={<CarReturnPage />} />
               <Route path="manage-cars/approval-review/:carId" element={<ApprovalReviewPage />} />
               <Route path="manage-cars/inspection/:carId" element={<CarInspectionPage />} />
-              <Route path="manage-customer" element={<CustomerManagementPage />} />
-              <Route path="manage-customer/verify/:customerId" element={<CustomerVerificationPage />} />
+              <Route path="manage-customer" element={<AdminCustomerManagementPage />} />
             </Route>
             {/* STAFF ROUTES */}
             <Route path="/staff/*" element={<StaffTemplate />}>
