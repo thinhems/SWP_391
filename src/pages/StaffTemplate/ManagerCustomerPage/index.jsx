@@ -5,7 +5,7 @@ import CustomerList from './CustomerList';
 import CustomerFilterSearch from './CustomerFilterSearch';
 import PopupCustomerType from './PopupCustomerType';
 
-export default function CustomerManagementPage() {
+export default function ManagerCustomerPage() {
   const { customersData, loading, updateCustomerType } = useCustomers(); 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

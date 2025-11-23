@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCustomers } from '../../../contexts/CustomersContext';
-import { useActivities } from '../../../contexts/ActivitiesContext';
+import { useCustomers } from '../../../../contexts/CustomersContext';
+import { useActivities } from '../../../../contexts/ActivitiesContext';
 import HeaderSection from './HeaderSection';
 import CustomerInfoSection from './CustomerInfoSection';
 import CustomerDocumentsSection from './CustomerDocumentsSection';

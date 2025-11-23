@@ -1,6 +1,6 @@
 
-export default function bookingInfoSection({ carData }) {
-  const booking = carData?.booking || {};
+export default function RentalInfoSection({ bookingData }) {
+  const booking = bookingData || {};
   const caculateKiloMax = 200 * (booking.rentalType === 1 ? booking.rentalTime : booking.rentalType === 2 ? booking.rentalTime * 7 : booking.rentalTime * 30);
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {

@@ -1,50 +1,49 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
-import { useCars } from '../../../contexts/CarsContext';
-import { useActivities } from '../../../contexts/ActivitiesContext';
+import { useAuth } from '../../../../contexts/AuthContext';
+import { useBookings } from '../../../../contexts/BookingsContext';
+import { useActivities } from '../../../../contexts/ActivitiesContext';
 import HeaderSection from './HeaderSection';  
 import ContractInfoStep from './ContractInfoStep';
 import CarInspectionStep from './CarInspectionStep';
 import ConfirmationStep from './ConfirmationStep';
 import CompletionStep from './CompletionStep';
 
-export default function CarDeliveryPage() {
-  let { carId } = useParams();
-  carId = parseInt(carId, 10);
+export default function ContractHandoverPage() {
+  const { bookingId } = useParams();
+  const bookingIdNum = parseInt(bookingId, 10);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { carsData, loading, createHandover } = useCars();
+  const { bookingsData, loading, createHandover } = useBookings();
   const { addActivity } = useActivities();
   const [currentStep, setCurrentStep] = useState(1);
-  const [carData, setCarData] = useState(null);
+  const [bookingData, setBookingData] = useState(null);
   const [error, setError] = useState(null);
   // dữ liệu kiểm tra xe
   const [inspectionData, setInspectionData] = useState({
-    checklist: [],
-    notes: ''
+    checklist: []
   });
   // state kiểm tra đã xác nhận giải thích với khách hàng chưa
   const [isStaffExplanationConfirmed, setIsStaffExplanationConfirmed] = useState(false);
   // state kiểm tra khách hàng đã xác nhận hợp đồng chưa
   const [isCustomerConfirmed, setIsCustomerConfirmed] = useState(false);
 
-  // load dữ liệu xe và booking từ API
+  // load dữ liệu booking từ BookingsContext
   useEffect(() => {
     const loadData = async () => {
       setError(null);
       try {
-        const data = carsData.getCarById(carId);
+        const data = bookingsData.getBookingById(bookingIdNum);
         if (!data) {
-          setError(`Không tìm thấy xe có ID: ${carId}`);
+          setError(`Không tìm thấy booking có ID: ${bookingIdNum}`);
           return;
         }
         if (data.status !== 3) {
-          setError("Yêu cầu duyệt không còn hợp lệ (xe không ở trạng thái chờ bàn giao).");
+          setError("Booking không ở trạng thái chờ bàn giao.");
         }
-        setCarData(data);
-        // lọc ra thành 1 list item theo category
-        const flatChecklist = data.categories?.flatMap(category =>
+        setBookingData(data);
+        // lọc ra thành 1 list item theo category từ vehicle
+        const flatChecklist = data.vehicle?.categories?.flatMap(category =>
           category.items.map(item => ({
             ...item,
             categoryName: category.categoryName
@@ -56,13 +55,13 @@ export default function CarDeliveryPage() {
           checklist: flatChecklist
         }));
       } catch (error) {
-        console.error('Error fetching car data:', error);
-        setError(`Không tìm thấy xe có ID: ${carId}`);
+        console.error('Error fetching booking data:', error);
+        setError(`Không tìm thấy booking có ID: ${bookingIdNum}`);
       }
     };
     
     loadData();
-  }, [carId, carsData]);
+  }, [bookingIdNum, bookingsData]);
   // các bước giao xe
   const steps = [
     { id: 1, title: 'Thông tin hợp đồng', desc: 'Xem thông tin chi tiết' },
@@ -99,24 +98,24 @@ export default function CarDeliveryPage() {
   const handleCompleteDelivery = async () => {
     try {
       const handoverData = {
-        bookingID: carData?.booking.id || 0,
+        bookingID: bookingData?.id || 0,
         staffID: user?.id || 0,
-        description: inspectionData.notes || "Không có ghi chú"
+        description: "Hoàn tất bàn giao xe"
       };
       
       await createHandover(handoverData);
       
       addActivity({
         type: 'delivery',
-        title: `Đã giao xe ${carData.modelName} (${carData.plateNumber})`,
-        customer: carData.customer.fullName,
+        title: `Đã giao xe ${bookingData.vehicle?.modelName} (${bookingData.vehicle?.plateNumber})`,
+        customer: bookingData.customer?.fullName,
         icon: 'car',
         color: 'text-green-600',
         bgColor: 'bg-green-100'
       });
       
-      alert(`Bàn giao xe ${carData.plateNumber} thành công! Xe đã chuyển sang trạng thái cho thuê.`);
-      navigate('/staff/manage-cars?tab=pending_handover');
+      alert(`Bàn giao xe ${bookingData.vehicle?.plateNumber} thành công! Xe đã chuyển sang trạng thái cho thuê.`);
+      navigate('/staff/manage-rentals?tab=pending_handover');
     } catch (error) {
       console.error('Error completing delivery:', error);
       alert('Có lỗi xảy ra khi hoàn tất bàn giao. Vui lòng thử lại.');
@@ -131,14 +130,14 @@ export default function CarDeliveryPage() {
           <div className="absolute top-0 left-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-green-600"></div>
         </div>
         <div className="text-center">
-          <p className="text-lg font-semibold text-gray-800">Đang tải thông tin hợp đồng...</p>
-          <p className="text-gray-500 text-sm mt-1">Car ID: {carId}</p>
+          <p className="text-lg font-semibold text-gray-800">Đang tải thông tin booking...</p>
+          <p className="text-gray-500 text-sm mt-1">Booking ID: {bookingIdNum}</p>
         </div>
       </div>
     );
   }
 
-  if (error || !carData) {
+  if (error) {
     return (
       <div className="text-center py-12">
         <div className="text-red-500 mb-4">
@@ -146,13 +145,13 @@ export default function CarDeliveryPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
           </svg>
         </div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy thông tin hợp đồng</h2>
-        <p className="text-gray-600 mb-4">{error || `Hợp đồng với xe ID "${carId}" không tồn tại hoặc đã bị xóa.`}</p>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy thông tin booking</h2>
+        <p className="text-gray-600 mb-4">{error || `Booking với ID "${bookingIdNum}" không tồn tại hoặc đã bị xóa.`}</p>
         <button
-          onClick={() => navigate('/staff/manage-cars?tab=pending_handover')}
+          onClick={() => navigate('/staff/manage-bookings?tab=pending_handover')}
           className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
         >
-          Quay lại danh sách xe
+          Quay lại danh sách booking
         </button>
       </div>
     );
@@ -162,30 +161,29 @@ export default function CarDeliveryPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <HeaderSection 
-        carData={carData}
-        carId={carId}
+        carData={bookingData?.vehicle}
+        bookingId={bookingIdNum}
         currentStep={currentStep}
         steps={steps}
-        onNavigateBack={() => navigate('/staff/manage-cars?tab=pending_handover')}
+        onNavigateBack={() => navigate('/staff/manage-bookings?tab=pending_handover')}
       />  
       {/* Step content */}
       <div className="min-h-96">
         {currentStep === 1 && (
           <ContractInfoStep
-            carData={carData}
+            bookingData={bookingData}
           />
         )}
         {currentStep === 2 && (
           <CarInspectionStep 
             inspectionData={inspectionData}
             setInspectionData={setInspectionData}
-            carId={carId}
-            categories={carData.categories || []}
+            categories={bookingData?.vehicle?.categories || []}
           />
         )}
         {currentStep === 3 && (
           <ConfirmationStep 
-            carData={carData}
+            bookingData={bookingData}
             inspectionData={inspectionData}
             isStaffExplanationConfirmed={isStaffExplanationConfirmed}
             setIsStaffExplanationConfirmed={setIsStaffExplanationConfirmed}
@@ -195,7 +193,7 @@ export default function CarDeliveryPage() {
         )}
         {currentStep === 4 && (
           <CompletionStep 
-            carData={carData}
+            bookingData={bookingData}
             inspectionData={inspectionData}
             onCompleteDelivery={handleCompleteDelivery}
           />

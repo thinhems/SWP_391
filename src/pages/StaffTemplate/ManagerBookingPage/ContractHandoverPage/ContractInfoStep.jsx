@@ -1,6 +1,8 @@
 
-export default function ContractInfoStep({ carData }) {
-  const booking = carData.booking || {};
+export default function ContractInfoStep({ bookingData }) {
+  const booking = bookingData || {};
+  const carData = bookingData?.vehicle || {};
+  const customer = bookingData?.customer || {};
   //format theo VND
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -49,23 +51,23 @@ export default function ContractInfoStep({ carData }) {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Họ và tên:</span>
-              <span className="text-gray-900 font-semibold">{carData.customer.fullName ? carData.customer.fullName : "N/A"}</span>
+              <span className="text-gray-900 font-semibold">{customer.fullName ? customer.fullName : "N/A"}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Số điện thoại:</span>
-              <span className="text-blue-600 font-semibold">{carData.customer.phone ? carData.customer.phone : "N/A"}</span>
+              <span className="text-blue-600 font-semibold">{customer.phone ? customer.phone : "N/A"}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Số CCCD:</span>
-              <span className="text-gray-900 font-semibold">{carData.customer.idCard ? carData.customer.idCard : "N/A"}</span>
+              <span className="text-gray-900 font-semibold">{customer.idCard ? customer.idCard : "N/A"}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Bằng lái xe:</span>
-              <span className="text-gray-900 font-semibold">{carData.customer.driverLicense ? carData.customer.driverLicense : "N/A"}</span>
+              <span className="text-gray-900 font-semibold">{customer.driverLicense ? customer.driverLicense : "N/A"}</span>
             </div>
             <div className="flex justify-between items-start">
               <span className="text-gray-600 font-medium">Địa chỉ:</span>
-              <span className="text-gray-900 font-semibold text-right max-w-xs">{carData.customer.address ? carData.customer.address : "N/A"}</span>
+              <span className="text-gray-900 font-semibold text-right max-w-xs">{customer.address ? customer.address : "N/A"}</span>
             </div>
           </div>
         </div>

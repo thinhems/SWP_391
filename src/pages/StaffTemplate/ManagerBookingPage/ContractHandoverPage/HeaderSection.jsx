@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function HeaderSection( { carData, carId, currentStep, steps, onNavigateBack }) {
+export default function HeaderSection( { carData, bookingId, currentStep, steps, onNavigateBack }) {
 	return (
 		<div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
 			{/* header */}
@@ -12,7 +12,7 @@ export default function HeaderSection( { carData, carId, currentStep, steps, onN
 							Xe {carData?.modelName} - Biển số <span className="font-bold text-red-600">{carData?.plateNumber}</span>
 						</p>
 						<span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-							ID: {carId}
+							Booking ID: {bookingId}
 						</span>
 					</div>
 				</div>

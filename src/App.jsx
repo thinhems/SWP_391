@@ -26,25 +26,18 @@ import Stations from './pages/AdminTemplate/Stations';
 import StaffManagement from './pages/AdminTemplate/StaffManagement';
 // Import Staff Pages
 import OverviewPage from './pages/StaffTemplate/OverviewPage';
-import ManagerCarsPage from './pages/StaffTemplate/ManagerCarsPage';
+import ManagerBookingPage from './pages/StaffTemplate/ManagerBookingPage';
 import AdminManagerCarsPage from './pages/AdminTemplate/ManagerCarsPage';
-import CarDeliveryPage from './pages/StaffTemplate/CarDeliveryPage';
-import CarReturnPage from './pages/StaffTemplate/CarReturnPage';
-import ApprovalReviewPage from './pages/StaffTemplate/ApprovalReviewPage';
-import CarInspectionPage from './pages/StaffTemplate/CarInspectionPage';
-import CustomerManagementPage from './pages/StaffTemplate/CustomerManagementPage';
+import ContractHandoverPage from './pages/StaffTemplate/ManagerBookingPage/ContractHandoverPage';
+import ComplatedHandoverPage from './pages/StaffTemplate/ManagerBookingPage/ComplatedHandoverPage';
+import ApprovalBookingPage from './pages/StaffTemplate/ManagerBookingPage/ApprovalBookingPage';
+import CarInspectionPage from './pages/StaffTemplate/ManagerCarsPage/CarInspectionPage';
+import ManagerCustomerPage from './pages/StaffTemplate/ManagerCustomerPage';
 import AdminCustomerManagementPage from './pages/AdminTemplate/CustomerManagementPage';
-import CustomerVerificationPage from './pages/StaffTemplate/CustomerVerificationPage';
+import CustomerVerificationPage from './pages/StaffTemplate/ManagerCustomerPage/CustomerVerificationPage';
 // Context Providers
 import { AuthProvider } from './contexts/AuthContext';
 import './App.css';
-
-// Loading component
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-  </div>
-);
 
 function App() {
   return (
@@ -60,21 +53,21 @@ function App() {
               <Route path="stations" element={<Stations />} />
               <Route path="staff" element={<StaffManagement />} />
               <Route path="manage-cars" element={<AdminManagerCarsPage />} />
-              <Route path="manage-cars/car-delivery/:carId" element={<CarDeliveryPage />} />
-              <Route path="manage-cars/car-return/:carId" element={<CarReturnPage />} />
-              <Route path="manage-cars/approval-review/:carId" element={<ApprovalReviewPage />} />
+              <Route path="manage-cars/car-delivery/:carId" element={<ContractHandoverPage />} />
+              <Route path="manage-cars/car-return/:carId" element={<ComplatedHandoverPage />} />
+              <Route path="manage-cars/approval-review/:carId" element={<ApprovalBookingPage />} />
               <Route path="manage-cars/inspection/:carId" element={<CarInspectionPage />} />
               <Route path="manage-customer" element={<AdminCustomerManagementPage />} />
             </Route>
             {/* STAFF ROUTES */}
             <Route path="/staff/*" element={<StaffTemplate />}>
               <Route index element={<OverviewPage />} />
-              <Route path="manage-cars" element={<ManagerCarsPage />} />
-              <Route path="manage-cars/car-delivery/:carId" element={<CarDeliveryPage />} />
-              <Route path="manage-cars/car-return/:carId" element={<CarReturnPage />} />
-              <Route path="manage-cars/approval-review/:carId" element={<ApprovalReviewPage />} />
-              <Route path="manage-cars/inspection/:carId" element={<CarInspectionPage />} />
-              <Route path="manage-customer" element={<CustomerManagementPage />} />
+              <Route path="manage-bookings" element={<ManagerBookingPage />} />
+              <Route path="manage-bookings/car-delivery/:bookingId" element={<ContractHandoverPage />} />
+              <Route path="manage-bookings/car-return/:bookingId" element={<ComplatedHandoverPage />} />
+              <Route path="manage-bookings/approval-review/:bookingId" element={<ApprovalBookingPage />} />
+              <Route path="manage-bookings/inspection/:bookingId" element={<CarInspectionPage />} />
+              <Route path="manage-customer" element={<ManagerCustomerPage />} />
               <Route path="manage-customer/verify/:customerId" element={<CustomerVerificationPage />} />
             </Route>
             {/* HOME ROUTES*/}

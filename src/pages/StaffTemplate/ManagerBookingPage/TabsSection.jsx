@@ -1,19 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 
-export default function TabsSection({ activeTab, setActiveTab, cars }) {
+export default function TabsSection({ activeTab, setActiveTab, bookings }) {
   const navigate = useNavigate();
 
   const handleTabChange = (newTab) => {
     setActiveTab(newTab);
-    navigate(`/staff/manage-cars?tab=${newTab}`);
+    navigate(`/staff/manage-bookings?tab=${newTab}`);
   };
   
   // mảng tab để render
   const tabs = [
-    { id: 'available', label: 'Xe có sẵn', count: cars.available.length },
-    { id: 'pending_approval', label: 'Chờ xác nhận', count: cars.pending_approval.length + cars.pending_contract.length },
-    { id: 'pending_handover', label: 'Chờ bàn giao', count: cars.pending_handover.length },
-    { id: 'rented', label: 'Đang cho thuê', count: cars.rented.length }
+    { id: 'pending_approval', label: 'Chờ phê duyệt', count: bookings.pending_approval.length },
+    { id: 'pending_contract', label: 'Chờ ký hợp đồng', count: bookings.pending_contract.length },
+    { id: 'pending_handover', label: 'Chờ bàn giao', count: bookings.pending_handover.length },
+    { id: 'rented', label: 'Đang thuê', count: bookings.rented.length }
   ];
 
   return (

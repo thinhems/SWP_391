@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { vietQR } from '../../../services/vietqr.api';
+import { vietQR } from '../../../../services/vietqr.api';
 
 export default function QRCodePayment({ amount, customerName, bookingId }) {
   const [qrUrl, setQrUrl] = useState(null);

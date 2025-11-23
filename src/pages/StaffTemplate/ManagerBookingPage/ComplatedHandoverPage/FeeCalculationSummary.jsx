@@ -1,9 +1,8 @@
-export default function FeeCalculationSummary({ carData, inspectionData, fees }) {
-  const booking = carData?.booking || {};
+export default function FeeCalculationSummary({ vehicle, deposit, rentalTime, rentalType, inspectionData, fees }) {
   // Tính thêm các giá trị cần thiết cho hiển thị
-  const kmDriven = inspectionData.currentOdometer - carData.odometer;
+  const kmDriven = inspectionData.currentOdometer - vehicle.odometer;
   const kmOverage = Math.max(0, kmDriven - 200);
-  const batteryDeficit = Math.max(0, carData.batteryLevel - inspectionData.currentBattery);
+  const batteryDeficit = Math.max(0, vehicle.batteryLevel - inspectionData.currentBattery);
   const needsPayment = fees.netAmount < 0;
 
   const formatCurrency = (amount) => {
@@ -22,12 +21,8 @@ export default function FeeCalculationSummary({ carData, inspectionData, fees })
         {/* phí thuê xe */}
         <div className="bg-gray-50 rounded-lg p-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-700">Phí thuê xe</span>
-            <span className="font-semibold text-gray-900">{formatCurrency(booking.retalCost)}</span>
-          </div>
-          <div className="flex justify-between items-center">
             <span className="text-gray-700">Tiền cọc</span>
-            <span className="font-semibold text-green-600">{formatCurrency(booking.deposit)}</span>
+            <span className="font-semibold text-green-600">{formatCurrency(deposit)}</span>
           </div>
         </div>
         {/* chi tiết phụ phí */}
@@ -84,7 +79,7 @@ export default function FeeCalculationSummary({ carData, inspectionData, fees })
           </div>
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-700 font-medium">Tiền cọc</span>
-            <span className="font-bold text-gray-900 text-lg">-{formatCurrency(booking.deposit)}</span>
+            <span className="font-bold text-gray-900 text-lg">-{formatCurrency(deposit)}</span>
           </div>
           <div className={`p-4 rounded-lg ${needsPayment ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
             <div className="flex justify-between items-center">
