@@ -55,7 +55,7 @@ export const carService = {
     }
   },
   // Tự động cập nhật status xe + booking dành cho duyệt yêu cầu thuê, trả xe
-  updateStatusCar: async (idCar) => {
+  updateStatusBooking: async (idCar) => {
     try {
       const response = await api.put(`/Vehicle/AutpUpdateStatus/${idCar}`);
       return response.data;

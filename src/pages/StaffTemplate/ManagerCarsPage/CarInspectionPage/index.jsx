@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCars } from '../../../contexts/CarsContext';
-import { useActivities } from '../../../contexts/ActivitiesContext';
+import { useCars } from '../../../../contexts/CarsContext';
+import { useActivities } from '../../../../contexts/ActivitiesContext';
 import CarInspectionHeader from './CarInspectionHeader';
 import CarImagesSection from './CarImagesSection';
 import CarInspectionContent from './CarInspectionContent';

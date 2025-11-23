@@ -1,7 +1,6 @@
-export default function VehicleReturnInfo({ carData }) {
-  const booking = carData?.booking || {};
+export default function VehicleReturnInfo({ customer, vehicle, deposit, rentalTime, rentalType }) {
   // tính số km tối đa được chạy
-  const caculateKiloMax = 200 * booking.rentalTime;
+  const caculateKiloMax = 200 * rentalTime;
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
       <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
@@ -18,19 +17,19 @@ export default function VehicleReturnInfo({ carData }) {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">Model:</span>
-              <span className="font-semibold">{carData.modelName}</span>
+              <span className="font-semibold">{vehicle.modelName}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Biển số:</span>
-              <span className="font-bold text-red-600">{carData.plateNumber}</span>
+              <span className="font-bold text-red-600">{vehicle.plateNumber}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Pin ban đầu:</span>
-              <span className="font-semibold text-green-600">{carData.batteryLevel}%</span>
+              <span className="font-semibold text-green-600">{vehicle.batteryLevel}%</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Số km ban đầu:</span>
-              <span className="font-semibold">{carData.odometer.toLocaleString()} km</span>
+              <span className="font-semibold">{vehicle.odometer.toLocaleString()} km</span>
             </div>
           </div>
         </div>
@@ -40,25 +39,25 @@ export default function VehicleReturnInfo({ carData }) {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">Tên:</span>
-              <span className="font-semibold">{carData.customer.fullName}</span>
+              <span className="font-semibold">{customer.fullName}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">SĐT:</span>
-              <span className="font-semibold text-blue-600">{carData.customer.phone}</span>
+              <span className="font-semibold text-blue-600">{customer.phone}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Thời gian thuê:</span>
               <span className="font-semibold">
-                {booking?.rentalType === 1 
-                  ? booking?.rentalTime 
-                  : booking?.rentalType === 2 
-                  ? booking?.rentalTime / 7 
-                  : booking?.rentalTime / 30} {booking?.rentalType === 1 ? "Ngày" : booking?.rentalType === 2 ? "Tuần" : "Tháng"}
+                {rentalType === 1 
+                  ? rentalTime 
+                  : rentalType === 2 
+                  ? rentalTime / 7 
+                  : rentalTime / 30} {rentalType === 1 ? "Ngày" : rentalType === 2 ? "Tuần" : "Tháng"}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Tiền cọc:</span>
-              <span className="font-bold text-green-600">{booking.deposit.toLocaleString()} đ</span>
+              <span className="font-bold text-green-600">{deposit.toLocaleString()} đ</span>
             </div>
           </div>
         </div>
@@ -72,7 +71,7 @@ export default function VehicleReturnInfo({ carData }) {
           <div>
             <p className="text-blue-800 text-sm">
               <strong>Lưu ý:</strong> Số km tối đa được chạy: <strong>{caculateKiloMax} km </strong> 
-              (200 km/ngày × {booking.rentalTime} ngày)
+              (200 km/ngày × {rentalTime} ngày)
             </p>
           </div>
         </div>

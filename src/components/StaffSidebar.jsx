@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHouse, faCar, faUsers, faRightFromBracket, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faCar, faUsers, faRightFromBracket, faArrowLeft, faBook } from "@fortawesome/free-solid-svg-icons";
 export default function StaffSidebar({ isOpen }) {
   const location = useLocation();
   const { logout } = useAuth(); 
@@ -12,6 +12,13 @@ export default function StaffSidebar({ isOpen }) {
       path: '/staff',
       icon: (
         <FontAwesomeIcon icon={faHouse} />
+      )
+    },
+    {
+      name: 'Quản lý đơn thuê',
+      path: '/staff/manage-bookings',
+      icon: (
+        <FontAwesomeIcon icon={faBook} />
       )
     },
     {

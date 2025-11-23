@@ -1,10 +1,12 @@
 
 export default function CompletionStep({
-  carData, 
+  bookingData, 
   inspectionData, 
   onCompleteDelivery 
 }) {
-  const booking = carData.booking || {};
+  const booking = bookingData || {};
+  const carData = bookingData?.vehicle || {};
+  const customer = bookingData?.customer || {};
   //format theo VND
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('vi-VN', {
@@ -43,11 +45,11 @@ export default function CompletionStep({
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Khách hàng:</span>
-              <span className="font-medium">{carData.customer.fullName}</span>
+              <span className="font-medium">{customer.fullName}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Số điện thoại:</span>
-              <span className="font-medium">{carData.customer.phone}</span>
+              <span className="font-medium">{customer.phone}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Xe:</span>

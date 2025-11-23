@@ -5,17 +5,6 @@ export default function CarInspectionStep({
   setInspectionData, 
   categories
 }) {
-  const [notes, setNotes] = useState(inspectionData.notes || '');
-
-  // xử lý thay đổi ghi chú
-  const handleNotesChange = (e) => {
-    const newNotes = e.target.value;
-    setNotes(newNotes);
-    setInspectionData(prev => ({
-      ...prev,
-      notes: newNotes
-    }));
-  };
 
   // hàm lấy thông tin label và màu sắc cho status
   const getStatusConfig = (status) => {
@@ -110,19 +99,6 @@ export default function CarInspectionStep({
             </span>
           </div>
         </div>
-      </div>
-      {/* ghi chú */}
-      <div className="mt-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Ghi chú bổ sung
-        </label>
-        <textarea
-          value={notes}
-          onChange={handleNotesChange}
-          placeholder="Thêm ghi chú về tình trạng xe (tùy chọn)..."
-          rows={3}
-          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-        />
       </div>
     </div>
   );

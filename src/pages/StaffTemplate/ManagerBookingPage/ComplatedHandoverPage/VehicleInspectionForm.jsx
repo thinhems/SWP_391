@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
-export default function VehicleInspectionForm({ carData, onDataChange }) {
-  const [currentBattery, setCurrentBattery] = useState(carData.batteryLevel);
-  const [currentOdometer, setCurrentOdometer] = useState(carData.odometer);
+export default function VehicleInspectionForm({ vehicle, onDataChange }) {
+  const [currentBattery, setCurrentBattery] = useState(vehicle.batteryLevel);
+  const [currentOdometer, setCurrentOdometer] = useState(vehicle.odometer);
   const [additionalFees, setAdditionalFees] = useState([]);
 
   const additionalFeeOptions = [
@@ -68,9 +68,9 @@ export default function VehicleInspectionForm({ carData, onDataChange }) {
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                 />
             </div>
-            {currentBattery < carData.batteryLevel && (
+            {currentBattery < vehicle.batteryLevel && (
               <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                ⚠️ Pin thấp hơn {carData.batteryLevel - currentBattery}% so với ban đầu
+                ⚠️ Pin thấp hơn {vehicle.batteryLevel - currentBattery}% so với ban đầu
               </div>
             )}
           </div>
@@ -83,29 +83,29 @@ export default function VehicleInspectionForm({ carData, onDataChange }) {
           <div className="relative">
             <input
               type="number"
-              min={carData.odometer}
+              min={vehicle.odometer}
               value={currentOdometer}
-              onChange={(e) => setCurrentOdometer(parseInt(e.target.value) || carData.odometer)}
+              onChange={(e) => setCurrentOdometer(parseInt(e.target.value) || vehicle.odometer)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent font-semibold text-lg"
               placeholder="Nhập số km hiện tại"
             />
             <span className="absolute right-4 top-3 text-gray-500 font-medium">km</span>
           </div>
-          {currentOdometer > carData.odometer && (
+          {currentOdometer > vehicle.odometer && (
             <div className="mt-2 flex items-center justify-between text-sm">
               <span className="text-gray-600">Số km đã chạy:</span>
               <span className={`font-bold ${
-                (currentOdometer - carData.odometer) > 200 
+                (currentOdometer - vehicle.odometer) > 200 
                   ? 'text-red-600' 
                   : 'text-green-600'
               }`}>
-                {(currentOdometer - carData.odometer).toLocaleString()} km
+                {(currentOdometer - vehicle.odometer).toLocaleString()} km
               </span>
             </div>
           )}
-          {(currentOdometer - carData.odometer) > 200 && (
+          {(currentOdometer - vehicle.odometer) > 200 && (
             <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-800">
-              ⚠️ Vượt quá {(currentOdometer - carData.odometer - 200).toLocaleString()} km so với giới hạn
+              ⚠️ Vượt quá {(currentOdometer - vehicle.odometer - 200).toLocaleString()} km so với giới hạn
             </div>
           )}
         </div>

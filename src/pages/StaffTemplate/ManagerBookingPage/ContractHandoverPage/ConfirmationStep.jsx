@@ -1,14 +1,16 @@
 import { useState } from 'react';
 
 export default function ConfirmationStep({
-  carData,
+  bookingData,
   inspectionData, 
   isStaffExplanationConfirmed,
   setIsStaffExplanationConfirmed,
   isCustomerConfirmed,
   setIsCustomerConfirmed
 }) {
-  const booking = carData.booking || {};
+  const booking = bookingData || {};
+  const carData = bookingData?.vehicle || {};
+  const customer = bookingData?.customer || {};
 
   // định dạng tiền theo VND
   const formatCurrency = (amount) => {
@@ -61,11 +63,11 @@ export default function ConfirmationStep({
           <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
             <h3 className="text-lg font-bold text-green-900 mb-3">BÊN B (Bên thuê)</h3>
             <div className="space-y-2 text-sm">
-              <p><span className="font-semibold">Họ và tên:</span> {carData.customer.fullName || "N/A"}</p>
-              <p><span className="font-semibold">CCCD/CMND:</span> {carData.customer.idCard || "N/A"}</p>
-              <p><span className="font-semibold">BLX:</span> {carData.customer.driverLicense || "N/A"}</p>
-              <p><span className="font-semibold">Số điện thoại:</span> {carData.customer.phone || "N/A"}</p>
-              <p><span className="font-semibold">Email:</span> {carData.customer.email || "N/A"}</p>
+              <p><span className="font-semibold">Họ và tên:</span> {customer.fullName || "N/A"}</p>
+              <p><span className="font-semibold">CCCD/CMND:</span> {customer.idCard || "N/A"}</p>
+              <p><span className="font-semibold">BLX:</span> {customer.driverLicense || "N/A"}</p>
+              <p><span className="font-semibold">Số điện thoại:</span> {customer.phone || "N/A"}</p>
+              <p><span className="font-semibold">Email:</span> {customer.email || "N/A"}</p>
             </div>
           </div>
         </div>
@@ -248,7 +250,7 @@ export default function ConfirmationStep({
                   </li>
                 </ul>
                 <p className="mt-4 text-sm font-semibold text-green-900">
-                  Khách hàng: <span className="underline">{carData.customer.fullName || "___________________"}</span>
+                  Khách hàng: <span className="underline">{customer.fullName || "___________________"}</span>
                 </p>
               </div>
             </label>
