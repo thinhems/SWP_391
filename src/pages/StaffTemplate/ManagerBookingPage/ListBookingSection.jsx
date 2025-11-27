@@ -42,17 +42,17 @@ export default function ListBookingSection({ bookings, activeTab }) {
 
   // Hàm chuyển trang nhận xe trả
   const handleCarReturn = (booking) => {
-    navigate(`/staff/manage-bookings/car-return/${booking.idBooking}`);
+    navigate(`/staff/manage-bookings/car-return/${booking.id}`);
   };
 
   // Hàm chuyển trang giao xe
   const handleCarDelivery = (booking) => {
-    navigate(`/staff/manage-bookings/car-delivery/${booking.idBooking}`);
+    navigate(`/staff/manage-bookings/car-delivery/${booking.id}`);
   };
 
   // Hàm chuyển trang duyệt booking
   const handleApprovalReview = (booking) => {
-    navigate(`/staff/manage-bookings/approval-review/${booking.idBooking}`);
+    navigate(`/staff/manage-bookings/approval-review/${booking.id}`);
   };
 
   // Hàm định dạng tiền
@@ -93,7 +93,7 @@ export default function ListBookingSection({ bookings, activeTab }) {
         const car = booking.vehicle; // Lấy thông tin xe từ booking
         
         return (
-          <div key={booking.idBooking} className="w-full sm:w-80 md:w-96 lg:w-[510px] bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+          <div key={booking.id} className="w-full sm:w-80 md:w-96 lg:w-[510px] bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow">
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{car?.modelName || 'N/A'}</h3>

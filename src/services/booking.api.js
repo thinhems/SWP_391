@@ -2,9 +2,11 @@ import api from "./api";
 
 export const bookingService = {
   // lấy danh sách booking
-  getAllBookings: async () => {
+  getAllBookings: async (stationID) => {
     try {
-      const response = await api.get('/Booking/GetAllBookingsForStaff');
+      const response = await api.get(`/Booking/StaffGetBookingByStation/${stationID}`, {
+        timeout: 60000 // 60 giây
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -29,9 +31,9 @@ export const bookingService = {
     }
   },
   // Tự động cập nhật status xe + booking dành cho duyệt yêu cầu thuê, trả xe
-  updateStatusCar: async (idCar) => {
+  updateStatusBooking: async (idBooking) => {
     try {
-      const response = await api.put(`/Vehicle/AutpUpdateStatus/${idCar}`);
+      const response = await api.put(`/Booking/AutoUpdateBookingStatus/${idBooking}`);
       return response.data;
     } catch (error) {
       throw error;

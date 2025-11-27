@@ -12,7 +12,7 @@ export default function ComplatedHandoverPage() {
   const { bookingId } = useParams();
   const bookingIdNum = parseInt(bookingId, 10);
   const navigate = useNavigate();
-  const { bookingsData, loading, completeReturn } = useBookings();
+  const { bookingsData, loading, autoUpdateStatusBooking } = useBookings();
   const { addActivity } = useActivities();
   const [bookingData, setBookingData] = useState(null);
   const [error, setError] = useState(null);
@@ -77,14 +77,14 @@ export default function ComplatedHandoverPage() {
     return { kmOverageFee, batteryDeficitFee, additionalFeesTotal, totalFees, netAmount };
   };
   // Xử lý hoàn tất nhận xe trả
-  const handleCompleteReturn = async () => {
+  const handleautoUpdateStatusBooking = async () => {
     const { netAmount } = calculateFees();
     
     if (netAmount < 0) {
       setShowQRCode(true);
     } else {
       // Hoàn trả tiền cho khách hàng
-      await completeReturn(bookingData.id);
+      await autoUpdateStatusBooking(bookingData.id);
       
       addActivity({
         type: 'return',
@@ -108,7 +108,7 @@ export default function ComplatedHandoverPage() {
   // xử lý xác nhận đã nhận thanh toán từ khách
   const handleConfirmPayment = async () => {
     const { netAmount } = calculateFees();
-    await completeReturn(bookingData.id);
+    await autoUpdateStatusBooking(bookingData.id);
     
     addActivity({
       type: 'return',
@@ -129,7 +129,7 @@ export default function ComplatedHandoverPage() {
     navigate('/staff/manage-rentals?tab=rented');
   };
 
-  if (loading) {
+  if (loading || !bookingData) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="relative">
@@ -144,7 +144,7 @@ export default function ComplatedHandoverPage() {
     );
   }
 
-  if (error || !bookingData) {
+  if (error) {
     return (
       <div className="text-center py-12">
         <div className="text-red-500 mb-4">
@@ -155,7 +155,7 @@ export default function ComplatedHandoverPage() {
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy booking</h2>
         <p className="text-gray-600 mb-4">{error || `Booking với ID "${bookingIdNum}" không tồn tại.`}</p>
         <button
-          onClick={() => navigate('/staff/manage-rentals?tab=rented')}
+          onClick={() => navigate('/staff/manage-bookings?tab=rented')}
           className="cursor-pointer mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Quay lại danh sách booking
@@ -192,7 +192,7 @@ export default function ComplatedHandoverPage() {
           </div>
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
             <button
-              onClick={handleCompleteReturn}
+              onClick={handleautoUpdateStatusBooking}
               className="cursor-pointer w-full bg-purple-600 text-white py-4 px-6 rounded-lg text-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
