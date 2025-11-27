@@ -3,16 +3,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useBookings } from '../../../../contexts/BookingsContext';
 import { useActivities } from '../../../../contexts/ActivitiesContext';
 import HeaderSection from './HeaderSection';  
+import PopupExtendEndDate from './PopupExtendEndDate';
 import VehicleReturnInfo from './VehicleReturnInfo';
 import VehicleInspectionForm from './VehicleInspectionForm';
 import FeeCalculationSummary from './FeeCalculationSummary';
 import QRCodePayment from './QRCodePayment';
 
 export default function ComplatedHandoverPage() {
+  // State popup gia hạn
+  const [showExtendPopup, setShowExtendPopup] = useState(false);
   const { bookingId } = useParams();
   const bookingIdNum = parseInt(bookingId, 10);
   const navigate = useNavigate();
-  const { bookingsData, loading, autoUpdateStatusBooking } = useBookings();
+  const { bookingsData, loading, autoUpdateStatusBooking, extendBookingEndDate } = useBookings();
   const { addActivity } = useActivities();
   const [bookingData, setBookingData] = useState(null);
   const [error, setError] = useState(null);
@@ -56,7 +59,7 @@ export default function ComplatedHandoverPage() {
   // Tính toán các khoản phí
   const calculateFees = () => {
     if (!bookingData) return { kmOverageFee: 0, batteryDeficitFee: 0, additionalFeesTotal: 0, totalFees: 0, netAmount: 0 };
-    
+    const overdue = bookingData?.overdue || 0;
     const kmDriven = inspectionData.currentOdometer - bookingData.vehicle.odometer;
     const kmOverage = Math.max(0, kmDriven - 200);
     const kmOverageFee = kmOverage * 5000; // 5.000 vnd cho mỗi km vượt quá 200km
@@ -71,10 +74,10 @@ export default function ComplatedHandoverPage() {
       return sum + fee.amount;
     }, 0);
 
-    const totalFees = kmOverageFee + batteryDeficitFee + additionalFeesTotal;
+    const totalFees = kmOverageFee + batteryDeficitFee + additionalFeesTotal + overdue;
     const netAmount = bookingData.deposit - totalFees;
     
-    return { kmOverageFee, batteryDeficitFee, additionalFeesTotal, totalFees, netAmount };
+    return { kmOverageFee, batteryDeficitFee, additionalFeesTotal, totalFees, netAmount, overdue };
   };
   // Xử lý hoàn tất nhận xe trả
   const handleautoUpdateStatusBooking = async () => {
@@ -164,9 +167,30 @@ export default function ComplatedHandoverPage() {
     );
   }
 
+  // Xử lý mở popup gia hạn
+  const handleOpenExtendPopup = () => {
+    console.log('Opening extend end date popup');
+    setShowExtendPopup(true);
+  };
+
+  // Xử lý xác nhận gia hạn
+  const handleConfirmExtend = async (newEndDate) => {
+    try {
+      // Status giữ nguyên hoặc truyền lại status hiện tại
+      await extendBookingEndDate(bookingData.id, newEndDate);
+      alert('Gia hạn ngày thuê thành công!');
+      setShowExtendPopup(false);
+    } catch (err) {
+      alert('Gia hạn thất bại!');
+    }
+  };
+
+  // Truyền hàm mở popup cho HeaderSection
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <HeaderSection onNavigateBack={() => navigate('/staff/manage-bookings?tab=rented')} />
+      <HeaderSection 
+          onNavigateBack={() => navigate('/staff/manage-bookings?tab=rented')} 
+          onExtendEndDate={handleOpenExtendPopup} />
       {!showQRCode ? (
         <>
           <VehicleReturnInfo
@@ -184,8 +208,6 @@ export default function ComplatedHandoverPage() {
             <FeeCalculationSummary
               vehicle={bookingData.vehicle}
               deposit={bookingData.deposit}
-              rentalTime={bookingData.rentalTime}
-              rentalType={bookingData.rentalType}
               inspectionData={inspectionData}
               fees={calculateFees()}
             />
@@ -225,6 +247,12 @@ export default function ComplatedHandoverPage() {
           </div>
         </>
       )}
+      <PopupExtendEndDate
+        show={showExtendPopup}
+        onClose={() => setShowExtendPopup(false)}
+        onConfirm={handleConfirmExtend}
+        currentEndDate={bookingData?.endDate}
+      />
     </div>
   );
 }

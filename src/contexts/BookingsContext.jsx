@@ -15,7 +15,7 @@ export const BookingsProvider = ({ children }) => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [userStation, setUserStation] = useState(null);
+  const [userStation, setUserStation] = useState(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).station : null);
   const isFirstLoadRef = useRef(true); // ← Thêm ref
 
   // call api get danh sach booking
@@ -120,7 +120,15 @@ export const BookingsProvider = ({ children }) => {
       throw error;
     }
   };
-  
+  // cập nhật end date cho booking
+  const extendBookingEndDate = async (bookingId, newEndDate) => {
+    try {
+      await bookingService.extendEndDateBooking(bookingId, newEndDate);
+      await fetchBookings();
+    } catch (error) {
+      throw error;
+    }
+  };
 
   const value = {
     bookingsData,
@@ -131,6 +139,7 @@ export const BookingsProvider = ({ children }) => {
     autoUpdateStatusBooking,
     rejectCarApproval,
     createHandover,
+    extendBookingEndDate,
     setUserStation,
   };
 

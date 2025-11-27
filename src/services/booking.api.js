@@ -57,4 +57,20 @@ export const bookingService = {
       throw error;
     }
   },
+  // cập nhật thêm end date cho booking
+  extendEndDateBooking: async (idBooking, newEndDate) => {
+    try {
+      const formData = new FormData();
+      formData.append('Status', '');
+      formData.append('EndDate', newEndDate);
+      const response = await api.put(`/Booking/${idBooking}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };

@@ -74,10 +74,12 @@ export default function ListBookingSection({ bookings, activeTab, onCancelContra
     return !invalidTimes.some(invalid => time.includes(invalid));
   };
 
-  // Hàm format datetime
+  // Hàm format datetime theo giờ Việt Nam (UTC+7)
   const formatDateTime = (dateTimeString) => {
     if (!dateTimeString || !isValidTime(dateTimeString)) return '';
     const date = new Date(dateTimeString);
+    // Cộng thêm 7 tiếng để chuyển sang giờ Việt Nam
+    date.setHours(date.getHours() + 7);
     return date.toLocaleString('vi-VN', {
       day: '2-digit',
       month: '2-digit',
