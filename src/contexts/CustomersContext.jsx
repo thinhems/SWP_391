@@ -57,11 +57,11 @@ export const CustomersProvider = ({ children }) => {
   // Tính toán số liệu cho khách hàng
   const customersData = {
     total: customers.length,
-    verified: customers.filter(c => c.status === 'verified').length,
-    unverified: customers.filter(c => c.status === 'unverified').length,
-    vip: customers.filter(c => c.customerType === 'vip').length,
-    regular: customers.filter(c => c.customerType === 'regular').length,
-    new: customers.filter(c => c.customerType === 'new').length,
+    verified: customers.filter(c => c.isVerified === 3).length,
+    unverified: customers.filter(c => c.isVerified === 1).length,
+    vip: customers.filter(c => c.cusType === 'vip').length,
+    regular: customers.filter(c => c.cusType === 'regular').length,
+    new: customers.filter(c => c.cusType === 'new').length,
     allCustomers: customers,
     
     getCustomerById: (id) => customers.find(c => c.id === id),

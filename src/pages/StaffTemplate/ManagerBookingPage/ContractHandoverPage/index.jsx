@@ -115,7 +115,7 @@ export default function ContractHandoverPage() {
       });
       
       alert(`Bàn giao xe ${bookingData.vehicle?.plateNumber} thành công! Xe đã chuyển sang trạng thái cho thuê.`);
-      navigate('/staff/manage-rentals?tab=pending_handover');
+      navigate('/staff/manage-bookings?tab=pending_handover');
     } catch (error) {
       console.error('Error completing delivery:', error);
       alert('Có lỗi xảy ra khi hoàn tất bàn giao. Vui lòng thử lại.');

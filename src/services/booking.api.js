@@ -48,10 +48,10 @@ export const bookingService = {
       throw error;
     }
   },
-  // từ chối duyệt xe
-  rejectCarApproval: async (idCar) => {
+  // từ chối duyệt xe/hủy hợp đồng
+  rejectCarApproval: async (idBooking) => {
     try {
-      const response = await api.put(`/Vehicle/StaffRefusedStatus/${idCar}`);
+      const response = await api.put(`/Booking/RefuseBookingStatus/${idBooking}`);
       return response.data;
     } catch (error) {
       throw error;

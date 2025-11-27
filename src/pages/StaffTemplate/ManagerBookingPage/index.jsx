@@ -10,7 +10,7 @@ export default function ManagerBookingPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabFromUrl || 'pending_approval');
-  const { bookingsData, loading, setUserStation } = useBookings();
+  const { bookingsData, loading, setUserStation, rejectCarApproval } = useBookings();
   const { user } = useAuth();
 
   // Cập nhật station của user vào BookingsContext khi component mount
@@ -40,7 +40,11 @@ export default function ManagerBookingPage() {
   
   // Lọc bookings theo tab
   const filteredBookings = organizedBookings[activeTab] || [];
-
+  
+  const handleCancelContract = async (booking) => {
+    await rejectCarApproval(booking.id);
+    alert(`Hợp đồng ${booking.id} đã được hủy thành công.`);
+  }
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
@@ -66,7 +70,7 @@ export default function ManagerBookingPage() {
       </div>
       <StatsSection bookings={organizedBookings} />
       <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} bookings={organizedBookings} />
-      <ListCarsSection bookings={filteredBookings} activeTab={activeTab} />
+      <ListCarsSection bookings={filteredBookings} activeTab={activeTab} onCancelContract={handleCancelContract} />
     </div>
   );
 }

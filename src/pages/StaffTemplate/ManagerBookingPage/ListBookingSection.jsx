@@ -1,7 +1,7 @@
 
 import { useNavigate } from 'react-router-dom';
 
-export default function ListBookingSection({ bookings, activeTab }) {
+export default function ListBookingSection({ bookings, activeTab, onCancelContract }) {
   const navigate = useNavigate();
   
   // Kiểm tra nếu bookings undefined hoặc không phải array
@@ -54,7 +54,10 @@ export default function ListBookingSection({ bookings, activeTab }) {
   const handleApprovalReview = (booking) => {
     navigate(`/staff/manage-bookings/approval-review/${booking.id}`);
   };
-
+  // Hàm chuyển trang hủy hợp đồng
+  const handleCancelContract = (booking) => {
+    onCancelContract(booking);  
+  };  
   // Hàm định dạng tiền
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', { 
@@ -204,6 +207,12 @@ export default function ListBookingSection({ bookings, activeTab }) {
 
               {activeTab === 'pending_contract' && (
                 <>
+                  <button 
+                    onClick={() => handleCancelContract(booking)}
+                    className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors cursor-pointer"
+                  >
+                    Hủy hợp đồng
+                  </button>
                   <button 
                     onClick={() => handleClick(booking?.customer?.phoneNumber)}
                     className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer">
