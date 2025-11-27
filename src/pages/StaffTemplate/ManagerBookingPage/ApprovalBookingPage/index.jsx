@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useBookings } from '../../../../contexts/BookingsContext';
 import { useActivities } from '../../../../contexts/ActivitiesContext';
 import { customersService } from '../../../../services/customers.api';
-import { bookingService } from '../../../../services/booking.api';
 import HeaderSection from './HeaderSection';  
 import CustomerInfoSection from './CustomerInfoSection';
 import CarInfoSection from './CarInfoSection';
@@ -14,7 +13,7 @@ export default function ApprovalBookingPage() {
   const { bookingId } = useParams();
   const bookingIdNum = parseInt(bookingId, 10);
   const navigate = useNavigate();
-  const { bookingsData, loading } = useBookings();
+  const { bookingsData, loading, autoUpdateStatusBooking, rejectCarApproval } = useBookings();
   const { addActivity } = useActivities();
   const [bookingData, setBookingData] = useState(null);
   const [error, setError] = useState(null);
@@ -67,7 +66,7 @@ export default function ApprovalBookingPage() {
   const handleApprove = async () => {
     setIsProcessing(true);
     try {
-      await bookingService.updateStatusCar(bookingData.vehicle?.id);
+      await autoUpdateStatusBooking(bookingData.id);
       addActivity({
         type: 'approval',
         title: `Đã duyệt booking xe ${bookingData.vehicle?.modelName}`,
@@ -79,7 +78,7 @@ export default function ApprovalBookingPage() {
     
       alert(`Đã duyệt booking thành công!\n\nThông báo đã được gửi tới: ${bookingData.customer?.fullName}\nEmail: ${bookingData.customer?.email}\nSĐT: ${bookingData.customer?.phoneNumber}\n\nHợp đồng điện tử sẽ được tạo và gửi cho khách hàng trong vòng 5 phút.`);
       
-      navigate('/staff/manage-bookings?tab=paid'); 
+      navigate('/staff/manage-bookings?tab=pending_contract'); 
     } catch (error) {
       console.error('Error approving booking:', error);
       alert('Có lỗi xảy ra khi duyệt booking. Vui lòng thử lại.');
@@ -91,7 +90,7 @@ export default function ApprovalBookingPage() {
   const handleReject = async (reason) => {
     setIsProcessing(true);
     try {
-      await bookingService.rejectCarApproval(bookingData.vehicle?.id);
+      await rejectCarApproval(bookingData.id);
       addActivity({
         type: 'rejection',
         title: `Đã từ chối booking xe ${bookingData.vehicle?.modelName}`,
@@ -103,7 +102,7 @@ export default function ApprovalBookingPage() {
       
       alert(`Đã từ chối booking!\n\nLý do từ chối: ${reason}\n\nThông báo đã được gửi tới: ${bookingData.customer?.fullName}\nEmail: ${bookingData.customer?.email}\nSĐT: ${bookingData.customer?.phoneNumber}`);
 
-      navigate('/staff/manage-bookings?tab=paid');
+      navigate('/staff/manage-bookings?tab=pending_contract');
     } catch (error) {
       console.error('Error rejecting booking:', error);
       alert('Có lỗi xảy ra khi từ chối booking. Vui lòng thử lại.');

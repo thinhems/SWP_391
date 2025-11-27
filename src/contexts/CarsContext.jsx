@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { carService } from '../services/cars.api';
-import { bookingService } from '../services/booking.api';
+
 const CarsContext = createContext();
 
 export const useCars = () => {
@@ -46,10 +46,7 @@ export const CarsProvider = ({ children }) => {
       // Kiểm tra nếu đang ở trang con của manage-cars thì không fetch
       const currentPath = window.location.pathname;
       const isInManageCarPage = currentPath.includes('/manage-cars');
-      const isInDetailPage = currentPath.includes('/car-delivery') || 
-                            currentPath.includes('/car-return') ||
-                            currentPath.includes('/approval-review') ||
-                            currentPath.includes('/inspection');
+      const isInDetailPage = currentPath.includes('/inspection')
       // Chỉ refresh khi ở trang manage-cars và KHÔNG ở các trang chi tiết
       if (isInManageCarPage && !isInDetailPage) {
         fetchListCars();
@@ -83,6 +80,10 @@ export const CarsProvider = ({ children }) => {
       else if (status === 4) return filteredCars.filter(car => car.status === status && car.booking?.status === 4);
       else return [];
     },
+    // lọc xe theo model
+    getCarsByModel: (modelID) => {
+      return filteredCars.filter(car => car.modelID === modelID);
+    },
     // lấy xe theo ID 
     getCarById: (id) => filteredCars.find(car => car.id === id),
   };
@@ -114,15 +115,6 @@ export const CarsProvider = ({ children }) => {
       await fetchListCars();
     } catch (error) {
       console.error('Error updating car status:', error);
-      throw error;
-    }
-  };
-  // khởi tạo biên bản
-  const createHandover = async (handoverData) => {
-    try {
-      await bookingService.createHandover(handoverData);
-      await fetchListCars();
-    } catch (error) {
       throw error;
     }
   };
@@ -159,7 +151,6 @@ export const CarsProvider = ({ children }) => {
     error,
     updateCar,
     autoUpdateStatusCar,
-    createHandover,
     rejectCarApproval,
     updateCarInspectionItem,
     uploadCarImage,

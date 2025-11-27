@@ -23,7 +23,7 @@ export default function StaffSidebar({ isOpen }) {
     },
     {
       name: 'Quản lý xe',
-      path: '/staff/manage-cars?tab=available',
+      path: '/staff/manage-cars',
       icon: (
         <FontAwesomeIcon icon={faCar} />
       )

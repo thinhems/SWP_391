@@ -20,29 +20,29 @@ export default function QuickActions({ carsData, navigate }) {
       borderColor: 'border-purple-200',
       textColor: 'text-purple-700',
       buttonColor: 'bg-purple-600 hover:bg-purple-700',
-      onClick: () => navigate('/staff/manage-cars?tab=available'),
+      onClick: () => navigate('/staff/manage-cars'),
       description: 'Kiểm tra và bảo trì'
     },
     {
-      title: 'Xe chờ xác nhận',
+      title: 'Đơn chờ xác nhận',
       count: carsData.pending_approval,
       icon: faClock,
       bgColor: 'bg-yellow-50',
       borderColor: 'border-yellow-200',
       textColor: 'text-yellow-700',
       buttonColor: 'bg-yellow-600 hover:bg-yellow-700',
-      onClick: () => navigate('/staff/manage-cars?tab=pending_approval'),
+      onClick: () => navigate('/staff/manage-bookings?tab=pending_contract'),
       description: 'Xử lý yêu cầu thuê xe'
     },
     {
-      title: 'Xe chờ ký HĐ',
+      title: 'Đơn chờ bàn giao',
       count: carsData.pending_contract,
       icon: faCalendarCheck,
       bgColor: 'bg-blue-50',
       borderColor: 'border-blue-200',
       textColor: 'text-blue-700',
       buttonColor: 'bg-blue-600 hover:bg-blue-700',
-      onClick: () => navigate('/staff/manage-cars?tab=booked'),
+      onClick: () => navigate('/staff/manage-bookings?tab=pending_handover'),
       description: 'Chuẩn bị giao xe'
     },
     {

@@ -122,7 +122,7 @@ export default function ContractHandoverPage() {
     }
   };
 
-  if (loading) {
+  if (loading || !bookingData) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="relative">
