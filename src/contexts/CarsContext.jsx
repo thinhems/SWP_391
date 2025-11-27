@@ -15,7 +15,7 @@ export const CarsProvider = ({ children }) => {
   const [listCar, setListCar] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [userStation, setUserStation] = useState(null);
+  const [userStation, setUserStation] = useState(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).station : null);
   const isFirstLoadRef = useRef(true); // ← Thêm ref
 
   // Fetch dữ liệu xe

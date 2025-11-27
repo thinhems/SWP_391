@@ -1,4 +1,4 @@
-export default function FeeCalculationSummary({ vehicle, deposit, rentalTime, rentalType, inspectionData, fees }) {
+export default function FeeCalculationSummary({ vehicle, deposit, inspectionData, fees }) {
   // Tính thêm các giá trị cần thiết cho hiển thị
   const kmDriven = inspectionData.currentOdometer - vehicle.odometer;
   const kmOverage = Math.max(0, kmDriven - 200);
@@ -56,6 +56,17 @@ export default function FeeCalculationSummary({ vehicle, deposit, rentalTime, re
               {fees.batteryDeficitFee > 0 ? `+${formatCurrency(fees.batteryDeficitFee)}` : '0 đ'}
             </span>
           </div>
+          {/* phí gia hạn */}
+          {fees.overdue > 0 && ( 
+            <div className="flex justify-between items-center text-sm">
+            <div className="flex-1">
+              <span className="text-gray-600">Phí gia hạn</span>
+            </div>
+            <span className={`font-semibold ${fees.overdue > 0 ? 'text-red-600' : 'text-gray-400'}`}>
+              {fees.overdue > 0 ? `+${formatCurrency(fees.overdue)}` : '0 đ'}
+            </span>
+          </div>
+          )}
           {/* phụ phí bổ sung */}
           {inspectionData.additionalFees.length > 0 && (
             <div className="space-y-2">
