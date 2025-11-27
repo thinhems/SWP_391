@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 export default function ListBookingSection({ bookings, activeTab, onCancelContract }) {
   const navigate = useNavigate();
-  
   // Kiểm tra nếu bookings undefined hoặc không phải array
   if (!bookings || !Array.isArray(bookings)) {
     return (
@@ -12,10 +11,9 @@ export default function ListBookingSection({ bookings, activeTab, onCancelContra
       </div>
     );
   }
-
-  // Sắp xếp bookings theo requestTime gần nhất
+  // Sắp xếp bookings theo id giảm dần
   let sortedBookings = [...bookings].sort((a, b) => 
-    new Date(b.requestTime) - new Date(a.requestTime)
+    a.id - b.id
   );
   // Hàm đổi màu pin
   const getBatteryColor = (battery) => {
@@ -121,12 +119,10 @@ export default function ListBookingSection({ bookings, activeTab, onCancelContra
                   </span>
                 </div>
               </div>
-
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Vị trí:</span>
-                <span className="text-sm font-medium text-gray-900">{car?.location || 'N/A'}</span>
+                <span className="text-sm font-medium text-gray-900">{car?.status == 4 ? "Đang được thuê" : car?.location}</span>
               </div>
-
               {/* Thông tin khách hàng */}
               {booking?.customer && (
                 <>
@@ -228,6 +224,12 @@ export default function ListBookingSection({ bookings, activeTab, onCancelContra
                     className="flex-1 bg-orange-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors cursor-pointer"
                   >
                     Giao xe
+                  </button>
+                  <button 
+                    onClick={() => handleCancelContract(booking)}
+                    className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors cursor-pointer"
+                  >
+                    Hủy hợp đồng
                   </button>
                   <button 
                     onClick={() => handleClick(booking?.customer?.phoneNumber)}

@@ -24,31 +24,13 @@ export const authService = {
       // API trả về user data trực tiếp, không wrapped trong success/data
       const userData = response.data;
       console.log('AuthService - User data:', userData);
-
-      // Map role từ API
-      let mappedRole;
-      switch((userData.role || '').toUpperCase()) {
-        case 'STAFF':
-          mappedRole = 'staff';
-          break;
-        case 'ADMIN':
-          mappedRole = 'admin';
-          break;
-        case 'RENTER':
-          mappedRole = 'renter';
-          break;
-        default:
-          console.warn('Role không xác định:', userData.role);
-          mappedRole = 'renter';
-      }
-
       // Tạo user object
       const user = {
         id: userData.userId || userData.id || userData.renterId || null,
         name: userData.fullName || '',
         email: userData.email || '',
         phone: userData.phone || userData.phoneNumber || '',
-        role: mappedRole,
+        role: userData.role?.toLowerCase(),
         station: userData.stationId || null,
         verifiedStatus: userData.verifiedStatus || 1
       };

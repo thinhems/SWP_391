@@ -102,7 +102,7 @@ export default function ComplatedHandoverPage() {
         `Số tiền hoàn trả: ${Math.abs(netAmount).toLocaleString()} đ\n\n` +
         `Booking đã hoàn tất.`
       );
-      navigate('/staff/manage-rentals?tab=rented');
+      navigate('/staff/manage-bookings?tab=rented');
     }
   };
   // xử lý xác nhận đã nhận thanh toán từ khách
@@ -126,7 +126,7 @@ export default function ComplatedHandoverPage() {
       `Số tiền đã thu: ${Math.abs(netAmount).toLocaleString()} đ\n\n` +
       `Booking đã hoàn tất.`
     );
-    navigate('/staff/manage-rentals?tab=rented');
+    navigate('/staff/manage-bookings?tab=rented');
   };
 
   if (loading || !bookingData) {

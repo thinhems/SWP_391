@@ -90,6 +90,9 @@ export const BookingsProvider = ({ children }) => {
   const autoUpdateStatusBooking = async (bookingId) => { 
     try {
       await bookingService.updateStatusBooking(bookingId);
+      setBookings(prevBookings => prevBookings.map(booking => 
+        booking.id === bookingId ? { ...booking, status: booking.status + 1 } : booking
+      ));
       await fetchBookings();
     } catch (error) {
       console.error('Error updating car status:', error);
@@ -97,9 +100,12 @@ export const BookingsProvider = ({ children }) => {
     }
   };
   // từ chối yêu cầu thuê xe
-  const rejectCarApproval = async (carId) => { 
+  const rejectCarApproval = async (bookingId) => { 
     try {
-      await bookingService.rejectCarApproval(carId);
+      await bookingService.rejectCarApproval(bookingId);
+      setBookings(prevBookings => prevBookings.map(booking => 
+        booking.id === bookingId ? { ...booking, status: 6 } : booking
+      ));
       await fetchBookings();
     } catch (error) {
       throw error;

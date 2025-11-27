@@ -12,8 +12,7 @@ const loginValidationSchema = Yup.object({
     .required('Email là bắt buộc'),
   password: Yup.string()
     .min(1, 'Mật khẩu phải có ít nhất 6 ký tự')
-    .required('Mật khẩu là bắt buộc'),
-  rememberMe: Yup.boolean()
+    .required('Mật khẩu là bắt buộc')
 });
 
 export default function LoginPage() {
@@ -29,8 +28,7 @@ export default function LoginPage() {
   // giá trị ban đầu cho form đăng nhập
   const initialValues = {
     email: '',
-    password: '',
-    rememberMe: false
+    password: ''
   };
   // hàm xử lý khi submit form đăng nhập
   const handleSubmit = async (values, { setSubmitting, setFieldError, setStatus }) => {
@@ -44,8 +42,7 @@ export default function LoginPage() {
       
       const loginResult = await login({
         email: values.email,
-        password: values.password,
-        rememberMe: values.rememberMe
+        password: values.password
       }).catch(error => {
         console.error('Login API error:', error);
         throw error;

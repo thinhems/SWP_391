@@ -7,14 +7,37 @@ import { CarsProvider } from '../../contexts/CarsContext';
 import { CustomersProvider } from '../../contexts/CustomersContext';
 import { ActivitiesProvider } from '../../contexts/ActivitiesContext';
 import { StationsProvider } from '../../contexts/StationsContext';
+import { jwtDecode } from "jwt-decode";
 
 export default function AdminTemplate() {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   if (loading) return null;
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.role !== 'admin') return <Navigate to="/" replace />;
+   // Kiểm tra token từ localStorage
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      return <Navigate to="/login" replace />;
+    }
+  
+    // Decode JWT token để lấy role
+    let userRole;
+    try {
+      const payload = jwtDecode(token);
+      userRole = payload.role;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return <Navigate to="/login" replace />;
+    }
+  
+    // Kiểm tra role từ token
+    if (userRole?.toUpperCase() !== "ADMIN") {
+      return <Navigate to="/" replace />;
+    }
+  
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 

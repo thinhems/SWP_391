@@ -68,13 +68,6 @@ export const CustomersProvider = ({ children }) => {
     getCustomersByStatus: (status) => customers.filter(c => c.status === status),
     getCustomersByType: (type) => customers.filter(c => c.customerType === type)
   };
-
-  // Cập nhật khách hàng
-  const updateCustomer = (customerId, updatedData) => {
-    setCustomers(prevCustomers => 
-      prevCustomers.map(c => c.id === customerId ? { ...c, ...updatedData } : c)
-    );
-  };
   // cập nhật status verify khách hàng
   const updateVerificationStatus = async (customerId, status) => {
     try {
@@ -100,7 +93,6 @@ export const CustomersProvider = ({ children }) => {
     loading,
     error,
     fetchCustomers,
-    updateCustomer,
     updateVerificationStatus,
     updateCustomerType
   };
