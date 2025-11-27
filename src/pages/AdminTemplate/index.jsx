@@ -10,33 +10,24 @@ import { StationsProvider } from '../../contexts/StationsContext';
 import { jwtDecode } from "jwt-decode";
 
 export default function AdminTemplate() {
-  const { loading } = useAuth();
+  const { user, loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  if (loading) return null;
-   // Kiểm tra token từ localStorage
-    const token = localStorage.getItem('token');
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
     
-    if (!token) {
+  if (!user) {
       return <Navigate to="/login" replace />;
     }
-  
-    // Decode JWT token để lấy role
-    let userRole;
-    try {
-      const payload = jwtDecode(token);
-      userRole = payload.role;
-    } catch (error) {
-      console.error('Error decoding token:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      return <Navigate to="/login" replace />;
-    }
-  
-    // Kiểm tra role từ token
-    if (userRole?.toUpperCase() !== "ADMIN") {
-      return <Navigate to="/" replace />;
-    }
+  // Kiểm tra role từ auth context
+  if (user.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
   
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);

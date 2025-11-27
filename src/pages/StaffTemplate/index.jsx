@@ -10,7 +10,7 @@ import { ActivitiesProvider } from "../../contexts/ActivitiesContext";
 import { jwtDecode } from "jwt-decode";
 
 export default function StaffTemplate() {
-  const { loading } = useAuth();
+  const { user, loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   
   if (loading) {
@@ -20,28 +20,12 @@ export default function StaffTemplate() {
       </div>
     );
   }
-
-  // Kiểm tra token từ localStorage
-  const token = localStorage.getItem('token');
   
-  if (!token) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
-
-  // Decode JWT token để lấy role
-  let userRole;
-  try {
-    const payload = jwtDecode(token);
-    userRole = payload.role;
-  } catch (error) {
-    console.error('Error decoding token:', error);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    return <Navigate to="/login" replace />;
-  }
-
-  // Kiểm tra role từ token
-  if (userRole?.toUpperCase() !== "STAFF") {
+  // Kiểm tra role từ auth context
+  if (user.role !== "staff") {
     return <Navigate to="/" replace />;
   }
 
