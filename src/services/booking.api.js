@@ -10,6 +10,15 @@ export const bookingService = {
       throw error;
     }
   },
+  // lấy danh sách tất cả booking (cho admin)
+  getAllBookingsForAdmin: async () => {
+    try {
+      const response = await api.get('/Booking');
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
   // lây thông tin booking theo id xe 
   getBookingByCarId: async (idCar) => {
     try {
