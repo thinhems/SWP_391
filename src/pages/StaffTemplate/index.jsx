@@ -7,9 +7,10 @@ import { BookingsProvider } from '../../contexts/BookingsContext';
 import { CarsProvider } from "../../contexts/CarsContext";
 import { CustomersProvider } from "../../contexts/CustomersContext";
 import { ActivitiesProvider } from "../../contexts/ActivitiesContext";
+import { jwtDecode } from "jwt-decode";
 
 export default function StaffTemplate() {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   
   if (loading) {
@@ -30,8 +31,8 @@ export default function StaffTemplate() {
   // Decode JWT token để lấy role
   let userRole;
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    userRole = payload.role || payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+    const payload = jwtDecode(token);
+    userRole = payload.role;
   } catch (error) {
     console.error('Error decoding token:', error);
     localStorage.removeItem('token');

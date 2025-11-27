@@ -91,33 +91,6 @@ export default function LoginFormCard({ formikProps, onNavigateToRegister, onFor
               <ErrorMessage name="password" />
             </ErrorMessage>
           </div>
-          {/* ghi nhớ login */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Field name="rememberMe">
-                {({ field }) => (
-                  <input
-                    {...field}
-                    id="rememberMe"
-                    type="checkbox"
-                    checked={field.value}
-                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                  />
-                )}
-              </Field>
-              <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
-                Ghi nhớ đăng nhập
-              </label>
-            </div>
-
-            <button
-              type="button"
-              onClick={onForgotPassword}
-              className="text-sm text-green-600 hover:text-green-500 font-medium transition-colors cursor-pointer"
-            >
-              Quên mật khẩu?
-            </button>
-          </div>
           {/* thông báo lỗi */}
           {status && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
@@ -153,8 +126,8 @@ export default function LoginFormCard({ formikProps, onNavigateToRegister, onFor
             )}
           </button>
         </Form>
-        {/* register link */}
-        <div className="mt-6 text-center">
+        {/* register link & forgot password */}
+        <div className="mt-6 text-center space-y-3">
           <p className="text-sm text-gray-600">
             Chưa có tài khoản?{' '}
             <button
@@ -163,6 +136,15 @@ export default function LoginFormCard({ formikProps, onNavigateToRegister, onFor
               className="font-medium text-green-600 hover:text-green-500 transition-colors cursor-pointer"
             >
               Đăng ký ngay
+            </button>
+          </p>
+          <p className="text-sm">
+            <button
+              type="button"
+              onClick={onForgotPassword}
+              className="text-green-600 hover:text-green-500 font-medium transition-colors cursor-pointer"
+            >
+              Quên mật khẩu?
             </button>
           </p>
         </div>

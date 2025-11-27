@@ -76,7 +76,7 @@ export default function ApprovalBookingPage() {
         bgColor: 'bg-green-100'
       });
     
-      alert(`Đã duyệt booking thành công!\n\nThông báo đã được gửi tới: ${bookingData.customer?.fullName}\nEmail: ${bookingData.customer?.email}\nSĐT: ${bookingData.customer?.phoneNumber}\n\nHợp đồng điện tử sẽ được tạo và gửi cho khách hàng trong vòng 5 phút.`);
+      alert(`Đã duyệt booking thành công!\n\nThông báo đã được gửi tới: ${bookingData.customer?.fullName}\nEmail: ${bookingData.customer?.email}\nSĐT: ${bookingData.customer?.phone}\n\nHợp đồng điện tử sẽ được tạo và gửi cho khách hàng trong vòng 5 phút.`);
       
       navigate('/staff/manage-bookings?tab=pending_contract'); 
     } catch (error) {
@@ -100,7 +100,7 @@ export default function ApprovalBookingPage() {
         bgColor: 'bg-red-100'
       });
       
-      alert(`Đã từ chối booking!\n\nLý do từ chối: ${reason}\n\nThông báo đã được gửi tới: ${bookingData.customer?.fullName}\nEmail: ${bookingData.customer?.email}\nSĐT: ${bookingData.customer?.phoneNumber}`);
+      alert(`Đã từ chối booking!\n\nLý do từ chối: ${reason}\n\nThông báo đã được gửi tới: ${bookingData.customer?.fullName}\nEmail: ${bookingData.customer?.email}\nSĐT: ${bookingData.customer?.phone}`);
 
       navigate('/staff/manage-bookings?tab=pending_contract');
     } catch (error) {
