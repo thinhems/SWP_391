@@ -20,10 +20,12 @@ export const CarsProvider = ({ children }) => {
 
   // Fetch dữ liệu xe
   const fetchListCars = async () => {
+    if (!userStation) {
+      return;
+    }
     if (isFirstLoadRef.current) {
       setLoading(true);
     }
-    
     setError(null);
     try {
       const data = await carService.getCars();
@@ -56,7 +58,7 @@ export const CarsProvider = ({ children }) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, []);
+  }, [userStation]);
   // Lọc xe theo station của user
   const filteredCars = userStation
     ? listCar.filter(car => car.stationID === userStation)
@@ -66,18 +68,18 @@ export const CarsProvider = ({ children }) => {
     // số lượng xe theo trạng thái
     total: filteredCars.length,
     available: filteredCars.filter(car => car.status === 0).length,
-    pending_approval: filteredCars.filter(car => car.status === 1 && car.booking?.status === 1).length,
-    pending_contract: filteredCars.filter(car => car.status === 2 && car.booking?.status === 2).length,
-    pending_handover: filteredCars.filter(car => car.status === 3 && car.booking?.status === 3).length,
-    rented: filteredCars.filter(car => car.status === 4 && car.booking?.status === 4).length,
+    pending_approval: filteredCars.filter(car => car.status === 1).length,
+    pending_contract: filteredCars.filter(car => car.status === 2).length,
+    pending_handover: filteredCars.filter(car => car.status === 3).length,
+    rented: filteredCars.filter(car => car.status === 4).length,
     allCars: filteredCars,
     // lấy danh sách xe theo trạng thái
     getCarsByStatus: (status) => {
       if (status === 0) return filteredCars.filter(car => car.status === status);
-      else if (status === 1) return filteredCars.filter(car => car.status === status && car.booking?.status === 1);
-      else if (status === 2) return filteredCars.filter(car => car.status === status && car.booking?.status === 2);
-      else if (status === 3) return filteredCars.filter(car => car.status === status && car.booking?.status === 3);
-      else if (status === 4) return filteredCars.filter(car => car.status === status && car.booking?.status === 4);
+      else if (status === 1) return filteredCars.filter(car => car.status === status);
+      else if (status === 2) return filteredCars.filter(car => car.status === status);
+      else if (status === 3) return filteredCars.filter(car => car.status === status);
+      else if (status === 4) return filteredCars.filter(car => car.status === status);
       else return [];
     },
     // lọc xe theo model
