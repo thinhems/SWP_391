@@ -21,7 +21,7 @@ export default function StaffTemplate() {
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role !== "staff") {
+  if (user.role !== "STAFF") {
     return <Navigate to="/" replace />;
   }
 

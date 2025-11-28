@@ -14,7 +14,7 @@ export default function AdminTemplate() {
 
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
-  if (user.role !== 'admin') return <Navigate to="/" replace />;
+  if (user.role !== 'ADMIN') return <Navigate to="/" replace />;
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 

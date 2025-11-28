@@ -25,21 +25,10 @@ export const authService = {
       const userData = response.data;
       console.log('AuthService - User data:', userData);
 
-      // Map role từ API
-      let mappedRole;
-      switch((userData.role || '').toUpperCase()) {
-        case 'STAFF':
-          mappedRole = 'staff';
-          break;
-        case 'ADMIN':
-          mappedRole = 'admin';
-          break;
-        case 'RENTER':
-          mappedRole = 'renter';
-          break;
-        default:
-          console.warn('Role không xác định:', userData.role);
-          mappedRole = 'renter';
+      // Sử dụng role từ BE trực tiếp (ADMIN, STAFF, RENTER)
+      const role = (userData.role || '').toUpperCase();
+      if (!['ADMIN', 'STAFF', 'RENTER'].includes(role)) {
+        console.warn('Role không xác định:', userData.role, '- Mặc định: RENTER');
       }
 
       // Tạo user object
@@ -48,7 +37,7 @@ export const authService = {
         name: userData.fullName || '',
         email: userData.email || '',
         phone: userData.phone || userData.phoneNumber || '',
-        role: mappedRole,
+        role: role || 'RENTER',
         station: userData.stationId || null,
         verifiedStatus: userData.verifiedStatus || 1
       };
