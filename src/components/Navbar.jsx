@@ -108,7 +108,7 @@ export default function Navbar() {
                       <div className="flex items-center space-x-2 mt-2">
                         {user?.role && (
                           <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
-                            {user.role === 'admin' ? '🛡️ Quản trị' : user.role === 'staff' ? '👔 Nhân viên' : '👤 Khách hàng'}
+                            {user.role === 'ADMIN' ? '🛡️ Quản trị' : user.role === 'STAFF' ? '👔 Nhân viên' : '👤 Khách hàng'}
                           </span>
                         )}
                         <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
@@ -136,7 +136,7 @@ export default function Navbar() {
                         </svg>
                         Thông tin cá nhân
                       </Link>
-                      {user?.role === 'staff' ? (
+                      {user?.role === 'STAFF' ? (
                         <Link
                           to="/staff"
                           onClick={() => setIsProfileMenuOpen(false)}
@@ -147,7 +147,7 @@ export default function Navbar() {
                           </svg>
                           Trang quản lý Staff
                         </Link>
-                      ) : user?.role === 'admin' ? (
+                      ) : user?.role === 'ADMIN' ? (
                         <Link
                           to="/admin"
                           onClick={() => setIsProfileMenuOpen(false)}

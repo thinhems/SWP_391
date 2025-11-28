@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 // Create axios instance with base configuration
 const api = axios.create({
   baseURL: '/api', // This will be proxied in development
-  timeout: 10000,
+  timeout: 20000,
   headers: {
     'Content-Type': 'application/json'
   }

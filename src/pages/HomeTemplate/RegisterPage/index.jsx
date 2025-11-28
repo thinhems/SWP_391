@@ -13,16 +13,6 @@ const registerValidationSchema = Yup.object({
   email: Yup.string()
     .email('Email không hợp lệ')
     .required('Email là bắt buộc'),
-  phone: Yup.string()
-    .matches(/^[0-9]{10,11}$/, 'Số điện thoại phải có 10-11 chữ số')
-    .required('Số điện thoại là bắt buộc'),
-  password: Yup.string()
-    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
-    .matches(/^(?=.*[a-zA-Z])(?=.*\d)/, 'Mật khẩu phải chứa ít nhất 1 chữ cái và 1 số')
-    .required('Mật khẩu là bắt buộc'),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password'), null], 'Mật khẩu xác nhận không khớp')
-    .required('Xác nhận mật khẩu là bắt buộc'),
   agreeToTerms: Yup.boolean()
     .oneOf([true], 'Bạn phải đồng ý với điều khoản và điều kiện')
     .required('Bạn phải đồng ý với điều khoản và điều kiện')
