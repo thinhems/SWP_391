@@ -21,8 +21,8 @@ export default function LoginPage() {
 
   // nếu đã đăng nhập, chuyển hướng theo vai trò
   if (isAuthenticated && !loading) {
-    if (user?.role === 'ADMIN') return <Navigate to="/admin" replace />;
-    if (user?.role === 'STAFF') return <Navigate to="/staff" replace />;
+    if (user?.role === 'admin') return <Navigate to="/admin" replace />;
+    if (user?.role === 'staff') return <Navigate to="/staff" replace />;
     return <Navigate to="/" replace />;
   }
   // giá trị ban đầu cho form đăng nhập
@@ -52,11 +52,17 @@ export default function LoginPage() {
 
       if (loginResult?.success && loginResult?.data?.user) {
         const role = loginResult.data.user.role;
-        if (role === 'ADMIN') {
+        console.log('User role after login:', role);
+        console.log('Role type:', typeof role);
+        
+        if (role === 'admin') {
+          console.log('Redirecting to /admin');
           navigate('/admin', { replace: true });
-        } else if (role === 'STAFF') {
+        } else if (role === 'staff') {
+          console.log('Redirecting to /staff');
           navigate('/staff', { replace: true });
         } else {
+          console.log('Redirecting to / (home)');
           navigate('/', { replace: true });
         }
         return;
