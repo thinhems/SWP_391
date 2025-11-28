@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 // Create axios instance with base configuration
 const api = axios.create({
@@ -14,6 +15,26 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
+      // Kiểm tra token có hết hạn không
+      try {
+        const payload = jwtDecode(token);
+        const expiry = payload.exp;
+        
+        if (expiry) {
+          const now = Math.floor(Date.now() / 1000);
+          if (now >= expiry) {
+            // Token hết hạn, xóa và chuyển về login
+            console.log('Token hết hạn, đang logout...');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+            return Promise.reject(new Error('Token đã hết hạn'));
+          }
+        }
+      } catch (error) {
+        console.error('Error checking token in interceptor:', error);
+      }
+      
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;

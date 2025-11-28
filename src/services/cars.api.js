@@ -5,7 +5,18 @@ export const carService = {
   getCars: async () => {
     try {
       const response = await api.get("/Vehicle", {
-        timeout: 30000 // 30 giây
+        timeout: 60000 // 60 giây
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  // lấy danh sách xe theo station
+  getCarsByStation: async (stationId) => {
+    try {
+      const response = await api.get(`/Vehicle/GetAllVehiclesByStation/${stationId}`, {
+        timeout: 60000 // 60 giây
       });
       return response.data;
     } catch (error) {
@@ -49,24 +60,6 @@ export const carService = {
   updateCarInspectionItem: async (carId, itemData) => {
     try {
       const response = await api.put(`/Vehicle/UpdateCarItems/${carId}`, itemData);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-  // Tự động cập nhật status xe + booking dành cho duyệt yêu cầu thuê, trả xe
-  updateStatusBooking: async (idCar) => {
-    try {
-      const response = await api.put(`/Vehicle/AutpUpdateStatus/${idCar}`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-  // từ chối duyệt xe
-  rejectCarApproval: async (idCar) => {
-    try {
-      const response = await api.put(`/Vehicle/StaffRefusedStatus/${idCar}`);
       return response.data;
     } catch (error) {
       throw error;

@@ -2,9 +2,11 @@ import api from "./api";
 
 export const bookingService = {
   // lấy danh sách booking
-  getAllBookings: async () => {
+  getAllBookings: async (stationID) => {
     try {
-      const response = await api.get('/Booking/GetAllBookingsForStaff');
+      const response = await api.get(`/Booking/StaffGetBookingByStation/${stationID}`, {
+        timeout: 60000 // 60 giây
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -38,18 +40,34 @@ export const bookingService = {
     }
   },
   // Tự động cập nhật status xe + booking dành cho duyệt yêu cầu thuê, trả xe
-  updateStatusCar: async (idCar) => {
+  updateStatusBooking: async (idBooking) => {
     try {
-      const response = await api.put(`/Vehicle/AutpUpdateStatus/${idCar}`);
+      const response = await api.put(`/Booking/AutoUpdateBookingStatus/${idBooking}`);
       return response.data;
     } catch (error) {
       throw error;
     }
   },
-  // từ chối duyệt xe
-  rejectCarApproval: async (idCar) => {
+  // từ chối duyệt xe/hủy hợp đồng
+  rejectCarApproval: async (idBooking) => {
     try {
-      const response = await api.put(`/Vehicle/StaffRefusedStatus/${idCar}`);
+      const response = await api.put(`/Booking/RefuseBookingStatus/${idBooking}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  // cập nhật thêm end date cho booking
+  extendEndDateBooking: async (idBooking, newEndDate) => {
+    try {
+      const formData = new FormData();
+      formData.append('Status', '');
+      formData.append('EndDate', newEndDate);
+      const response = await api.put(`/Booking/${idBooking}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       return response.data;
     } catch (error) {
       throw error;

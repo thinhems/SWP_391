@@ -19,7 +19,6 @@ export default function ContractDetailPage() {
       setLoading(true);
       try {
         const result = await bookingService.getBookingDetail(id);
-        
         if (!result.success) {
           console.error('Error:', result.error);
           navigate('/my-contracts');
@@ -111,11 +110,11 @@ export default function ContractDetailPage() {
             pickupLocation: booking.stationName || 'N/A',
             rentalType: booking.rentalType === 2 ? 'weeks' : booking.rentalType === 3 ? 'months' : 'days',
             rentTime: booking.rentTime || null,
-            totalDays: Math.max(1, Math.ceil((new Date(booking.endDate) - new Date(booking.startDate)) / (1000*60*60*24))),
+            totalDays: booking.rentalTime || Math.max(1, Math.ceil((new Date(booking.endDate) - new Date(booking.startDate)) / (1000*60*60*24))),
             maxKmPerDay: 300, // Default value
             totalMaxKm: Math.max(1, Math.ceil((new Date(booking.endDate) - new Date(booking.startDate)) / (1000*60*60*24))) * 300,
-            pricePerDay: (booking.retalCost || booking.baseCost || 0) / Math.max(1, Math.ceil((new Date(booking.endDate) - new Date(booking.startDate)) / (1000*60*60*24))),
-            totalCost: booking.retalCost || booking.baseCost || 0,
+            pricePerDay: (booking.retalCost + (booking.overdue || 0))  / booking.rentalTime,
+            totalCost: booking.retalCost + (booking.overdue || 0),
             deposit: booking.deposit || 0,
             grandTotal: booking.baseCost || (booking.retalCost + booking.deposit) || 0,
             kmOverageFee: 5000, // Default value
@@ -142,7 +141,7 @@ export default function ContractDetailPage() {
             deposit: booking.deposit || 0,
             totalCost: booking.baseCost || (booking.retalCost + booking.deposit) || 0,
             finalCost: booking.finalCost || null,
-            finalAmount: booking.finalCost || booking.baseCost || 0,
+            finalAmount: (booking.baseCost || 0) + (booking.overdue || 0),
             voucher: booking.voucherID ? { 
               code: `VOUCHER-${booking.voucherID}`,
               discount: 0 

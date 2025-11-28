@@ -19,17 +19,30 @@ export default function ManagerCustomerPage() {
   const customers = customersData.allCustomers;
   
   // Filter khách hàng
-  const filteredCustomers = customers.filter((customer) => {
-    const searchMatch = 
-      customer.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.phone.includes(searchTerm);
-    
-    const statusMatch = statusFilter === 'all' || customer.isVerified === parseInt(statusFilter);
-    const typeMatch = typeFilter === 'all' || customer.cusType === parseInt(typeFilter);
+  const getFilteredCustomers = () => {
+    let filtered = customers;
+    // Lọc theo trạng thái
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(customer => customer.isVerified === parseInt(statusFilter));
+    }
+    // Lọc theo loại khách hàng
+    if (typeFilter !== 'all') {
+      filtered = filtered.filter(customer => customer.cusType === parseInt(typeFilter));
+    }
+    // Tìm kiếm
+    if (searchTerm.trim()) {
+      const query = searchTerm.toLowerCase();
+      filtered = filtered.filter(customer =>
+        customer.fullName?.toLowerCase().includes(query) ||
+        customer.email?.toLowerCase().includes(query) ||
+        customer.phone?.includes(searchTerm)
+      );
+    }
 
-    return searchMatch && statusMatch && typeMatch;
-  });
+    return filtered;
+  };
+
+  const filteredCustomers = getFilteredCustomers();
 
   // Phân trang
   const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);

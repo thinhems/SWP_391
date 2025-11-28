@@ -57,23 +57,16 @@ export const CustomersProvider = ({ children }) => {
   // Tính toán số liệu cho khách hàng
   const customersData = {
     total: customers.length,
-    verified: customers.filter(c => c.status === 'verified').length,
-    unverified: customers.filter(c => c.status === 'unverified').length,
-    vip: customers.filter(c => c.customerType === 'vip').length,
-    regular: customers.filter(c => c.customerType === 'regular').length,
-    new: customers.filter(c => c.customerType === 'new').length,
+    verified: customers.filter(c => c.isVerified === 3).length,
+    unverified: customers.filter(c => c.isVerified === 1).length,
+    vip: customers.filter(c => c.cusType === 'vip').length,
+    regular: customers.filter(c => c.cusType === 'regular').length,
+    new: customers.filter(c => c.cusType === 'new').length,
     allCustomers: customers,
     
     getCustomerById: (id) => customers.find(c => c.id === id),
     getCustomersByStatus: (status) => customers.filter(c => c.status === status),
     getCustomersByType: (type) => customers.filter(c => c.customerType === type)
-  };
-
-  // Cập nhật khách hàng
-  const updateCustomer = (customerId, updatedData) => {
-    setCustomers(prevCustomers => 
-      prevCustomers.map(c => c.id === customerId ? { ...c, ...updatedData } : c)
-    );
   };
   // cập nhật status verify khách hàng
   const updateVerificationStatus = async (customerId, status) => {
@@ -100,7 +93,6 @@ export const CustomersProvider = ({ children }) => {
     loading,
     error,
     fetchCustomers,
-    updateCustomer,
     updateVerificationStatus,
     updateCustomerType
   };

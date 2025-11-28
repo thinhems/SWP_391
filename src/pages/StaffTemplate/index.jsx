@@ -7,47 +7,49 @@ import { BookingsProvider } from '../../contexts/BookingsContext';
 import { CarsProvider } from "../../contexts/CarsContext";
 import { CustomersProvider } from "../../contexts/CustomersContext";
 import { ActivitiesProvider } from "../../contexts/ActivitiesContext";
-import { StationsProvider } from "../../contexts/StationsContext";
+import { jwtDecode } from "jwt-decode";
 
 export default function StaffTemplate() {
   const { user, loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   
   if (loading) {
-    return null;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
-
+  
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-
-  if (user.role !== "STAFF") {
+  // Kiểm tra role từ auth context
+  if (user.role !== "staff") {
     return <Navigate to="/" replace />;
   }
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
-    <StationsProvider>
-      <CarsProvider>
-        <CustomersProvider>
-          <ActivitiesProvider>
-            <BookingsProvider>
-              <div className="flex h-screen bg-gray-100">
-              <div className={`${sidebarOpen ? "w-64" : "w-16"} transition-all duration-300 ease-in-out`}>
-                <StaffSidebar isOpen={sidebarOpen} />
-              </div>
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <HeaderStaff onToggleSidebar={toggleSidebar} />
-                <main className="flex-1 overflow-y-auto p-6">
-                  <Outlet />
-                </main>
-              </div>
+    <CarsProvider>
+      <CustomersProvider>
+        <ActivitiesProvider>
+          <BookingsProvider>
+            <div className="flex h-screen bg-gray-100">
+            <div className={`${sidebarOpen ? "w-64" : "w-16"} transition-all duration-300 ease-in-out`}>
+              <StaffSidebar isOpen={sidebarOpen} />
             </div>
-          </BookingsProvider>
-        </ActivitiesProvider>
-      </CustomersProvider>
-    </CarsProvider>
-  </StationsProvider>
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <HeaderStaff onToggleSidebar={toggleSidebar} />
+              <main className="flex-1 overflow-y-auto p-6">
+                <Outlet />
+              </main>
+            </div>
+          </div>
+        </BookingsProvider>
+      </ActivitiesProvider>
+    </CustomersProvider>
+  </CarsProvider>
 );
 }

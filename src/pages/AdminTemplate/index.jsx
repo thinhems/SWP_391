@@ -7,14 +7,28 @@ import { CarsProvider } from '../../contexts/CarsContext';
 import { CustomersProvider } from '../../contexts/CustomersContext';
 import { ActivitiesProvider } from '../../contexts/ActivitiesContext';
 import { StationsProvider } from '../../contexts/StationsContext';
+import { jwtDecode } from "jwt-decode";
 
 export default function AdminTemplate() {
   const { user, loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  if (loading) return null;
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.role !== 'ADMIN') return <Navigate to="/" replace />;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+    
+  if (!user) {
+      return <Navigate to="/login" replace />;
+    }
+  // Kiểm tra role từ auth context
+  if (user.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+  
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 

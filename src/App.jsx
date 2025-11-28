@@ -27,6 +27,7 @@ import StaffManagement from './pages/AdminTemplate/StaffManagement';
 // Import Staff Pages
 import OverviewPage from './pages/StaffTemplate/OverviewPage';
 import ManagerBookingPage from './pages/StaffTemplate/ManagerBookingPage';
+import ManagerCarsPage from './pages/StaffTemplate/ManagerCarsPage';
 import AdminManagerCarsPage from './pages/AdminTemplate/ManagerCarsPage';
 import ContractHandoverPage from './pages/StaffTemplate/ManagerBookingPage/ContractHandoverPage';
 import ComplatedHandoverPage from './pages/StaffTemplate/ManagerBookingPage/ComplatedHandoverPage';
@@ -67,6 +68,8 @@ function App() {
               <Route path="manage-bookings/car-return/:bookingId" element={<ComplatedHandoverPage />} />
               <Route path="manage-bookings/approval-review/:bookingId" element={<ApprovalBookingPage />} />
               <Route path="manage-bookings/inspection/:bookingId" element={<CarInspectionPage />} />
+              <Route path="manage-cars" element={<ManagerCarsPage />} />
+              <Route path="manage-cars/inspection/:carId" element={<CarInspectionPage />} />
               <Route path="manage-customer" element={<ManagerCustomerPage />} />
               <Route path="manage-customer/verify/:customerId" element={<CustomerVerificationPage />} />
             </Route>

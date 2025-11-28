@@ -24,20 +24,13 @@ export const authService = {
       // API trả về user data trực tiếp, không wrapped trong success/data
       const userData = response.data;
       console.log('AuthService - User data:', userData);
-
-      // Sử dụng role từ BE trực tiếp (ADMIN, STAFF, RENTER)
-      const role = (userData.role || '').toUpperCase();
-      if (!['ADMIN', 'STAFF', 'RENTER'].includes(role)) {
-        console.warn('Role không xác định:', userData.role, '- Mặc định: RENTER');
-      }
-
       // Tạo user object
       const user = {
         id: userData.userId || userData.id || userData.renterId || null,
         name: userData.fullName || '',
         email: userData.email || '',
         phone: userData.phone || userData.phoneNumber || '',
-        role: role || 'RENTER',
+        role: userData.role?.toLowerCase(),
         station: userData.stationId || null,
         verifiedStatus: userData.verifiedStatus || 1
       };

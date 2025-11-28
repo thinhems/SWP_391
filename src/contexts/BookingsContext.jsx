@@ -1,6 +1,5 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { bookingService } from '../services/booking.api';
-import bookingData from '../data/booking.json';
 
 const BookingsContext = createContext();
 
@@ -16,29 +15,53 @@ export const BookingsProvider = ({ children }) => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [userStation, setUserStation] = useState(null);
+  const [userStation, setUserStation] = useState(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).station : null);
+  const isFirstLoadRef = useRef(true); // ← Thêm ref
 
   // call api get danh sach booking
   const fetchBookings = async () => {
-    setLoading(true);
+    // Không fetch nếu chưa có userStation
+    if (!userStation) {
+      return;
+    }
+    if (isFirstLoadRef.current) {
+      setLoading(true);
+    }
     setError(null);
     try {
-      // const data = await bookingService.getAllBookings();
-      // Sử dụng dữ liệu mẫu từ booking.json với timeout
-      await new Promise(resolve => setTimeout(resolve, 500));
-      // Map dữ liệu để thêm idBooking
-      const mappedData = bookingData.map(booking => ({
-        ...booking,
-        idBooking: booking.id
-      }));
-      setBookings(mappedData);
+      const data = await bookingService.getAllBookings(userStation);
+      setBookings(data);
     } catch (err) {
       setError(err.message || 'Failed to fetch bookings');
       throw err;
     } finally {
-      setLoading(false);
+      if (isFirstLoadRef.current) {
+        setLoading(false);
+        isFirstLoadRef.current = false;
+      }
     }
   };
+  // Load bookings on mount
+  useEffect(() => {
+    fetchBookings();
+    // tự động làm mới danh sách xe mỗi 20 giây
+    const intervalId = setInterval(() => {
+      // Kiểm tra nếu đang ở trang con của manage-cars thì không fetch
+      const currentPath = window.location.pathname;
+      const isInManageBookingPage = currentPath.includes('/manage-bookings');
+      const isInDetailPage = currentPath.includes('/approval-review') 
+                          || currentPath.includes('/car-delivery')
+                          || currentPath.includes('/car-return')
+      // Chỉ refresh khi ở trang manage-cars và KHÔNG ở các trang chi tiết
+      if (isInManageBookingPage && !isInDetailPage) {
+        fetchBookings();
+      }
+    }, 20000);
+    // cleanup interval khi unmount
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [userStation]);
 
   // lấy thông tin booking theo id xe
   const getBookingByCarId = async (idCar) => {
@@ -54,23 +77,22 @@ export const BookingsProvider = ({ children }) => {
       setLoading(false);
     }
   };
-  // Lọc bookings theo station
-  const filteredBookings = userStation
-    ? bookings.filter(booking => booking.stationID === userStation)
-    : bookings;
   // data cung cấp trong context
   const bookingsData = {
     // lấy danh sách booking theo trạng thái
     getBookingsByStatus: (status) => {
-      return filteredBookings.filter(booking => booking.status === status);
+      return bookings.filter(booking => booking.status === status);
     },
     // lấy booking theo ID
-    getBookingById: (id) => filteredBookings.find(booking => booking.idBooking === id)
+    getBookingById: (id) => bookings.find(booking => booking.id === id)
   };
   // Tự động cập nhật status xe + booking
-  const autoUpdateStatusBooking = async (carId) => { 
+  const autoUpdateStatusBooking = async (bookingId) => { 
     try {
-      await bookingService.updateStatusBooking(carId);
+      await bookingService.updateStatusBooking(bookingId);
+      setBookings(prevBookings => prevBookings.map(booking => 
+        booking.id === bookingId ? { ...booking, status: booking.status + 1 } : booking
+      ));
       await fetchBookings();
     } catch (error) {
       console.error('Error updating car status:', error);
@@ -78,9 +100,12 @@ export const BookingsProvider = ({ children }) => {
     }
   };
   // từ chối yêu cầu thuê xe
-  const rejectCarApproval = async (carId) => { 
+  const rejectCarApproval = async (bookingId) => { 
     try {
-      await bookingService.rejectCarApproval(carId);
+      await bookingService.rejectCarApproval(bookingId);
+      setBookings(prevBookings => prevBookings.map(booking => 
+        booking.id === bookingId ? { ...booking, status: 6 } : booking
+      ));
       await fetchBookings();
     } catch (error) {
       throw error;
@@ -95,10 +120,15 @@ export const BookingsProvider = ({ children }) => {
       throw error;
     }
   };
-  // Load bookings on mount
-  useEffect(() => {
-    fetchBookings();
-  }, []);
+  // cập nhật end date cho booking
+  const extendBookingEndDate = async (bookingId, newEndDate) => {
+    try {
+      await bookingService.extendEndDateBooking(bookingId, newEndDate);
+      await fetchBookings();
+    } catch (error) {
+      throw error;
+    }
+  };
 
   const value = {
     bookingsData,
@@ -109,6 +139,7 @@ export const BookingsProvider = ({ children }) => {
     autoUpdateStatusBooking,
     rejectCarApproval,
     createHandover,
+    extendBookingEndDate,
     setUserStation,
   };
 

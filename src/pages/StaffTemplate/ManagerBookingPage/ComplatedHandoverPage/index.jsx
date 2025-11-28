@@ -3,16 +3,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useBookings } from '../../../../contexts/BookingsContext';
 import { useActivities } from '../../../../contexts/ActivitiesContext';
 import HeaderSection from './HeaderSection';  
+import PopupExtendEndDate from './PopupExtendEndDate';
 import VehicleReturnInfo from './VehicleReturnInfo';
 import VehicleInspectionForm from './VehicleInspectionForm';
 import FeeCalculationSummary from './FeeCalculationSummary';
 import QRCodePayment from './QRCodePayment';
 
 export default function ComplatedHandoverPage() {
+  // State popup gia hạn
+  const [showExtendPopup, setShowExtendPopup] = useState(false);
   const { bookingId } = useParams();
   const bookingIdNum = parseInt(bookingId, 10);
   const navigate = useNavigate();
-  const { bookingsData, loading, completeReturn } = useBookings();
+  const { bookingsData, loading, autoUpdateStatusBooking, extendBookingEndDate } = useBookings();
   const { addActivity } = useActivities();
   const [bookingData, setBookingData] = useState(null);
   const [error, setError] = useState(null);
@@ -56,7 +59,7 @@ export default function ComplatedHandoverPage() {
   // Tính toán các khoản phí
   const calculateFees = () => {
     if (!bookingData) return { kmOverageFee: 0, batteryDeficitFee: 0, additionalFeesTotal: 0, totalFees: 0, netAmount: 0 };
-    
+    const overdue = bookingData?.overdue || 0;
     const kmDriven = inspectionData.currentOdometer - bookingData.vehicle.odometer;
     const kmOverage = Math.max(0, kmDriven - 200);
     const kmOverageFee = kmOverage * 5000; // 5.000 vnd cho mỗi km vượt quá 200km
@@ -71,20 +74,20 @@ export default function ComplatedHandoverPage() {
       return sum + fee.amount;
     }, 0);
 
-    const totalFees = kmOverageFee + batteryDeficitFee + additionalFeesTotal;
+    const totalFees = kmOverageFee + batteryDeficitFee + additionalFeesTotal + overdue;
     const netAmount = bookingData.deposit - totalFees;
     
-    return { kmOverageFee, batteryDeficitFee, additionalFeesTotal, totalFees, netAmount };
+    return { kmOverageFee, batteryDeficitFee, additionalFeesTotal, totalFees, netAmount, overdue };
   };
   // Xử lý hoàn tất nhận xe trả
-  const handleCompleteReturn = async () => {
+  const handleautoUpdateStatusBooking = async () => {
     const { netAmount } = calculateFees();
     
     if (netAmount < 0) {
       setShowQRCode(true);
     } else {
       // Hoàn trả tiền cho khách hàng
-      await completeReturn(bookingData.id);
+      await autoUpdateStatusBooking(bookingData.id);
       
       addActivity({
         type: 'return',
@@ -102,13 +105,13 @@ export default function ComplatedHandoverPage() {
         `Số tiền hoàn trả: ${Math.abs(netAmount).toLocaleString()} đ\n\n` +
         `Booking đã hoàn tất.`
       );
-      navigate('/staff/manage-rentals?tab=rented');
+      navigate('/staff/manage-bookings?tab=rented');
     }
   };
   // xử lý xác nhận đã nhận thanh toán từ khách
   const handleConfirmPayment = async () => {
     const { netAmount } = calculateFees();
-    await completeReturn(bookingData.id);
+    await autoUpdateStatusBooking(bookingData.id);
     
     addActivity({
       type: 'return',
@@ -126,10 +129,10 @@ export default function ComplatedHandoverPage() {
       `Số tiền đã thu: ${Math.abs(netAmount).toLocaleString()} đ\n\n` +
       `Booking đã hoàn tất.`
     );
-    navigate('/staff/manage-rentals?tab=rented');
+    navigate('/staff/manage-bookings?tab=rented');
   };
 
-  if (loading) {
+  if (loading || !bookingData) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="relative">
@@ -144,7 +147,7 @@ export default function ComplatedHandoverPage() {
     );
   }
 
-  if (error || !bookingData) {
+  if (error) {
     return (
       <div className="text-center py-12">
         <div className="text-red-500 mb-4">
@@ -155,7 +158,7 @@ export default function ComplatedHandoverPage() {
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy booking</h2>
         <p className="text-gray-600 mb-4">{error || `Booking với ID "${bookingIdNum}" không tồn tại.`}</p>
         <button
-          onClick={() => navigate('/staff/manage-rentals?tab=rented')}
+          onClick={() => navigate('/staff/manage-bookings?tab=rented')}
           className="cursor-pointer mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Quay lại danh sách booking
@@ -164,9 +167,30 @@ export default function ComplatedHandoverPage() {
     );
   }
 
+  // Xử lý mở popup gia hạn
+  const handleOpenExtendPopup = () => {
+    console.log('Opening extend end date popup');
+    setShowExtendPopup(true);
+  };
+
+  // Xử lý xác nhận gia hạn
+  const handleConfirmExtend = async (newEndDate) => {
+    try {
+      // Status giữ nguyên hoặc truyền lại status hiện tại
+      await extendBookingEndDate(bookingData.id, newEndDate);
+      alert('Gia hạn ngày thuê thành công!');
+      setShowExtendPopup(false);
+    } catch (err) {
+      alert('Gia hạn thất bại!');
+    }
+  };
+
+  // Truyền hàm mở popup cho HeaderSection
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <HeaderSection onNavigateBack={() => navigate('/staff/manage-bookings?tab=rented')} />
+      <HeaderSection 
+          onNavigateBack={() => navigate('/staff/manage-bookings?tab=rented')} 
+          onExtendEndDate={handleOpenExtendPopup} />
       {!showQRCode ? (
         <>
           <VehicleReturnInfo
@@ -184,15 +208,13 @@ export default function ComplatedHandoverPage() {
             <FeeCalculationSummary
               vehicle={bookingData.vehicle}
               deposit={bookingData.deposit}
-              rentalTime={bookingData.rentalTime}
-              rentalType={bookingData.rentalType}
               inspectionData={inspectionData}
               fees={calculateFees()}
             />
           </div>
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
             <button
-              onClick={handleCompleteReturn}
+              onClick={handleautoUpdateStatusBooking}
               className="cursor-pointer w-full bg-purple-600 text-white py-4 px-6 rounded-lg text-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,6 +247,12 @@ export default function ComplatedHandoverPage() {
           </div>
         </>
       )}
+      <PopupExtendEndDate
+        show={showExtendPopup}
+        onClose={() => setShowExtendPopup(false)}
+        onConfirm={handleConfirmExtend}
+        currentEndDate={bookingData?.endDate}
+      />
     </div>
   );
 }

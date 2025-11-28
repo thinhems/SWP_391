@@ -1,9 +1,8 @@
 
 import { useNavigate } from 'react-router-dom';
 
-export default function ListBookingSection({ bookings, activeTab }) {
+export default function ListBookingSection({ bookings, activeTab, onCancelContract }) {
   const navigate = useNavigate();
-  
   // Kiểm tra nếu bookings undefined hoặc không phải array
   if (!bookings || !Array.isArray(bookings)) {
     return (
@@ -12,10 +11,9 @@ export default function ListBookingSection({ bookings, activeTab }) {
       </div>
     );
   }
-
-  // Sắp xếp bookings theo requestTime gần nhất
+  // Sắp xếp bookings theo id giảm dần
   let sortedBookings = [...bookings].sort((a, b) => 
-    new Date(b.requestTime) - new Date(a.requestTime)
+    a.id - b.id
   );
   // Hàm đổi màu pin
   const getBatteryColor = (battery) => {
@@ -42,19 +40,22 @@ export default function ListBookingSection({ bookings, activeTab }) {
 
   // Hàm chuyển trang nhận xe trả
   const handleCarReturn = (booking) => {
-    navigate(`/staff/manage-bookings/car-return/${booking.idBooking}`);
+    navigate(`/staff/manage-bookings/car-return/${booking.id}`);
   };
 
   // Hàm chuyển trang giao xe
   const handleCarDelivery = (booking) => {
-    navigate(`/staff/manage-bookings/car-delivery/${booking.idBooking}`);
+    navigate(`/staff/manage-bookings/car-delivery/${booking.id}`);
   };
 
   // Hàm chuyển trang duyệt booking
   const handleApprovalReview = (booking) => {
-    navigate(`/staff/manage-bookings/approval-review/${booking.idBooking}`);
+    navigate(`/staff/manage-bookings/approval-review/${booking.id}`);
   };
-
+  // Hàm chuyển trang hủy hợp đồng
+  const handleCancelContract = (booking) => {
+    onCancelContract(booking);  
+  };  
   // Hàm định dạng tiền
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', { 
@@ -73,10 +74,12 @@ export default function ListBookingSection({ bookings, activeTab }) {
     return !invalidTimes.some(invalid => time.includes(invalid));
   };
 
-  // Hàm format datetime
+  // Hàm format datetime theo giờ Việt Nam (UTC+7)
   const formatDateTime = (dateTimeString) => {
     if (!dateTimeString || !isValidTime(dateTimeString)) return '';
     const date = new Date(dateTimeString);
+    // Cộng thêm 7 tiếng để chuyển sang giờ Việt Nam
+    date.setHours(date.getHours() + 7);
     return date.toLocaleString('vi-VN', {
       day: '2-digit',
       month: '2-digit',
@@ -93,7 +96,7 @@ export default function ListBookingSection({ bookings, activeTab }) {
         const car = booking.vehicle; // Lấy thông tin xe từ booking
         
         return (
-          <div key={booking.idBooking} className="w-full sm:w-80 md:w-96 lg:w-[510px] bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+          <div key={booking.id} className="w-full sm:w-80 md:w-96 lg:w-[510px] bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow">
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{car?.modelName || 'N/A'}</h3>
@@ -118,12 +121,10 @@ export default function ListBookingSection({ bookings, activeTab }) {
                   </span>
                 </div>
               </div>
-
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Vị trí:</span>
-                <span className="text-sm font-medium text-gray-900">{car?.location || 'N/A'}</span>
+                <span className="text-sm font-medium text-gray-900">{car?.status == 4 ? "Đang được thuê" : car?.location}</span>
               </div>
-
               {/* Thông tin khách hàng */}
               {booking?.customer && (
                 <>
@@ -205,6 +206,12 @@ export default function ListBookingSection({ bookings, activeTab }) {
               {activeTab === 'pending_contract' && (
                 <>
                   <button 
+                    onClick={() => handleCancelContract(booking)}
+                    className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors cursor-pointer"
+                  >
+                    Hủy hợp đồng
+                  </button>
+                  <button 
                     onClick={() => handleClick(booking?.customer?.phoneNumber)}
                     className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer">
                     Liên hệ KH
@@ -219,6 +226,12 @@ export default function ListBookingSection({ bookings, activeTab }) {
                     className="flex-1 bg-orange-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors cursor-pointer"
                   >
                     Giao xe
+                  </button>
+                  <button 
+                    onClick={() => handleCancelContract(booking)}
+                    className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors cursor-pointer"
+                  >
+                    Hủy hợp đồng
                   </button>
                   <button 
                     onClick={() => handleClick(booking?.customer?.phoneNumber)}

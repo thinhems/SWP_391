@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { carService } from '../services/cars.api';
-import { bookingService } from '../services/booking.api';
+
 const CarsContext = createContext();
 
 export const useCars = () => {
@@ -15,18 +15,20 @@ export const CarsProvider = ({ children }) => {
   const [listCar, setListCar] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [userStation, setUserStation] = useState(null);
+  const [userStation, setUserStation] = useState(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).station : null);
   const isFirstLoadRef = useRef(true); // ← Thêm ref
 
   // Fetch dữ liệu xe
   const fetchListCars = async () => {
+    if (!userStation) {
+      return;
+    }
     if (isFirstLoadRef.current) {
       setLoading(true);
     }
-    
     setError(null);
     try {
-      const data = await carService.getCars();
+      const data = await carService.getCarsByStation(userStation);
       setListCar(data);
     } catch (err) {
       setError(err);
@@ -46,10 +48,7 @@ export const CarsProvider = ({ children }) => {
       // Kiểm tra nếu đang ở trang con của manage-cars thì không fetch
       const currentPath = window.location.pathname;
       const isInManageCarPage = currentPath.includes('/manage-cars');
-      const isInDetailPage = currentPath.includes('/car-delivery') || 
-                            currentPath.includes('/car-return') ||
-                            currentPath.includes('/approval-review') ||
-                            currentPath.includes('/inspection');
+      const isInDetailPage = currentPath.includes('/inspection')
       // Chỉ refresh khi ở trang manage-cars và KHÔNG ở các trang chi tiết
       if (isInManageCarPage && !isInDetailPage) {
         fetchListCars();
@@ -59,37 +58,40 @@ export const CarsProvider = ({ children }) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, []);
-  // Lọc xe theo station của user
-  const filteredCars = userStation
-    ? listCar.filter(car => car.stationID === userStation)
-    : listCar;
+  }, [userStation]);
   // Tính toán số liệu cho xe đã lọc theo station
   const carsData = {
     // số lượng xe theo trạng thái
-    total: filteredCars.length,
-    available: filteredCars.filter(car => car.status === 0).length,
-    pending_approval: filteredCars.filter(car => car.status === 1 && car.booking?.status === 1).length,
-    pending_contract: filteredCars.filter(car => car.status === 2 && car.booking?.status === 2).length,
-    pending_handover: filteredCars.filter(car => car.status === 3 && car.booking?.status === 3).length,
-    rented: filteredCars.filter(car => car.status === 4 && car.booking?.status === 4).length,
-    allCars: filteredCars,
+    total: listCar.length,
+    available: listCar.filter(car => car.status === 0).length,
+    pending_approval: listCar.filter(car => car.status === 1).length,
+    pending_contract: listCar.filter(car => car.status === 2).length,
+    pending_handover: listCar.filter(car => car.status === 3).length,
+    rented: listCar.filter(car => car.status === 4).length,
+    allCars: listCar,
     // lấy danh sách xe theo trạng thái
     getCarsByStatus: (status) => {
-      if (status === 0) return filteredCars.filter(car => car.status === status);
-      else if (status === 1) return filteredCars.filter(car => car.status === status && car.booking?.status === 1);
-      else if (status === 2) return filteredCars.filter(car => car.status === status && car.booking?.status === 2);
-      else if (status === 3) return filteredCars.filter(car => car.status === status && car.booking?.status === 3);
-      else if (status === 4) return filteredCars.filter(car => car.status === status && car.booking?.status === 4);
+      if (status === 0) return listCar.filter(car => car.status === status);
+      else if (status === 1) return listCar.filter(car => car.status === status);
+      else if (status === 2) return listCar.filter(car => car.status === status);
+      else if (status === 3) return listCar.filter(car => car.status === status);
+      else if (status === 4) return listCar.filter(car => car.status === status);
       else return [];
     },
+    // lọc xe theo model
+    getCarsByModel: (modelID) => {
+      return listCar.filter(car => car.modelID === modelID);
+    },
     // lấy xe theo ID 
-    getCarById: (id) => filteredCars.find(car => car.id === id),
+    getCarById: (id) => listCar.find(car => car.id === id),
   };
   // Cập nhật xe
   const updateCar = async (carId, updateCar) => { 
     try {
       await carService.updateCar(carId, updateCar);
+      setListCar(prevCars => prevCars.map(car => 
+        car.id === carId ? { ...car, ...updateCar } : car
+      ));
       // Cập nhật lại danh sách xe sau khi update thành công
       await fetchListCars();
     } catch (error) {
@@ -101,37 +103,13 @@ export const CarsProvider = ({ children }) => {
   const updateCarInspectionItem = async (carId, itemData) => {
     try {
       await carService.updateCarInspectionItem(carId, itemData);
+      setListCar(prevCars => prevCars.map(car => 
+        car.id === carId ? { ...car, inspectionItems: itemData } : car
+      ));
+      // Cập nhật lại danh sách xe sau khi update thành công
       await fetchListCars();
     } catch (error) {
       console.error('Error updating car inspection item:', error);
-      throw error;
-    }
-  };
-  // Tự động cập nhật status xe + booking
-  const autoUpdateStatusCar = async (carId) => { 
-    try {
-      await carService.updateStatusCar(carId);
-      await fetchListCars();
-    } catch (error) {
-      console.error('Error updating car status:', error);
-      throw error;
-    }
-  };
-  // khởi tạo biên bản
-  const createHandover = async (handoverData) => {
-    try {
-      await bookingService.createHandover(handoverData);
-      await fetchListCars();
-    } catch (error) {
-      throw error;
-    }
-  };
-  // từ chối yêu cầu thuê xe
-  const rejectCarApproval = async (carId) => { 
-    try {
-      await carService.rejectCarApproval(carId);
-      await fetchListCars();
-    } catch (error) {
       throw error;
     }
   };
@@ -158,9 +136,6 @@ export const CarsProvider = ({ children }) => {
     loading,
     error,
     updateCar,
-    autoUpdateStatusCar,
-    createHandover,
-    rejectCarApproval,
     updateCarInspectionItem,
     uploadCarImage,
     deleteCarImage,

@@ -5,7 +5,7 @@ export const customersService = {
   getAllUsers: async () => {
     try {
       const response = await api.get('/User/GetAllRenters', {
-        timeout: 30000 // 30 giây
+        timeout: 60000 // 60 giây
       });
       return response.data;
     } catch (error) {
