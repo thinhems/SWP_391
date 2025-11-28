@@ -24,6 +24,7 @@ export default function StaffTemplate() {
   if (!user) {
     return <Navigate to="/login" replace />;
   }
+  
   // Kiểm tra role từ auth context
   if (user.role !== "staff") {
     return <Navigate to="/" replace />;
