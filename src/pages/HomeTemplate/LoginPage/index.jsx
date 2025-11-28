@@ -52,7 +52,8 @@ export default function LoginPage() {
 
       if (loginResult?.success && loginResult?.data?.user) {
         const role = loginResult.data.user.role;
-        if (role === 'ADMIN') {
+        console.log('Login successful, user role:', role);
+        if (role === 'admin') {
           navigate('/admin', { replace: true });
         } else if (role === 'STAFF') {
           navigate('/staff', { replace: true });
